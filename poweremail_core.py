@@ -139,4 +139,54 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)
+        
 poweremail_core_accounts()
+
+class poweremail_core_selfolder(osv.osv_memory):
+    _name="poweremail.core.selfolder"
+    _description = "Shows a list of IMAP folders from which the user can select his required folder"
+
+    def _get_folders(self,cr,uid,ids,context={}):
+        record = self.pool.get('poweremail.core.accounts').browse(cr,uid,ctx['active_ids'][0])
+        if record:
+            folderlist = []
+            try:
+                if record.isssl:
+                    serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
+                else:
+                    serv = imaplib.IMAP4(record.iserver,record.isport)
+            except imaplib.error,error:
+                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+            try:
+                serv.login(record.isuser, record.ispass)
+            except imaplib.error,error
+                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+            try:
+                for folders in serv.list()[1]:
+                    folderlist.append((folders,folders.split('"')[3])) #TODO:Have to check with IMAPS other than gmail
+            except imaplib.error,error
+                raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+        else:
+            folderlist=[('invalid','Invalid')]
+        return folderlist
+    
+    _columns = {
+        'name':fields.many2one('poweremail.core.accounts',string='Email Account',readonly=True),
+        'folder':fields.selection(_get_folders, string="IMAP Folder"),
+        
+    }
+    _defaults = {
+        'name':lambda self,cr,uid,ctx: ctx['active_ids'][0],
+    }
+
+    def sel_folder(self,cr,uid,ids,context={}):
+        if self.read(cr,uid,ids,['folder'])['folder'][0]:
+            if not self.read(cr,uid,ids,['folder'])['folder'][0]=='invalid':
+                self.pool.get('poweremail.core.accounts').write(cr,uid,context['active_ids'][0],{'isfolder':self.read(cr,uid,ids,['folder'])['folder'][0]})
+                return {'type':'ir.actions.act_window_close'}
+            else:
+                raise osv.except_osv(_("Folder Error"), _("This is an invalid folder "))
+        else:
+            raise osv.except_osv(_("Folder Error"), _("Select a folder before you save record "))
+        
+poweremail_core_selfolder()
