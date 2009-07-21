@@ -4,9 +4,39 @@
 	
     <!--EMail client Form view  -->
     
+    		<record model="ir.ui.view" id="poweremail_core_selfolder_form">
+		<field name="name">poweremail.core_selfolder.form</field>
+			<field name="model">poweremail.core_selfolder</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Get Mail">
+				<field name="name" select="1" />
+				<field name="folder" select="1" />
+				<group>
+				<button icon="gtk-cancel" special="cancel" string="Cancel" />
+                <button icon="gtk-ok" name="get_mails" string="" type="object"/>
+				</group>
+				</form>
+			</field>
+		</record>
+		
+		<record model="ir.actions.act_window"
+			id="action_poweremail_core_selfolder_form">
+			<field name="name">Mail Wizard</field>
+			<field name="src_model">poweremail.core_accounts</field>
+			<field name="res_model">poweremail.core_selfolder</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="auto_refresh" eval="1" />
+			<field name="target">new</field>
+			<field name="context">{active_id:ids}</field>
+		</record>
+		
+    
     <record model="ir.ui.view" id="poweremail_core_accounts_form">
-		<field name="name">poweremail.core.accounts.form</field>
-			<field name="model">poweremail.core.accounts</field>
+		<field name="name">poweremail.core_accounts.form</field>
+			<field name="model">poweremail.core_accounts</field>
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<form string="Power Email Configuration">
@@ -41,7 +71,7 @@
 							<newline />
 							<field name="iserver_type" select="2" />
 							<field name="isfolder" attrs="{'visible':[('iserver_type','=','imap')]}"/>
-<!--							<button name="%(select_folder)d" type="action"/>-->
+							<button name="%(action_poweremail_core_selfolder_form)d" type="action" string="Select Folder"/>
 							<separator string="User Information"
 								colspan="6" />
 							<field name="isuser" select="2" />
@@ -54,8 +84,8 @@
 		</record>
 		
 		<record model="ir.ui.view" id="poweremail_core_accounts_tree">
-			<field name="name">poweremail.core.accounts.tree</field>
-			<field name="model">poweremail.core.accounts</field>
+			<field name="name">poweremail.core_accounts.tree</field>
+			<field name="model">poweremail.core_accounts</field>
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
 				<tree string="SMTP Server">
@@ -72,7 +102,7 @@
 
 		<record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree">
 			<field name="name">Email Accounts</field>
-			<field name="res_model">poweremail.core.accounts</field>
+			<field name="res_model">poweremail.core_accounts</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">form,tree</field>
 			<field name="view_id" ref="poweremail_core_accounts_tree" />
@@ -85,7 +115,7 @@
 		<record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_all">
 			<field name="name">Email Server</field>
-			<field name="res_model">poweremail.core.accounts</field>
+			<field name="res_model">poweremail.core_accounts</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">form,tree</field>
 			<field name="view_id" ref="poweremail_core_accounts_tree" />
@@ -94,7 +124,7 @@
 		<record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_co">
 			<field name="name">Email Server</field>
-			<field name="res_model">poweremail.core.accounts</field>
+			<field name="res_model">poweremail.core_accounts</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">form,tree</field>
 			<field name="view_id" ref="poweremail_core_accounts_tree" />
@@ -123,7 +153,7 @@
 			id="menu_poweremail_core_accounts_Personal_co"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_co" />
-		
+			
 	</data>
 </openerp>
 	

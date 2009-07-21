@@ -22,6 +22,7 @@
 #You should have received a copy of the GNU General Public License      #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
+
 from osv import osv, fields
 import pooler
 import smtplib
@@ -50,7 +51,7 @@ else:
     from md5 import md5
 
 class poweremail_core_accounts(osv.osv):
-    _name = "poweremail.core.accounts"
+    _name = "poweremail.core_accounts"
 
     def _get_user(self,cr,uid,ids,context={}):
         return uid
@@ -137,7 +138,59 @@ class poweremail_core_accounts(osv.osv):
 
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
-        self.write(cr, uid, ids, {'state':'suspended'}, context=context)
-        
-        
+        self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
 poweremail_core_accounts()
+
+class poweremail_core_selfolder(osv.osv_memory):
+    _name="poweremail.core_selfolder"
+    _description = "Shows a list of IMAP folders"
+
+    def _get_folders(self,cr,uid,context={}):
+        print "dfdf", context
+        if 'active_ids' in context.keys():
+            record = self.pool.get('poweremail.core_accounts').browse(cr,uid,context['active_ids'][0])
+            print" GGDFGSDFGDFSg",record
+#            for record in records:
+            print record
+            if record:
+                folderlist = []
+                try:
+                    if record.smtpssl:
+                        serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
+                    else:
+                        serv = imaplib.IMAP4(record.iserver,record.isport)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.login(record.isuser, record.ispass)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                try:
+                    for folders in serv.list()[1]:
+                        folderlist.append((folders,folders.split('"')[3])) #TODO:Have to check with IMAPS other than gmail
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+        else:
+            folderlist=[('invalid','Invalid')]
+        return folderlist
+    
+    _columns = {
+        'name':fields.many2one('poweremail.core_accounts',string='Email Account',readonly=True),
+        'folder':fields.selection(_get_folders, string="IMAP Folder"),
+        
+    }
+    _defaults = {
+        'name':lambda self,cr,uid,ctx: ctx['active_ids'][0],
+    }
+
+    def sel_folder(self,cr,uid,ids,context={}):
+        if self.read(cr,uid,ids,['folder'])['folder'][0]:
+            if not self.read(cr,uid,ids,['folder'])['folder'][0]=='invalid':
+                self.pool.get('poweremail.core_accounts').write(cr,uid,context['active_ids'][0],{'isfolder':self.read(cr,uid,ids,['folder'])['folder'][0]})
+                return {'type':'ir.actions.act_window_close'}
+            else:
+                raise osv.except_osv(_("Folder Error"), _("This is an invalid folder "))
+        else:
+            raise osv.except_osv(_("Folder Error"), _("Select a folder before you save record "))
+        
+poweremail_core_selfolder()
