@@ -72,9 +72,8 @@ class poweremail_core_accounts(osv.osv):
         'isuser':fields.char('User Name',size=100),
         'ispass':fields.char('Password',size=100),
         'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type'),
+        'isfolder':fields.char('Folder',readonly=True,size=100,help="Folder to be used for downloading IMAP mails\nClick on adjacent button to select from a list of folders"),
         
-        'isssl':fields.boolean('Use SSL'),
-
         'company':fields.selection([
                                     ('yes','Yes'),
                                     ('no','No')
@@ -89,14 +88,14 @@ class poweremail_core_accounts(osv.osv):
                 }
 
     _defaults = {
-         'name':lambda cr,uid,ids:self.pool.get('res.users').read(cr,uid,uid,['name'])[0]['name'],
+         'name':lambda self,cr,uid,ctx:self.pool.get('res.users').read(cr,uid,uid,['name'])['name'],
          'smtpserver':lambda *a:'smtp.gmail.com',
          'smtpport':lambda *a:587,
          'smtpuname':lambda *a:'yourname@yourdomain.com',
          'email_id':lambda *a:'yourname@yourdomain.com',
          'smtpssl':lambda *a:True,
          'state':lambda *a:'draft',
-         'user':lambda cr,uid,ids:uid
+         'user':lambda self,cr,uid,ctx:uid
                  }
                  
     _sql_constraints = [
@@ -139,4 +138,6 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)
+        
+        
 poweremail_core_accounts()
