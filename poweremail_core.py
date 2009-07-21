@@ -24,6 +24,7 @@
 #########################################################################
 
 from osv import osv, fields
+import re
 import pooler
 import smtplib
 import mimetypes
@@ -53,9 +54,6 @@ else:
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
 
-    def _get_user(self,cr,uid,ids,context={}):
-        return uid
-
     _columns = {
         'name': fields.char('Email Account Desc', size=64, required=True, select=True),
         'user':fields.many2one('res.users','Related User',required=True,readonly=True),
@@ -73,6 +71,7 @@ class poweremail_core_accounts(osv.osv):
         'isuser':fields.char('User Name',size=100),
         'ispass':fields.char('Password',size=100),
         'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type'),
+        'isssl':fields.boolean('Use SSL'),
         'isfolder':fields.char('Folder',readonly=True,size=100,help="Folder to be used for downloading IMAP mails\nClick on adjacent button to select from a list of folders"),
         
         'company':fields.selection([
@@ -105,7 +104,7 @@ class poweremail_core_accounts(osv.osv):
     def _constraint_unique(self, cr, uid, ids):
         print self.read(cr,uid,ids,['company'])[0]['company']
         if self.read(cr,uid,ids,['company'])[0]['company']=='no':
-            print self.read(cr,uid,ids,['username'])[0]['username']
+            print self.read(cr,uid,ids,['email_id'])[0]['email_id']
             accounts = self.search(cr, uid,[('user','=',uid),('company','=','no')])
             if len(accounts) > 1 :
                 return False
@@ -139,37 +138,47 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
+
 poweremail_core_accounts()
 
 class poweremail_core_selfolder(osv.osv_memory):
     _name="poweremail.core_selfolder"
     _description = "Shows a list of IMAP folders"
-
-    def _get_folders(self,cr,uid,context={}):
-        print "dfdf", context
-        if 'active_ids' in context.keys():
-            record = self.pool.get('poweremail.core_accounts').browse(cr,uid,context['active_ids'][0])
-            print" GGDFGSDFGDFSg",record
-#            for record in records:
-            print record
-            if record:
-                folderlist = []
-                try:
-                    if record.smtpssl:
-                        serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
+    
+    def _get_folders(self,cr,uid,ctx={}):
+        print cr,uid,ctx
+        record = self.pool.get('poweremail.core_accounts').browse(cr,uid,ctx['active_ids'][0])
+        print record.email_id
+        if record:
+            folderlist = []
+            try:
+                if record.isssl:
+                    serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
+                else:
+                    serv = imaplib.IMAP4(record.iserver,record.isport)
+            except imaplib.IMAP4.error,error:
+                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+            try:
+                serv.login(record.isuser, record.ispass)
+            except imaplib.IMAP4.error,error:
+                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+            try:
+                for folders in serv.list()[1]:
+                    result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")([^\"]*)(?:\")', folders)
+                    seperator = result.groups()[0]
+                    folder_readable_name = ""
+                    splitname = result.groups()[1].split(seperator) #Not readable now
+                    print splitname,len(splitname)
+                    if len(splitname)>1:#If a parent and child exists, format it as parent/child/grandchild
+                        for i in range(0,len(splitname)-1):
+                            folder_readable_name=splitname[i]+'/'
+                        folder_readable_name = folder_readable_name+splitname[-1]
                     else:
-                        serv = imaplib.IMAP4(record.iserver,record.isport)
-                except imaplib.IMAP4.error,error:
-                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
-                try:
-                    serv.login(record.isuser, record.ispass)
-                except imaplib.IMAP4.error,error:
-                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-                try:
-                    for folders in serv.list()[1]:
-                        folderlist.append((folders,folders.split('"')[3])) #TODO:Have to check with IMAPS other than gmail
-                except imaplib.IMAP4.error,error:
-                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+                        folder_readable_name = result.groups()[1].split(seperator)[0]
+                    if folders.find('Noselect')==-1: #If it is a selectable folder
+                        folderlist.append((folders,folder_readable_name))
+            except imaplib.IMAP4.error,error:
+                raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
         else:
             folderlist=[('invalid','Invalid')]
         return folderlist

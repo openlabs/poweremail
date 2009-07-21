@@ -1,160 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data>
+    <data>
 	
     <!--EMail client Form view  -->
     
-    		<record model="ir.ui.view" id="poweremail_core_selfolder_form">
-		<field name="name">poweremail.core_selfolder.form</field>
-			<field name="model">poweremail.core_selfolder</field>
-			<field name="type">form</field>
-			<field name="arch" type="xml">
-				<form string="Get Mail">
-				<field name="name" select="1" />
-				<field name="folder" select="1" />
-				<group>
-				<button icon="gtk-cancel" special="cancel" string="Cancel" />
-                <button icon="gtk-ok" name="get_mails" string="" type="object"/>
-				</group>
-				</form>
-			</field>
-		</record>
+        <record model="ir.ui.view" id="poweremail_core_selfolder_form">
+            <field name="name">poweremail.core_selfolder.form</field>
+            <field name="model">poweremail.core_selfolder</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Get Mail">
+                    <field name="name" select="1" />
+                    <field name="folder" select="1" />
+                    <group>
+                        <button icon="gtk-cancel" special="cancel" string="Cancel" />
+                        <button icon="gtk-ok" name="get_mails" string="" type="object"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 		
-		<record model="ir.actions.act_window"
-			id="action_poweremail_core_selfolder_form">
-			<field name="name">Mail Wizard</field>
-			<field name="src_model">poweremail.core_accounts</field>
-			<field name="res_model">poweremail.core_selfolder</field>
-			<field name="type">ir.actions.act_window</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form</field>
-			<field name="auto_refresh" eval="1" />
-			<field name="target">new</field>
-			<field name="context">{active_id:ids}</field>
-		</record>
+        <record id="act_selfolder_form"
+			model="ir.actions.act_window">
+            <field name="name">IMAP Folder Selection Wizard</field>
+            <field name="res_model">poweremail.core_selfolder</field>
+            <field name="src_model">poweremail.core_accounts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="auto_refresh" eval="1" />
+            <field name="target">new</field>
+            <field name="context">{'ids':active_id}</field>
+        </record>
 		
     
-    <record model="ir.ui.view" id="poweremail_core_accounts_form">
-		<field name="name">poweremail.core_accounts.form</field>
-			<field name="model">poweremail.core_accounts</field>
-			<field name="type">form</field>
-			<field name="arch" type="xml">
-				<form string="Power Email Configuration">
-				<field name="name" select="1" />
-					<notebook colspan="4">
-						<page string="Configuration">
-							<separator string="User Information"
+        <record model="ir.ui.view" id="poweremail_core_accounts_form">
+            <field name="name">poweremail.core_accounts.form</field>
+            <field name="model">poweremail.core_accounts</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Power Email Configuration">
+                    <field name="name" select="1" />
+                    <notebook colspan="4">
+                        <page string="Configuration">
+                            <separator string="User Information" colspan="4" />
+                            <field name="email_id" select="1" /><!--on_change="on_change_emailid(smtpname,email_id)" /> -->
+                            <field name="smtppass" password="True" />
+                            <newline />
+                            <field name="smtpuname" select="1" />
+                            <field name="user" select="2" />
+                            <field name="company" select="2" />
+                            <newline />
+                            <separator string="Server Information"
 								colspan="4" />
-							<field name="email_id" select="1"
-								on_change="on_change_emailid(smtpname,email_id)" />
-							<field name="smtppass" 
-								password="True" />
-							<newline />
-							<field name="smtpuname" select="1" />
-							<field name="user" select="2" />
-							<field name="company" select="2" />
-							<newline />
-							<separator string="Server Information"
+                            <field name="smtpserver" select="1" />
+                            <field name="smtpport" select="2" />
+                            <separator string="Verification Information"
 								colspan="4" />
-							<field name="smtpserver" select="1" />
-							<field name="smtpport" select="2" />
-							<separator string="Verification Information"
-								colspan="4" />
-							<field name="state" select="1" />
-							<newline />
-						</page>
-						<page string="Incoming">
-							<separator string="Server Information"
+                            <field name="state" select="1" />
+                            <newline />
+                        </page>
+                        <page string="Incoming">
+                            <separator string="Server Information"
 								colspan="6" />
-							<field name="iserver" select="2" />
-							<field name="isport" select="2" />
-							<newline />
-							<field name="iserver_type" select="2" />
-							<field name="isfolder" attrs="{'visible':[('iserver_type','=','imap')]}"/>
-							<button name="%(action_poweremail_core_selfolder_form)d" type="action" string="Select Folder"/>
-							<separator string="User Information"
+                            <field name="iserver" select="2" />
+                            <field name="isport" select="2" />
+                            <newline />
+                            <field name="iserver_type" select="2" />
+                            <field name="isfolder" />
+                            <field name="isssl" />
+                            <button name="%(act_selfolder_form)d" type="action" string="Select Folder"/>
+                            <separator string="User Information"
 								colspan="6" />
-							<field name="isuser" select="2" />
-							<field name="ispass" select="2" password="True" />
-						</page>
-					</notebook>
+                            <field name="isuser" select="2" />
+                            <field name="ispass" select="2" password="True" />
+                        </page>
+                    </notebook>
 					
-				</form>
-			</field>
-		</record>
+                </form>
+            </field>
+        </record>
 		
-		<record model="ir.ui.view" id="poweremail_core_accounts_tree">
-			<field name="name">poweremail.core_accounts.tree</field>
-			<field name="model">poweremail.core_accounts</field>
-			<field name="type">tree</field>
-			<field name="arch" type="xml">
-				<tree string="SMTP Server">
-					<field name="name" select="2" />
-					<field name="email_id" select="2" />
-					<field name="smtpuname" select="2" />
-					<field name="user" select="2" />
-					<field name="smtpserver" select="2" />
-					<field name="smtpport" select="2" />
-					<field name="state" select="2" />
-				</tree>
-			</field>
-		</record>
+        <record model="ir.ui.view" id="poweremail_core_accounts_tree">
+            <field name="name">poweremail.core_accounts.tree</field>
+            <field name="model">poweremail.core_accounts</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="SMTP Server">
+                    <field name="name" select="2" />
+                    <field name="email_id" select="2" />
+                    <field name="smtpuname" select="2" />
+                    <field name="user" select="2" />
+                    <field name="smtpserver" select="2" />
+                    <field name="smtpport" select="2" />
+                    <field name="state" select="2" />
+                </tree>
+            </field>
+        </record>
 
-		<record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree">
-			<field name="name">Email Accounts</field>
-			<field name="res_model">poweremail.core_accounts</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form,tree</field>
-			<field name="view_id" ref="poweremail_core_accounts_tree" />
-			<field name="domain">
+        <record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree">
+            <field name="name">Email Accounts</field>
+            <field name="res_model">poweremail.core_accounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_core_accounts_tree" />
+            <field name="domain">
 				[('user','=',uid),('company','=','no')]
-			</field>
-			<field name="context">{'user':uid,'company':'no'}</field>
-		</record>
+            </field>
+            <field name="context">{'user':uid,'company':'no'}</field>
+        </record>
 
-		<record model="ir.actions.act_window"
+        <record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_all">
-			<field name="name">Email Server</field>
-			<field name="res_model">poweremail.core_accounts</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form,tree</field>
-			<field name="view_id" ref="poweremail_core_accounts_tree" />
-		</record>
+            <field name="name">Email Server</field>
+            <field name="res_model">poweremail.core_accounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_core_accounts_tree" />
+        </record>
 
-		<record model="ir.actions.act_window"
+        <record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_co">
-			<field name="name">Email Server</field>
-			<field name="res_model">poweremail.core_accounts</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form,tree</field>
-			<field name="view_id" ref="poweremail_core_accounts_tree" />
-			<field name="domain">[('company','=','yes')]</field>
-			<field name="context">{'company':'yes'}</field>
-		</record>
+            <field name="name">Email Server</field>
+            <field name="res_model">poweremail.core_accounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_core_accounts_tree" />
+            <field name="domain">[('company','=','yes')]</field>
+            <field name="context">{'company':'yes'}</field>
+        </record>
 
-		<menuitem name="Power Email"
+        <menuitem name="Power Email"
 			id="menu_poweremail_administration_server" />
 			
-		<menuitem name="Configuration"
+        <menuitem name="Configuration"
 			id="menu_poweremail_configuration_server" 
 			parent="menu_poweremail_administration_server" />
 
-		<menuitem name="All Account"
+        <menuitem name="All Account"
 			id="menu_poweremail_core_accounts_all"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree" />
 
-		<menuitem name="Personal Accounts"
+        <menuitem name="Personal Accounts"
 			id="menu_poweremail_core_accounts_Personal"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_all" />
 
-		<menuitem name="Company Accounts"
+        <menuitem name="Company Accounts"
 			id="menu_poweremail_core_accounts_Personal_co"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_co" />
 			
-	</data>
+    </data>
 </openerp>
 	
 
