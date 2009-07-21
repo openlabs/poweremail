@@ -168,7 +168,6 @@ class poweremail_core_selfolder(osv.osv_memory):
                     seperator = result.groups()[0]
                     folder_readable_name = ""
                     splitname = result.groups()[1].split(seperator) #Not readable now
-                    print splitname,len(splitname)
                     if len(splitname)>1:#If a parent and child exists, format it as parent/child/grandchild
                         for i in range(0,len(splitname)-1):
                             folder_readable_name=splitname[i]+'/'
@@ -177,6 +176,8 @@ class poweremail_core_selfolder(osv.osv_memory):
                         folder_readable_name = result.groups()[1].split(seperator)[0]
                     if folders.find('Noselect')==-1: #If it is a selectable folder
                         folderlist.append((folders,folder_readable_name))
+                    if folder_readable_name=='INBOX':
+                        self.inboxvalue = folders
             except imaplib.IMAP4.error,error:
                 raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
         else:
@@ -190,6 +191,7 @@ class poweremail_core_selfolder(osv.osv_memory):
     }
     _defaults = {
         'name':lambda self,cr,uid,ctx: ctx['active_ids'][0],
+        'folder': lambda self,cr,uid,ctx:self.inboxvalue
     }
 
     def sel_folder(self,cr,uid,ids,context={}):
