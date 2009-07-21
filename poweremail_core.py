@@ -147,39 +147,42 @@ class poweremail_core_selfolder(osv.osv_memory):
     
     def _get_folders(self,cr,uid,ctx={}):
         print cr,uid,ctx
-        record = self.pool.get('poweremail.core_accounts').browse(cr,uid,ctx['active_ids'][0])
-        print record.email_id
-        if record:
-            folderlist = []
-            try:
-                if record.isssl:
-                    serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
-                else:
-                    serv = imaplib.IMAP4(record.iserver,record.isport)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
-            try:
-                serv.login(record.isuser, record.ispass)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-            try:
-                for folders in serv.list()[1]:
-                    result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")([^\"]*)(?:\")', folders)
-                    seperator = result.groups()[0]
-                    folder_readable_name = ""
-                    splitname = result.groups()[1].split(seperator) #Not readable now
-                    if len(splitname)>1:#If a parent and child exists, format it as parent/child/grandchild
-                        for i in range(0,len(splitname)-1):
-                            folder_readable_name=splitname[i]+'/'
-                        folder_readable_name = folder_readable_name+splitname[-1]
+        if 'active_ids' in ctx.keys():
+            record = self.pool.get('poweremail.core_accounts').browse(cr,uid,ctx['active_ids'][0])
+            print record.email_id
+            if record:
+                folderlist = []
+                try:
+                    if record.isssl:
+                        serv = imaplib.IMAP4_SSL(record.iserver,record.isport)
                     else:
-                        folder_readable_name = result.groups()[1].split(seperator)[0]
-                    if folders.find('Noselect')==-1: #If it is a selectable folder
-                        folderlist.append((folders,folder_readable_name))
-                    if folder_readable_name=='INBOX':
-                        self.inboxvalue = folders
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+                        serv = imaplib.IMAP4(record.iserver,record.isport)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.login(record.isuser, record.ispass)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                try:
+                    for folders in serv.list()[1]:
+                        result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")([^\"]*)(?:\")', folders)
+                        seperator = result.groups()[0]
+                        folder_readable_name = ""
+                        splitname = result.groups()[1].split(seperator) #Not readable now
+                        if len(splitname)>1:#If a parent and child exists, format it as parent/child/grandchild
+                            for i in range(0,len(splitname)-1):
+                                folder_readable_name=splitname[i]+'/'
+                            folder_readable_name = folder_readable_name+splitname[-1]
+                        else:
+                            folder_readable_name = result.groups()[1].split(seperator)[0]
+                        if folders.find('Noselect')==-1: #If it is a selectable folder
+                            folderlist.append((folders,folder_readable_name))
+                        if folder_readable_name=='INBOX':
+                            self.inboxvalue = folders
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+            else:
+                folderlist=[('invalid','Invalid')]
         else:
             folderlist=[('invalid','Invalid')]
         return folderlist
