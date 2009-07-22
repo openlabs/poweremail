@@ -43,6 +43,7 @@ import netsvc
 import sys
 import poplib
 import imaplib
+
 import string
 import email
 
@@ -116,7 +117,48 @@ class poweremail_core_accounts(osv.osv):
     _constraints = [
         (_constraint_unique, _('Error: You are not allowed to have more than 1 account.'), [])
     ]
-
+    
+    def on_change_emailid(self, cr, uid, ids, name=None,email_id=None, context=None):
+        self.write(cr, uid, ids, {'state':'draft'}, context=context)
+        return {'value': {'state': 'draft','smtpuname':email_id,'isuser':email_id}}
+    
+    
+    def out_connection(self,cr,uid,ids,context={}):
+        rec = self.browse(cr, uid, ids )[0]
+        if rec:
+            try:
+                if rec.smtpssl:
+                    serv = smtplib.SMTP_SSL(rec.smtpserver,rec.smtpport)
+                else:
+                    serv = smtplib.SMTP(rec.smtpserver,rec.smtppass)
+            except smtplib.SMTPException:
+                raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
+            try:
+                serv.login(rec.smtpuname, rec.smtppass)
+                return True
+            except imaplib.SMTPException:
+                raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
+        
+    
+    def in_connection(self,cr,uid,ids,context={}):
+        rec = self.browse(cr, uid, ids )[0]
+        if rec:
+            try:
+                if rec.isssl:
+                    serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+                else:
+                    serv = imaplib.IMAP4(rec.iserver,rec.isport)
+            except imaplib.IMAP4.error,error:
+                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+            try:
+                serv.login(rec.isuser, rec.ispass)
+                print "Test connection is succesful"
+                return True
+            except imaplib.IMAP4.error,error:
+                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+        
+        
+        
     def on_change_emailid(self, cr, uid, ids, smtpacc=None,email_id=None, context=None):
         self.write(cr, uid, ids, {'state':'draft'}, context=context)
         return {'value': {'state': 'draft','username':email_id,'isuser':email_id}}
@@ -140,6 +182,7 @@ class poweremail_core_accounts(osv.osv):
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
 
 poweremail_core_accounts()
+
 
 class poweremail_core_selfolder(osv.osv_memory):
     _name="poweremail.core_selfolder"

@@ -44,7 +44,7 @@
                     <notebook colspan="4">
                         <page string="Configuration">
                             <separator string="User Information" colspan="4" />
-                            <field name="email_id" select="1" /><!--on_change="on_change_emailid(smtpname,email_id)" /> -->
+                            <field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" />
                             <field name="smtppass" password="True" />
                             <newline />
                             <field name="smtpuname" select="1" />
@@ -55,6 +55,11 @@
 								colspan="4" />
                             <field name="smtpserver" select="1" />
                             <field name="smtpport" select="2" />
+                            <field name="smtpssl" select="2" />
+                            <newline></newline>
+                             <group>
+                            	<button name="out_connection" type="object" string="Check Outgoing Connection"/>
+                            </group>
                             <separator string="Verification Information"
 								colspan="4" />
                             <field name="state" select="1" />
@@ -69,7 +74,11 @@
                             <field name="iserver_type" select="2" />
                             <field name="isfolder" />
                             <field name="isssl" />
-                            <button name="%(act_selfolder_form)d" type="action" string="Select Folder"/>
+                            <newline></newline>
+                            <group>
+                            	<button name="%(act_selfolder_form)d" type="action" string="Select Folder"/>
+                            	<button name="in_connection" type="object" string="Check Incomming Connection"/>
+                            </group>
                             <separator string="User Information"
 								colspan="6" />
                             <field name="isuser" select="2" />
