@@ -127,19 +127,19 @@ class poweremail_core_accounts(osv.osv):
         rec = self.browse(cr, uid, ids )[0]
         if rec:
             try:
+                serv = smtplib.SMTP(rec.smtpserver,rec.smtpport)
                 if rec.smtpssl:
-                    serv = smtplib.SMTP_SSL(rec.smtpserver,rec.smtpport)
-                else:
-                    serv = smtplib.SMTP(rec.smtpserver,rec.smtppass)
-            except smtplib.SMTPException:
+                    serv.ehlo()
+                    serv.starttls()
+                    serv.ehlo()
+            except smtplib.SMTPException,error:
                 raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
             try:
                 serv.login(rec.smtpuname, rec.smtppass)
-                return True
-            except imaplib.SMTPException:
+            except smtplib.SMTPException,error:
                 raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
-        
-    
+            raise osv.except_osv(_("Information"),_("Test Was Successful"))
+
     def in_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
         if rec:
@@ -152,11 +152,9 @@ class poweremail_core_accounts(osv.osv):
                 raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
             try:
                 serv.login(rec.isuser, rec.ispass)
-                print "Test connection is succesful"
-                return True
             except imaplib.IMAP4.error,error:
                 raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-        
+            raise osv.except_osv(_("Information"),_("Test Was Successful"))
         
         
     def on_change_emailid(self, cr, uid, ids, smtpacc=None,email_id=None, context=None):
