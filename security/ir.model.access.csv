@@ -1,0 +1,4 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_poweremail_settings_manager","poweremail.settings.manager","poweremail.model_poweremail_core_selfolder","res_groups_manager",1,1,1,1
+"access_poweremail_external_users","poweremail.external.users","poweremail.model_poweremail_core_selfolder","res_groups_users",1,1,1,0
+"access_poweremail_internal_users","poweremail.internal.users","poweremail.model_poweremail_core_selfolder","res_groups_user",1,1,0,0
