@@ -20,28 +20,34 @@
                 <form string="Power Email Templates">
                     <field name="name"/>
                     <field name="object"/>
+                    <field name="model_object_field" domain="[('model_id','=',object)]" on_change="_field_changed(model_object_field)"/>
+                    <field name="sub_object"/>
+                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object)]"/>
+                    <field name="null_value"/>
+                    <field name="copyvalue"/>
+                    <button name="add_field" string="Copy Field" type="object"/>
                     <notebook colspan="4">
-	                    <page string="Mail Details">
-	                    	   	<field name="def_to"/>
-			                    <field name="def_cc"/>
-			                    <field name="def_bcc"/>
-			                    <field name="def_subject"/>
-			                     <field name="use_sign"/>
-			                     <field name="file_name"/>
-			                    <separator colspan="4" string="Standard Body"/>
-			                    <field name="def_body" colspan="4" nolabel="1"/>
-	                    </page>
-	                    <page string="Security">
-	                    		<separator colspan="4" string="Allowed User Groups"/>
-	                    		<field name="allowed_groups" string="Allowed User Groups" nolabel="1"/>
-	                    </page>
-	                    <page string="Advance">
-	                    		<field name="enforce_from_account"/>
-			                    <field name="auto_email"/>
-			                    <field name="attached_wkf"/>
-			                    <field name="attached_activity"  domain="[('wkf_id', '=', attached_wkf)]"/>
-			                    <field name="server_action" readonly="1"/>
-	                    </page>
+                        <page string="Mail Details">
+                            <field name="def_to"/>
+                            <field name="def_cc"/>
+                            <field name="def_bcc"/>
+                            <field name="def_subject"/>
+                            <field name="use_sign"/>
+                            <field name="file_name"/>
+                            <separator colspan="4" string="Standard Body"/>
+                            <field name="def_body" colspan="4" nolabel="1"/>
+                        </page>
+                        <page string="Security">
+                            <separator colspan="4" string="Allowed User Groups"/>
+                            <field name="allowed_groups" string="Allowed User Groups" nolabel="1"/>
+                        </page>
+                        <page string="Advance">
+                            <field name="enforce_from_account"/>
+                            <field name="auto_email"/>
+                            <field name="attached_wkf"/>
+                            <field name="attached_activity"  domain="[('wkf_id', '=', attached_wkf)]"/>
+                            <field name="server_action" readonly="1"/>
+                        </page>
                     </notebook>
                  
                  
