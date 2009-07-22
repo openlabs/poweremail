@@ -1,6 +1,6 @@
 #########################################################################
 #Power Email is a module for Open ERP which enables it to send mails    #
-#to customers, suppliers etc. and also has a fiull fledged email client.#
+#Core settings are stored here                                          #
 #########################################################################
 #   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
 #   #   #   #  #   #      #  #     #  #    #    # # #  #  #  #    #     #
@@ -12,7 +12,7 @@
 #This program is free software: you can redistribute it and/or modify   #
 #it under the terms of the GNU General Public License as published by   #
 #the Free Software Foundation, either version 3 of the License, or      #
-#(at your option) any later version.                                    #
+# any later version.                                                    #
 #                                                                       #
 #This program is distributed in the hope that it will be useful,        #
 #but WITHOUT ANY WARRANTY; without even the implied warranty of         #
@@ -22,25 +22,33 @@
 #You should have received a copy of the GNU General Public License      #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
+from osv import osv, fields
 
-{
-    "name" : "Powerful Email capabilities for Open ERP",
-    "version" : "0.1.0",
-    "author" : "Sharoon Thomas, TL-Pragmatic",
-    "website" : "",
-    "category" : "Added functionality",
-    "depends" : ['base'],
-    "description": """
-    A module similar to the smtpclient and email_sale etc etc. But lot more powerful. Creates three user groups:1.Email Manager(obvious), 2.Email External(Send email to partners),3.Email Internal (mail to seniors etc). the module supports cc, bcc etc which the present smtp client does not. Most unique thing is you can create default settings for sale order, invoice, etc with default cc's,bcc's and default subject, report name and body. the subject, reportname and body takes placeholders which has over 12 functions eg. can get customer name with %(cust_name) etc etc.
+class poweremail_templates(osv.osv):
+    _name="poweremail.templates"
+    _description = 'Power Email Templates for Models'
+
+    _columns = {
+        'name' : fields.char('Name of Template',size=100,required=True),
+        'object':fields.many2one('ir.model','Model',required=True),
+        'def_to':fields.char('Recepient (To)',size=64,required=True),
+        'def_cc':fields.char('Default CC',size=64),
+        'def_bcc':fields.char('Default BCC',size=64),
+        'def_subject':fields.char('Standard Subject',size=200),
+        'def_body':fields.text('Standard Body',help="The Signatures will be automatically appended"),
+        'use_sign':fields.boolean('Use Signature'),
+        'file_name':fields.char('File Name Pattern',size=200,required=True),
+        'allowed_groups':fields.one2many('res.groups','poweremail_template',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
+        'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
+
+        'auto_email':fields.boolean('Auto Email'),
+        'attached_wkf':fields.many2one('workflow','Workflow'),
+        'attached_activity':fields.many2one('workflow.activity','Activity'),
+        'server_action':fields.many2one('ir.actions.server','Related Server Action')
         
-    """,
-    "update_xml": [
-        'poweremail_core_view.xml',
-        'poweremail_template_view.xml'
-    ],
-    "demo_xml" : [],
-    "installable": True,
-    "active": False,
-}
+    }
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+    _defaults = {
+
+    }
+poweremail_templates()

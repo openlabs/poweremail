@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : poweremail_template_view.xml
+    Created on : 22 July, 2009, 10:08 AM
+    Author     : Sharoon Thomas
+    Description: View file for templates
+
+-->
+<openerp>
+    <data>
+
+    <!--EMail client Form view  -->
+
+        <record model="ir.ui.view" id="poweremail_template_form">
+            <field name="name">poweremail.templates.form</field>
+            <field name="model">poweremail.templates</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Power Email Templates">
+                    <field name="name"/>
+                    <field name="object"/>
+                    <field name="def_to"/>
+                    <field name="def_cc"/>
+                    <field name="def_bcc"/>
+                    <field name="def_subject"/>
+                    <field name="def_body"/>
+                    <field name="use_sign"/>
+                    <field name="file_name"/>
+                    <field name="allowed_groups"/>
+                    <field name="enforce_from_account"/>
+                    <field name="auto_email"/>
+                    <field name="attached_wkf"/>
+                    <field name="attached_activity"/>
+                    <field name="server_action"/>
+                </form>
+            </field>
+        </record>
+
+       
+        <record model="ir.actions.act_window"
+			id="action_poweremail_template_tree_all">
+            <field name="name">Email Templates</field>
+            <field name="res_model">poweremail.templates</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_template_form" />
+        </record>
+
+
+        <menuitem name="E-M@IL Templates"
+			id="menu_poweremail_templates"
+			parent="menu_poweremail_administration_server" action="action_poweremail_template_tree_all"/>
+
+    </data>
+</openerp>
+
+
+
+
+
