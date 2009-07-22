@@ -45,11 +45,11 @@ class poweremail_templates(osv.osv):
         'attached_wkf':fields.many2one('workflow','Workflow'),
         'attached_activity':fields.many2one('workflow.activity','Activity'),
         'server_action':fields.many2one('ir.actions.server','Related Server Action'),
-        'model_object_field':fields.many2one('ir.model.fields',string="Available Options"),
-        'sub_object':fields.many2one('ir.model','Sub Object'),
+        'model_object_field':fields.many2one('ir.model.fields',string="Field"),
+        'sub_object':fields.many2one('ir.model','Sub-model'),
         'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field'),
         'null_value':fields.char('Null Value',help="This Value is used if the field is empty",size=50),
-        'copyvalue':fields.char('Placeholder',size=100)
+        'copyvalue':fields.char('Expression',size=100,help="Copy and paste the value in the location you want to use a system value.")
     }
 
     _defaults = {
