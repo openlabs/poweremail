@@ -14,7 +14,7 @@
                     <field name="folder" select="1" />
                     <group>
                         <button icon="gtk-cancel" special="cancel" string="Cancel" />
-                        <button icon="gtk-ok" name="get_mails" string="" type="object"/>
+                        <button icon="gtk-ok" name="sel_folder" string="" type="object"/>
                     </group>
                 </form>
             </field>
@@ -104,9 +104,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
             <field name="view_id" ref="poweremail_core_accounts_tree" />
-            <field name="domain">
-				[('user','=',uid),('company','=','no')]
-            </field>
+            <field name="domain">[('user','=',uid),('company','=','no')]</field>
             <field name="context">{'user':uid,'company':'no'}</field>
         </record>
 
