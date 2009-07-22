@@ -22,10 +22,6 @@
 #You should have received a copy of the GNU General Public License      #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
-import pygtk
-pygtk.require('2.0')
-import gtk
-
 from osv import osv, fields
 
 class poweremail_templates(osv.osv):
@@ -35,13 +31,13 @@ class poweremail_templates(osv.osv):
     _columns = {
         'name' : fields.char('Name of Template',size=100,),
         'object_name':fields.many2one('ir.model','Model'),
-        'def_to':fields.char('Recepient (To)',size=64,),
-        'def_cc':fields.char('Default CC',size=64),
-        'def_bcc':fields.char('Default BCC',size=64),
-        'def_subject':fields.char('Standard Subject',size=200),
+        'def_to':fields.char('Recepient (To)',size=64,help="The default recepient of email. Placeholders can be used here."),
+        'def_cc':fields.char('Default CC',size=64,help="The default CC for the email. Placeholders can be used here."),
+        'def_bcc':fields.char('Default BCC',size=64,help="The default BCC for the email. Placeholders can be used here."),
+        'def_subject':fields.char('Default Subject',size=200, help="The default subject of email. Placeholders can be used here."),
         'def_body':fields.text('Standard Body',help="The Signatures will be automatically appended"),
-        'use_sign':fields.boolean('Use Signature'),
-        'file_name':fields.char('File Name Pattern',size=200,),
+        'use_sign':fields.boolean('Use Signature',help="the signature from the User details will be appened to the mail"),
+        'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"),
         'allowed_groups':fields.one2many('res.groups','poweremail_template',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
         'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
 
@@ -79,7 +75,6 @@ class poweremail_templates(osv.osv):
             return {'value':{'sub_object':False,'sub_model_object_field':False}}
         
     def add_field(self,cr,uid,ids,ctx={}):
-        clipboard = gtk.clipboard_get()
         if self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field']:
             obj_id = self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field'][0]
             obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
@@ -93,15 +88,13 @@ class poweremail_templates(osv.osv):
             obj_not = "[[$." + obj_not + "]]"
             self.write(cr,uid,ids,{'copyvalue':obj_not})
             return {'value':{'copyvalue':obj_not}}
-            clipboard.set_text(obj_not)
-            clipboard.store()
-            print "Clipboard:",clipboard.wait_for_text()
 
         
 poweremail_templates()
 
 class res_groups(osv.osv):
     _inherit = "res.groups"
+    _description = "User Groups"
     _columns={
         'poweremail_template':fields.many2one('poweremail.templates'),
     }

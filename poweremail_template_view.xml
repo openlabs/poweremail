@@ -22,7 +22,7 @@
                     <field name="object_name"/>
                     <field name="model_object_field" domain="[('model_id','=',object_name)]" on_change="_field_changed(model_object_field)"/>
                     <field name="sub_object" readonly="1"/>
-                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object)]"/>
+                    <field name="sub_model_object_field" domain="[('model_id','=',sub_object)]" attrs="{'readonly':[('sub_object','=',False)]}"/>
                     <field name="null_value"/>
                     <field name="copyvalue"/>
                     <button name="add_field" string="Compute Placeholder" type="object"/>
