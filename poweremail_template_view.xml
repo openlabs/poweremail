@@ -31,7 +31,7 @@
                     <field name="enforce_from_account"/>
                     <field name="auto_email"/>
                     <field name="attached_wkf"/>
-                    <field name="attached_activity"/>
+                    <field name="attached_activity"  domain="[('wkf_id', '=', attached_wkf)]"/>
                     <field name="server_action"/>
                 </form>
             </field>
