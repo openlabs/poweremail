@@ -19,13 +19,13 @@
             <field name="arch" type="xml">
                 <form string="Power Email Templates">
                     <field name="name"/>
-                    <field name="object"/>
-                    <field name="model_object_field" domain="[('model_id','=',object)]" on_change="_field_changed(model_object_field)"/>
-                    <field name="sub_object"/>
+                    <field name="object_name"/>
+                    <field name="model_object_field" domain="[('model_id','=',object_name)]" on_change="_field_changed(model_object_field)"/>
+                    <field name="sub_object" readonly="1"/>
                     <field name="sub_model_object_field" domain="[('model_id','=',sub_object)]"/>
                     <field name="null_value"/>
                     <field name="copyvalue"/>
-                    <button name="add_field" string="Copy Field" type="object"/>
+                    <button name="add_field" string="Compute Placeholder" type="object"/>
                     <notebook colspan="4">
                         <page string="Mail Details">
                             <field name="def_to"/>

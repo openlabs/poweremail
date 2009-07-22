@@ -34,7 +34,7 @@ class poweremail_templates(osv.osv):
 
     _columns = {
         'name' : fields.char('Name of Template',size=100,),
-        'object':fields.many2one('ir.model','Model'),
+        'object_name':fields.many2one('ir.model','Model'),
         'def_to':fields.char('Recepient (To)',size=64,),
         'def_cc':fields.char('Default CC',size=64),
         'def_bcc':fields.char('Default BCC',size=64),
@@ -74,9 +74,9 @@ class poweremail_templates(osv.osv):
                 else:
                     return {'value':{'sub_object':False,'sub_model_object_field':False}}
             else:
-                    return {'value':{'sub_object':False,'sub_model_object_field':False}}
+                return {'value':{'sub_object':False,'sub_model_object_field':False}}
         else:
-                    return {'value':{'sub_object':False,'sub_model_object_field':False}}
+            return {'value':{'sub_object':False,'sub_model_object_field':False}}
         
     def add_field(self,cr,uid,ids,ctx={}):
         clipboard = gtk.clipboard_get()
@@ -91,6 +91,7 @@ class poweremail_templates(osv.osv):
                 if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
                     obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
             obj_not = "[[$." + obj_not + "]]"
+            self.write(cr,uid,ids,{'copyvalue':obj_not})
             return {'value':{'copyvalue':obj_not}}
             clipboard.set_text(obj_not)
             clipboard.store()
