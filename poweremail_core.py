@@ -43,9 +43,9 @@ import netsvc
 import sys
 import poplib
 import imaplib
-
 import string
 import email
+
 
 if sys.version[0:3] > '2.4':
     from hashlib import md5
@@ -56,33 +56,32 @@ class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
 
     _columns = {
-        'name': fields.char('Email Account Desc', size=64, required=True, select=True),
-        'user':fields.many2one('res.users','Related User',required=True,readonly=True),
+        'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'drafthjkh':[('readonly',False)]} ),
+        'user':fields.many2one('res.users','Related User',required=True,readonly=True, states={'draft':[('readonly',False)]} ),
         
-        'email_id': fields.char('Email ID',size=120,required=True),
+        'email_id': fields.char('Email ID',size=120,required=True, readonly=True, states={'draft':[('readonly',False)]} ),
         
-        'smtpserver': fields.char('Server', size=120, required=True),
-        'smtpport': fields.integer('SMTP Port ', size=64, required=True),
-        'smtpuname': fields.char('User Name', size=120, required=True),
-        'smtppass': fields.char('Password', size=120, invisible=True, required=True),
-        'smtpssl':fields.boolean('Use SSL'),
+        'smtpserver': fields.char('Server', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]} ),
+        'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'smtpuname': fields.char('User Name', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'smtppass': fields.char('Password', size=120, invisible=True, required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly',False)]}),
         
-        'iserver':fields.char('Incoming Server',size=100),
-        'isport': fields.integer('Port'),
-        'isuser':fields.char('User Name',size=100),
-        'ispass':fields.char('Password',size=100),
-        'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type'),
-        'isssl':fields.boolean('Use SSL'),
+        'iserver':fields.char('Incoming Server',size=100, readonly=True, states={'draft':[('readonly',False)]}),
+        'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly',False)]}),
+        'isuser':fields.char('User Name',size=100, readonly=True, states={'draft':[('readonly',False)]}),
+        'ispass':fields.char('Password',size=100, readonly=True, states={'draft':[('readonly',False)]}),
+        'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type',readonly=True, states={'draft':[('readonly',False)]}),
+        'isssl':fields.boolean('Use SSL', readonly=True, states={'draft':[('readonly',False)]} ),
         'isfolder':fields.char('Folder',readonly=True,size=100,help="Folder to be used for downloading IMAP mails\nClick on adjacent button to select from a list of folders"),
         
         'company':fields.selection([
                                     ('yes','Yes'),
                                     ('no','No')
-                                    ],'Company Mail A/c',help="Select if this mail account does not belong to specific user but the organisation as a whole. eg:info@somedomain.com",required=True,),
+                                    ],'Company Mail A/c', readonly=True, help="Select if this mail account does not belong to specific user but the organisation as a whole. eg:info@somedomain.com",required=True, states={'draft':[('readonly',False)]}),
 
         'state':fields.selection([
                                   ('draft','Initiated'),
-                                  ('awaiting','Awaiting Approval'),
                                   ('suspended','Suspended'),
                                   ('approved','Approved')
                                   ],'Account Status',required=True,readonly=True),
@@ -142,6 +141,7 @@ class poweremail_core_accounts(osv.osv):
     
     def in_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
+        ass= self.pool.get
         if rec:
             try:
                 if rec.isssl:
@@ -153,20 +153,17 @@ class poweremail_core_accounts(osv.osv):
             try:
                 serv.login(rec.isuser, rec.ispass)
                 print "Test connection is succesful"
+                SimpleDialog(root,
+             text="Hi there\nHere is some text",
+             buttons=["OK"],
+             default=0,
+             title="Demo Dialog").go()
                 return True
             except imaplib.IMAP4.error,error:
                 raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
         
         
         
-    def on_change_emailid(self, cr, uid, ids, smtpacc=None,email_id=None, context=None):
-        self.write(cr, uid, ids, {'state':'draft'}, context=context)
-        return {'value': {'state': 'draft','username':email_id,'isuser':email_id}}
-
-    def get_approval(self,cr,uid,ids,context={}):
-        #TODO: Request for approval
-        self.write(cr, uid, ids, {'state':'awaiting'}, context=context)
-#        wf_service = netsvc.LocalService("workflow")
 
     def do_approval(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="PE_ADMIN" model="res.roles">
+            <field name="name">Power Email Administrator</field>
+        </record>
+
+        <record id="wkf_poweremail_setting" model="workflow">
+            <field name="name">Poweremail Workflow</field>
+            <field name="osv">poweremail.core_accounts</field>
+            <field name="on_create">True</field>
+        </record>
+        
+        <!--Activity -->
+        
+         <record id="act_draft" model="workflow.activity">
+            <field name="wkf_id" ref="wkf_poweremail_setting"/>
+            <field name="flow_start">True</field>
+            <field name="name">draft</field>
+        </record>
+       
+        <record id="act_approved" model="workflow.activity">
+            <field name="name">approval</field>
+            <field name="wkf_id" ref="wkf_poweremail_setting"/>
+            <field name="kind">function</field>
+            <field name="action">do_approval()</field>
+        </record>
+        
+        <record id="act_suspended" model="workflow.activity">
+            <field name="name">suspended</field>
+            <field name="wkf_id" ref="wkf_poweremail_setting"/>
+            <field name="kind">function</field>
+            <field name="action">write({'state':'suspended'})</field>
+            <field name="flow_stop">True</field>
+        </record>
+        
+        <!-- Transition -->
+        
+        <record id="trans_awaiting_approved" model="workflow.transition">
+            <field name="act_from" ref="act_draft"/>
+            <field name="act_to" ref="act_approved"/>
+            <field name="signal">button_approval</field>
+            <field name="role_id" ref="PE_ADMIN"/>
+        </record>
+        
+        <record id="trans_approved_suspended" model="workflow.transition">
+            <field name="act_from" ref="act_approved"/>
+            <field name="act_to" ref="act_suspended"/>
+            <field name="signal">button_suspended</field>
+            <field name="role_id" ref="PE_ADMIN"/>
+        </record>
+        <record id="trans_suspended_reapproved" model="workflow.transition">
+            <field name="act_from" ref="act_suspended"/>
+            <field name="act_to" ref="act_draft"/>
+            <field name="role_id" ref="PE_ADMIN"/>
+        </record>
+        
+    </data>
+</openerp>

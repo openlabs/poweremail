@@ -58,12 +58,8 @@
                             <field name="smtpssl" select="2" />
                             <newline></newline>
                              <group>
-                            	<button name="out_connection" type="object" string="Check Outgoing Connection"/>
+                            	<button name="out_connection" type="object" string="Check Outgoing Connection" states="draft"/>
                             </group>
-                            <separator string="Verification Information"
-								colspan="4" />
-                            <field name="state" select="1" />
-                            <newline />
                         </page>
                         <page string="Incoming">
                             <separator string="Server Information"
@@ -76,7 +72,7 @@
                             <field name="isssl" />
                             <newline></newline>
                             <group>
-                            	<button name="%(act_selfolder_form)d" type="action" string="Select Folder"/>
+                            	<button name="%(act_selfolder_form)d" type="action" string="Select Folder" states="draft"/>
                             	<button name="in_connection" type="object" string="Check Incomming Connection"/>
                             </group>
                             <separator string="User Information"
@@ -85,7 +81,15 @@
                             <field name="ispass" select="2" password="True" />
                         </page>
                     </notebook>
-					
+					 <group>
+					   <field name="state" select="1" />
+						<button string="Approve Account"
+							name="button_approval" states="draft" type="workflow" />
+						<button string="Suspend Account"
+							name="button_suspended" states="approved" type="workflow" />
+						<button string="Request Re-activation"
+							name="get_reapprove" states="suspended" type="object" />
+                    </group>
                 </form>
             </field>
         </record>
@@ -136,6 +140,17 @@
             <field name="domain">[('company','=','yes')]</field>
             <field name="context">{'company':'yes'}</field>
         </record>
+        
+        <record model="ir.actions.act_window"
+			id="action_poweremail_core_accounts_tree_my">
+            <field name="name">Email Server</field>
+            <field name="res_model">poweremail.core_accounts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_core_accounts_tree" />
+            <field name="domain">[(uid, '=', user)]</field>
+            <field name="context">{'company':'yes'}</field>
+        </record>
 
         <menuitem name="Power Email"
 			id="menu_poweremail_administration_server" />
@@ -158,6 +173,11 @@
 			id="menu_poweremail_core_accounts_Personal_co"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_co" />
+		
+		<menuitem name="My Accounts"
+			id="menu_poweremail_core_accounts_Personal_my"
+			parent="menu_poweremail_configuration_server"
+			action="action_poweremail_core_accounts_tree_my" />
 			
     </data>
 </openerp>

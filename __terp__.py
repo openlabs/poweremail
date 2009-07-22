@@ -35,6 +35,7 @@
         
     """,
     "update_xml": [
+        'poweremail_workflow.xml',
         'poweremail_core_view.xml',
         'poweremail_template_view.xml'
     ],
