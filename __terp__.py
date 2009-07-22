@@ -35,8 +35,8 @@
         
     """,
     "update_xml": [
-        'security/poweremail_security.xml',
-        'security/ir.model.access.csv',
+        #'security/poweremail_security.xml',
+        #'security/ir.model.access.csv',
         'poweremail_workflow.xml',
         'poweremail_core_view.xml',
         'poweremail_template_view.xml'

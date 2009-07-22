@@ -40,26 +40,29 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Power Email Configuration">
+                    <group colspan="2">
                     <field name="name" select="1" />
+                    </group>
                     <notebook colspan="4">
-                        <page string="Configuration">
+                        <page string="Outgoing">
                             <separator string="User Information" colspan="4" />
-                            <field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" />
-                            <field name="smtppass" password="True" />
-                            <newline />
-                            <field name="smtpuname" select="1" />
-                            <field name="user" select="2" />
-                            <field name="company" select="2" />
+                            <group col="2" colspan="2">
+                            <field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" colspan="2"/>
+                            <field name="smtppass" password="True" colspan="2"/>
+                            <field name="smtpuname" select="1" colspan="2"/>
+                            <field name="user" select="2" colspan="2"/>
+                            <field name="company" select="2" colspan="2"/>
+                         	</group>
                             <newline />
                             <separator string="Server Information"
 								colspan="4" />
+                           
                             <field name="smtpserver" select="1" />
                             <field name="smtpport" select="2" />
                             <field name="smtpssl" select="2" />
-                            <newline></newline>
-                             <group>
-                            	<button name="out_connection" type="object" string="Check Outgoing Connection" states="draft"/>
-                            </group>
+                            <button name="out_connection" type="object" string="Check Outgoing Connection" states="draft"/>
+                           
+                           
                         </page>
                         <page string="Incoming">
                             <separator string="Server Information"
@@ -72,7 +75,7 @@
                             <field name="isssl" />
                             <newline></newline>
                             <group>
-                            	<button name="%(act_selfolder_form)d" type="action" string="Select Folder" states="draft"/>
+                            	<button name="%(act_selfolder_form)d" type="action" string="Select Folder" attrs="{'invisible':[('iserver_type','=','pop3')]}" states="draft"/>
                             	<button name="in_connection" type="object" string="Check Incomming Connection"/>
                             </group>
                             <separator string="User Information"
