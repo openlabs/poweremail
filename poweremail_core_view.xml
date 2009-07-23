@@ -98,7 +98,7 @@
 						<button string="Suspend Account"
 							name="button_suspended" states="approved" type="workflow" colspan="2"/>
 						<button string="Request Re-activation"
-							name="get_reapprove" states="suspended" type="object" colspan="2" />
+							name="get_reapprove" states="suspended" type="workflow" colspan="2" />
                     </group>
                 </form>
             </field>
@@ -163,7 +163,7 @@
         </record>
 
         <menuitem name="Power Email"
-			id="menu_poweremail_administration_server" />
+			id="menu_poweremail_administration_server" icon="terp-pem"/>
 			
         <menuitem name="Configuration"
 			id="menu_poweremail_configuration_server" 
