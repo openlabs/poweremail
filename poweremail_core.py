@@ -95,7 +95,12 @@ class poweremail_core_accounts(osv.osv):
          'email_id':lambda *a:'yourname@yourdomain.com',
          'smtpssl':lambda *a:True,
          'state':lambda *a:'draft',
-         'user':lambda self,cr,uid,ctx:uid
+         'user':lambda self,cr,uid,ctx:uid,
+         'iserver':lambda *a: 'imap.gmail.com',
+         'iserver_type': lambda *a: 'imap',
+         'isport': lambda *a: 993,
+         'isssl': lambda *a: True,
+         
                  }
                  
     _sql_constraints = [
