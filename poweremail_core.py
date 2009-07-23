@@ -56,7 +56,7 @@ class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
 
     _columns = {
-        'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'drafthjkh':[('readonly',False)]} ),
+        'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'draft':[('readonly',False)]} ),
         'user':fields.many2one('res.users','Related User',required=True,readonly=True, states={'draft':[('readonly',False)]} ),
         
         'email_id': fields.char('Email ID',size=120,required=True, readonly=True, states={'draft':[('readonly',False)]} ),

@@ -29,7 +29,7 @@ class poweremail_templates(osv.osv):
     _description = 'Power Email Templates for Models'
 
     _columns = {
-        'name' : fields.char('Name of Template',size=100,),
+        'name' : fields.char('Name of Template',size=100,required=True),
         'object_name':fields.many2one('ir.model','Model'),
         'def_to':fields.char('Recepient (To)',size=64,help="The default recepient of email. Placeholders can be used here."),
         'def_cc':fields.char('Default CC',size=64,help="The default CC for the email. Placeholders can be used here."),
@@ -38,16 +38,16 @@ class poweremail_templates(osv.osv):
         'def_body':fields.text('Standard Body',help="The Signatures will be automatically appended"),
         'use_sign':fields.boolean('Use Signature',help="the signature from the User details will be appened to the mail"),
         'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"),
-        'allowed_groups':fields.one2many('res.groups','poweremail_template',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
+        'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
         'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
 
-        'auto_email':fields.boolean('Auto Email'),
+        'auto_email':fields.boolean('Auto Email', help="Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created."),
         'attached_wkf':fields.many2one('workflow','Workflow'),
         'attached_activity':fields.many2one('workflow.activity','Activity'),
-        'server_action':fields.many2one('ir.actions.server','Related Server Action'),
-        'model_object_field':fields.many2one('ir.model.fields',string="Field"),
-        'sub_object':fields.many2one('ir.model','Sub-model'),
-        'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field'),
+        'server_action':fields.many2one('ir.actions.server','Related Server Action',help="Corresponding server action is here."),
+        'model_object_field':fields.many2one('ir.model.fields',string="Field",help="Select the field from the model you want to use.\nIf it is a relationship field you will be able to choose the nested values in the box below\n(Note:If there are no values make sure you have selected the correct model)"),
+        'sub_object':fields.many2one('ir.model','Sub-model',help='When a relation field is used this field will show you the type of field you have selected'),
+        'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field',help='When you choose relationship fields this field will specify the sub value you can use.'),
         'null_value':fields.char('Null Value',help="This Value is used if the field is empty",size=50),
         'copyvalue':fields.char('Expression',size=100,help="Copy and paste the value in the location you want to use a system value.")
     }
@@ -95,7 +95,5 @@ poweremail_templates()
 class res_groups(osv.osv):
     _inherit = "res.groups"
     _description = "User Groups"
-    _columns={
-        'poweremail_template':fields.many2one('poweremail.templates'),
-    }
+    _columns = {}
 res_groups()

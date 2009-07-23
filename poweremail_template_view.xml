@@ -51,7 +51,7 @@
                             <separator colspan="4" string="Allowed User Groups"/>
                             <field name="allowed_groups" string="Allowed User Groups" nolabel="1"/>
                         </page>
-                        <page string="Advance">
+                        <page string="Advanced">
                             <field name="enforce_from_account"/>
                             <field name="auto_email"/>
                             <field name="attached_wkf"/>
