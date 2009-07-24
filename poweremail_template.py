@@ -58,6 +58,34 @@ class poweremail_templates(osv.osv):
 
     }
     
+    def create(self, cr, uid, vals, *args, **kwargs):
+        src_obj = self.pool.get('ir.model').read(cr,uid,vals['object_name'],['model'])['model']
+        win_val={
+             'name': vals['name'] + " Mail Form",
+             'type':'ir.actions.act_window',
+             'res_model':'poweremail.send.wizard',
+             'src_model': src_obj,
+             'view_type': 'form',
+             'context': "{'src_model':'" + src_obj + "'}",
+             'view_mode':'form,tree',
+             'view_id':self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')])[0],
+             'target': 'new',
+             'auto_refresh':1
+             }
+        
+        act_id = self.pool.get('ir.actions.act_window').create(cr, uid, win_val)
+        value_vals={
+             'name': 'Send Mail(' + vals['name'] + ")",
+             'model': src_obj,
+             'key2': 'client_action_multi',    
+             'value': "ir.actions.act_window,"+ str(act_id),
+             'object':True,
+             }
+        act_id = self.pool.get('ir.values').create(cr, uid, value_vals)
+        
+        return super(poweremail_templates,self).create(cr, uid, vals, *args, **kwargs)   
+
+    
     def _field_changed(self,cr,uid,ids,parent_field):
         #print "Parent:",parent_field
         if parent_field:
@@ -193,13 +221,16 @@ class poweremail_preview(osv.osv_memory):
                     result = eval(exp_spl[0], {'object':obj, 'context': context,})
                 except:
                     result = "Rendering Error"
-                #print result
-                if result in (None, False):
-                    if len(exp_spl)>1:
-                        return exp_spl[1]
-                    else:
-                        return 'Not Available'
-                return str(result)
+                #print "result:",result
+                try:
+                    if result in (None, False):
+                        if len(exp_spl)>1:
+                            return exp_spl[1]
+                        else:
+                            return 'Not Available'
+                    return str(result)
+                except:
+                    return "Rendering Error"
             com = re.compile('(\[\[.+?\]\])')
             message = com.sub(merge, message)
             return message

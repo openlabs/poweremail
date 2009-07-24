@@ -23,5 +23,6 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 
-import poweremail_template
 import poweremail_core
+import poweremail_template
+import poweremail_send_wizard

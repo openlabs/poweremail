@@ -39,7 +39,8 @@
         #'security/ir.model.access.csv',
         'poweremail_workflow.xml',
         'poweremail_core_view.xml',
-        'poweremail_template_view.xml'
+        'poweremail_template_view.xml',
+        'poweremail_send_wizard.xml'
     ],
     "demo_xml" : [],
     "installable": True,
