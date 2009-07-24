@@ -23,6 +23,8 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 from osv import osv, fields
+import netsvc
+import re
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
@@ -57,25 +59,33 @@ class poweremail_templates(osv.osv):
     }
     
     def _field_changed(self,cr,uid,ids,parent_field):
-        print "Parent:",parent_field
+        #print "Parent:",parent_field
         if parent_field:
             field_obj = self.pool.get('ir.model.fields').browse(cr,uid,parent_field)
-            print field_obj.ttype
+            #print field_obj.ttype
             if field_obj.ttype in ['many2one','one2many','many2many']:
                 res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-                print res_ids[0]
+                #print res_ids[0]
                 if res_ids:
-                    print self.write(cr,uid,ids,{'sub_object':res_ids[0]})
-                    return {'value':{'sub_object':res_ids[0]}}
+                    self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':res_ids[0],'sub_model_object_field':False})
+                    expr_val = self._add_field(cr,uid,ids)
+                    return {'value':{'sub_object':res_ids[0],'copyvalue':expr_val['value']['copyvalue']}}
                 else:
-                    return {'value':{'sub_object':False,'sub_model_object_field':False}}
+                    self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':False,'sub_model_object_field':False})
+                    expr_val = self._add_field(cr,uid,ids)
+                    return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
             else:
-                return {'value':{'sub_object':False,'sub_model_object_field':False}}
+                self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':False,'sub_model_object_field':False,})
+                expr_val = self._add_field(cr,uid,ids)
+                return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
         else:
-            return {'value':{'sub_object':False,'sub_model_object_field':False}}
+            expr_val = self._add_field(cr,uid,ids)
+            self.write(cr,uid,ids,{'sub_object':False,'sub_model_object_field':False})
+            return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
         
-    def add_field(self,cr,uid,ids,ctx={}):
+    def _add_field(self,cr,uid,ids,ctx={}):
         if self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field']:
+            #print "Computing Field"
             obj_id = self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field'][0]
             obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
             obj_not = obj_br.name
@@ -83,15 +93,134 @@ class poweremail_templates(osv.osv):
                 obj_id = self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field'][0]
                 obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
                 obj_not = obj_not + "." + obj_br.name
-                if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
-                    obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
-            obj_not = "[[$." + obj_not + "]]"
+            if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
+                obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
+            obj_not = "[[object." + obj_not + "]]"
+            #print "Object Value (_add_field):",obj_not
             self.write(cr,uid,ids,{'copyvalue':obj_not})
             return {'value':{'copyvalue':obj_not}}
 
-        
+    def _auto_compute(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value,ctx={}):
+        if model_object_field:
+            obj_id = model_object_field
+            obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
+            obj_not = obj_br.name
+            if sub_model_object_field:
+                obj_br = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+                obj_not = obj_not + "." + obj_br.name
+            if null_value:
+                obj_not = obj_not + "/" + null_value
+            obj_not = "[[object." + obj_not + "]]"
+            #print "Object Value (_suto_compute):",obj_not
+            #self.write(cr,uid,ids,{'copyvalue':obj_not})
+            return {'value':{'copyvalue':obj_not}}
+
 poweremail_templates()
 
+class poweremail_preview(osv.osv_memory):
+    _name = "poweremail.preview"
+    _description = "Power Email Template Preview"
+    
+    def _get_model_recs(self,cr,uid,ctx={}):
+        self.context = ctx
+        if 'active_id' in ctx.keys():
+            ref_obj_id = self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
+            ref_obj_name = self.pool.get('ir.model').read(cr,uid,ref_obj_id[0],['model'])['model']
+            ref_obj_ids = self.pool.get(ref_obj_name).search(cr,uid,[])
+            ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr,uid,ref_obj_ids)
+            #print ref_obj_recs
+            return ref_obj_recs
+
+    _columns = {
+        'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
+        'rel_model':fields.many2one('ir.model','Model',readonly=True),
+        'rel_model_ref':fields.selection(_get_model_recs,'Referred Document'),
+        'to':fields.char('To',size=100,readonly=True),
+        'cc':fields.char('CC',size=100,readonly=True),
+        'bcc':fields.char('BCC',size=100,readonly=True),
+        'subject':fields.char('Subject',size=200,readonly=True),
+        'body_text':fields.text('Body',readonly=True),
+        'body_html':fields.text('Body',readonly=True),
+        'report':fields.char('Report Name',size=100,readonly=True),
+    }
+    _defaults = {
+        'ref_template': lambda self,cr,uid,ctx:ctx['active_id'],
+        'rel_model': lambda self,cr,uid,ctx:self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
+    }
+
+    def strip_html(self,text):
+        def fixup(m):
+            text = m.group(0)
+            if text[:1] == "<":
+                return "" # ignore tags
+            if text[:2] == "&#":
+                try:
+                    if text[:3] == "&#x":
+                        return unichr(int(text[3:-1], 16))
+                    else:
+                        return unichr(int(text[2:-1]))
+                except ValueError:
+                    pass
+            elif text[:1] == "&":
+                import htmlentitydefs
+                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                if entity:
+                    if entity[:2] == "&#":
+                        try:
+                            return unichr(int(entity[2:-1]))
+                        except ValueError:
+                            pass
+                    else:
+                        return unicode(entity, "iso-8859-1")
+            return text # leave as is
+        return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
+
+    def parsevalue(self,cr,uid,id,message,template,context):
+        #id: ID of the template's model record to be used
+        #message: the complete text including placeholders
+        #template: the browserecord object of the template
+        #context: TODO
+        if message:
+            logger = netsvc.Logger()
+            def merge(match):
+                obj_pool = self.pool.get(template.object_name.model)
+                obj = obj_pool.browse(cr, uid, id)
+                exp = str(match.group()[2:-2]).strip()
+                #print "level 1:",exp
+                exp_spl = exp.split('/')
+                #print "level 2:",exp_spl
+                try:
+                    result = eval(exp_spl[0], {'object':obj, 'context': context,})
+                except:
+                    result = "Rendering Error"
+                #print result
+                if result in (None, False):
+                    if len(exp_spl)>1:
+                        return exp_spl[1]
+                    else:
+                        return 'Not Available'
+                return str(result)
+            com = re.compile('(\[\[.+?\]\])')
+            message = com.sub(merge, message)
+            return message
+
+    def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
+        if rel_model_ref:
+            vals={}
+            if ctx == {}:
+                ctx = self.context
+            template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
+            vals['to']= self.parsevalue(cr,uid,rel_model_ref,template.def_to,template,ctx)
+            vals['cc']= self.parsevalue(cr,uid,rel_model_ref,template.def_cc,template,ctx)
+            vals['bcc']= self.parsevalue(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
+            vals['subject']= self.parsevalue(cr,uid,rel_model_ref,template.def_subject,template,ctx)
+            vals['body_text']=self.parsevalue(cr,uid,rel_model_ref,self.strip_html(template.def_body),template,ctx)
+            vals['body_html']=self.parsevalue(cr,uid,rel_model_ref,template.def_body,template,ctx)
+            vals['report']= self.parsevalue(cr,uid,rel_model_ref,template.file_name,template,ctx)
+            #print "Vals>>>>>",vals
+            return {'value':vals}
+        
+poweremail_preview()
 class res_groups(osv.osv):
     _inherit = "res.groups"
     _description = "User Groups"

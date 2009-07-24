@@ -136,11 +136,11 @@ class poweremail_core_accounts(osv.osv):
                     serv.ehlo()
                     serv.starttls()
                     serv.ehlo()
-            except smtplib.SMTPException,error:
+            except Exception,error:
                 raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
             try:
                 serv.login(rec.smtpuname, rec.smtppass)
-            except smtplib.SMTPException,error:
+            except Exception,error:
                 raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
             raise osv.except_osv(_("Information"),_("Test Was Successful"))
 
