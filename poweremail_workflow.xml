@@ -18,6 +18,8 @@
             <field name="wkf_id" ref="wkf_poweremail_setting"/>
             <field name="flow_start">True</field>
             <field name="name">draft</field>
+	    <field name="kind">function</field>
+            <field name="action">write({'state':'draft'})</field>
         </record>
        
         <record id="act_approved" model="workflow.activity">
@@ -32,6 +34,10 @@
             <field name="wkf_id" ref="wkf_poweremail_setting"/>
             <field name="kind">function</field>
             <field name="action">write({'state':'suspended'})</field>
+        </record>
+        <record id="act_dummy" model="workflow.activity">
+            <field name="name">dummy</field>
+            <field name="wkf_id" ref="wkf_poweremail_setting"/>
             <field name="flow_stop">True</field>
         </record>
         
@@ -53,8 +59,14 @@
         <record id="trans_suspended_reapproved" model="workflow.transition">
             <field name="act_from" ref="act_suspended"/>
             <field name="act_to" ref="act_draft"/>
+            <field name="signal">get_reapprove</field>
             <field name="role_id" ref="PE_ADMIN"/>
         </record>
-        
+        <record id="trans_suspended_dummy" model="workflow.transition">
+            <field name="act_from" ref="act_suspended"/>
+            <field name="act_to" ref="act_dummy"/>
+            <field name="signal">get_never</field>
+            <field name="role_id" ref="PE_ADMIN"/>
+        </record>        
     </data>
 </openerp>
