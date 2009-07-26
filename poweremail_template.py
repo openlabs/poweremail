@@ -44,9 +44,14 @@ class poweremail_templates(osv.osv):
         'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
 
         'auto_email':fields.boolean('Auto Email', help="Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created."),
+        #Referred Stuff - Dont delete even if template is deleted
         'attached_wkf':fields.many2one('workflow','Workflow'),
         'attached_activity':fields.many2one('workflow.activity','Activity'),
-        'server_action':fields.many2one('ir.actions.server','Related Server Action',help="Corresponding server action is here."),
+        #Referred Stuff - Delete these if template are deleted or they will crash the system
+        'server_action':fields.many2one('ir.actions.server','Related Server Action',help="Corresponding server action is here.",ondelete="cascade"),
+        'ref_ir_act_window':fields.many2one('ir.actions.act_window','Window Action',readonly=True,ondelete="cascade"),
+        'ref_ir_value':fields.many2one('ir.values','Wizard Button',readonly=True,ondelete="cascade"),
+        #Expression Builder fields
         'model_object_field':fields.many2one('ir.model.fields',string="Field",help="Select the field from the model you want to use.\nIf it is a relationship field you will be able to choose the nested values in the box below\n(Note:If there are no values make sure you have selected the correct model)"),
         'sub_object':fields.many2one('ir.model','Sub-model',help='When a relation field is used this field will show you the type of field you have selected'),
         'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field',help='When you choose relationship fields this field will specify the sub value you can use.'),
@@ -72,20 +77,33 @@ class poweremail_templates(osv.osv):
              'target': 'new',
              'auto_refresh':1
              }
-        
-        act_id = self.pool.get('ir.actions.act_window').create(cr, uid, win_val)
+        vals['ref_ir_act_window']= self.pool.get('ir.actions.act_window').create(cr, uid, win_val)
         value_vals={
              'name': 'Send Mail(' + vals['name'] + ")",
              'model': src_obj,
              'key2': 'client_action_multi',    
-             'value': "ir.actions.act_window,"+ str(act_id),
+             'value': "ir.actions.act_window,"+ str(vals['ref_ir_act_window']),
              'object':True,
              }
-        act_id = self.pool.get('ir.values').create(cr, uid, value_vals)
-        
+        vals['ref_ir_value'] = self.pool.get('ir.values').create(cr, uid, value_vals)
         return super(poweremail_templates,self).create(cr, uid, vals, *args, **kwargs)   
 
-    
+    def unlink(self, cr, uid, ids, ctx={}):
+        for id in ids:
+            try:
+                ref_ir_act_window = self.read(cr, uid, id, ['ref_ir_act_window'])['ref_ir_act_window']
+                ref_ir_value = self.read(cr, uid, id, ['ref_ir_value'])['ref_ir_value']
+                print ref_ir_act_window,ref_ir_value
+                if ref_ir_act_window:
+                    self.pool.get('ir.actions.act_window').unlink(cr,uid,ref_ir_act_window[0])
+                if ref_ir_value:
+                    self.pool.get('ir.values').unlink(cr,uid,ref_ir_value[0])
+                super(poweremail_templates,self).unlink(cr,uid,id)
+            except:
+                raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))
+                return False
+        return True
+
     def _field_changed(self,cr,uid,ids,parent_field):
         #print "Parent:",parent_field
         if parent_field:
@@ -112,21 +130,24 @@ class poweremail_templates(osv.osv):
             return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
         
     def _add_field(self,cr,uid,ids,ctx={}):
-        if self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field']:
-            #print "Computing Field"
-            obj_id = self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field'][0]
-            obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
-            obj_not = obj_br.name
-            if self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field']:
-                obj_id = self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field'][0]
+        try:
+            if self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field']:
+                #print "Computing Field"
+                obj_id = self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field'][0]
                 obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
-                obj_not = obj_not + "." + obj_br.name
-            if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
-                obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
-            obj_not = "[[object." + obj_not + "]]"
-            #print "Object Value (_add_field):",obj_not
-            self.write(cr,uid,ids,{'copyvalue':obj_not})
-            return {'value':{'copyvalue':obj_not}}
+                obj_not = obj_br.name
+                if self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field']:
+                    obj_id = self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field'][0]
+                    obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
+                    obj_not = obj_not + "." + obj_br.name
+                if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
+                    obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
+                obj_not = "[[object." + obj_not + "]]"
+                #print "Object Value (_add_field):",obj_not
+                self.write(cr,uid,ids,{'copyvalue':obj_not})
+                return {'value':{'copyvalue':obj_not}}
+        except:
+            raise osv.except_osv(_("Warning"),_("You need to save the template before expressions can be computed"))
 
     def _auto_compute(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value,ctx={}):
         if model_object_field:
@@ -177,31 +198,32 @@ class poweremail_preview(osv.osv_memory):
     }
 
     def strip_html(self,text):
-        def fixup(m):
-            text = m.group(0)
-            if text[:1] == "<":
-                return "" # ignore tags
-            if text[:2] == "&#":
-                try:
-                    if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
-                    else:
-                        return unichr(int(text[2:-1]))
-                except ValueError:
-                    pass
-            elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
-                if entity:
-                    if entity[:2] == "&#":
-                        try:
-                            return unichr(int(entity[2:-1]))
-                        except ValueError:
-                            pass
-                    else:
-                        return unicode(entity, "iso-8859-1")
-            return text # leave as is
-        return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
+        if text:
+            def fixup(m):
+                text = m.group(0)
+                if text[:1] == "<":
+                    return "" # ignore tags
+                if text[:2] == "&#":
+                    try:
+                        if text[:3] == "&#x":
+                            return unichr(int(text[3:-1], 16))
+                        else:
+                            return unichr(int(text[2:-1]))
+                    except ValueError:
+                        pass
+                elif text[:1] == "&":
+                    import htmlentitydefs
+                    entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                    if entity:
+                        if entity[:2] == "&#":
+                            try:
+                                return unichr(int(entity[2:-1]))
+                            except ValueError:
+                                pass
+                        else:
+                            return unicode(entity, "iso-8859-1")
+                return text # leave as is
+            return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
 
     def parsevalue(self,cr,uid,id,message,template,context):
         #id: ID of the template's model record to be used
@@ -231,8 +253,11 @@ class poweremail_preview(osv.osv_memory):
                     return str(result)
                 except:
                     return "Rendering Error"
-            com = re.compile('(\[\[.+?\]\])')
-            message = com.sub(merge, message)
+            if message:
+                com = re.compile('(\[\[.+?\]\])')
+                message = com.sub(merge, message)
+            else:
+                message=""
             return message
 
     def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
@@ -252,6 +277,7 @@ class poweremail_preview(osv.osv_memory):
             return {'value':vals}
         
 poweremail_preview()
+
 class res_groups(osv.osv):
     _inherit = "res.groups"
     _description = "User Groups"
