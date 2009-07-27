@@ -29,32 +29,54 @@ class poweremail_send_wizard(osv.osv_memory):
     _description = 'This is the wizard for sending mail'
     _rec_name = "subject"
 
-    def _get_model_recs(self,cr,uid,ctx={}):
-        self.context = ctx
-        if 'active_id' in ctx.keys():
-            ref_obj_id = self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
-            ref_obj_name = self.pool.get('ir.model').read(cr,uid,ref_obj_id[0],['model'])['model']
-            ref_obj_ids = self.pool.get(ref_obj_name).search(cr,uid,[])
-            ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr,uid,ref_obj_ids)
-            #print ref_obj_recs
-            return ref_obj_recs
+    def _get_accounts(self,cr,uid,ctx={}):
+        self.engine = self.pool.get("poweremail.engines")
+        if 'template' in ctx.keys():
+            self.model_ref = ctx['active_id']
+            tmpl_id = self.pool.get('poweremail.templates').search(cr,uid,[('name','=',ctx['template'])])
+            if tmpl_id:
+                self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0])
+                #print self.template.allowed_groups
+                if self.template.enforce_from_account:
+                    return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]
+                else:
+                    accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','yes'),('user','=',uid)])
+                    if accounts_id:
+                        accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id)
+                        return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
+
+    def get_value(self,cr,uid,ctx={},message={}):
+        return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
         
-    def _get_accounts(self,cr,uid,ids,ctx={}):
-        print cr,uid,ids,ctx
-        
+
     _columns = {
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
-        'rel_model_ref':fields.selection(_get_model_recs,'Referred Document',readonly=True),
-        'from':fields.many2one('poweremail.core_accounts','From Account',),
+        #'rel_model_ref':fields.selection(_get_model_recs,'Referred Document',readonly=True),
+        'from':fields.selection(_get_accounts,'From Account',required=True),
         'to':fields.char('To',size=100,readonly=True),
-        'cc':fields.char('CC',size=100,readonly=True),
-        'bcc':fields.char('BCC',size=100,readonly=True),
-        'subject':fields.char('Subject',size=200,readonly=True),
-        'body_text':fields.text('Body',readonly=True),
-        'body_html':fields.text('Body',readonly=True),
-        'report':fields.char('Report Name',size=100,readonly=True),
+        'cc':fields.char('CC',size=100,),
+        'bcc':fields.char('BCC',size=100,),
+        'subject':fields.char('Subject',size=200,),
+        'body_text':fields.text('Body',),
+        'body_html':fields.text('Body',),
+        'report':fields.char('Report File Name',size=100,),
+        'signature':fields.boolean('Attach my signature to mail')
                 }
+
+    _defaults = {
+        'rel_model': lambda self,cr,uid,ctx:self.pool.get('ir.model').search(cr,uid,[('model','=',ctx['src_model'])])[0],
+        'rel_model_ref': lambda self,cr,uid,ctx:ctx['active_id'],
+        'to': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_to),
+        'cc': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_cc),
+        'bcc': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_bcc),
+        'subject':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_subject),
+        'body_text':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_text),
+        'body_html':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_html),
+        'report': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.file_name),
+        'signature': lambda self,cr,uid,ctx: self.template.use_sign
+    }
+
 poweremail_send_wizard()
     
     

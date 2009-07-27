@@ -25,6 +25,7 @@
 from osv import osv, fields
 import netsvc
 import re
+import poweremail_engines
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
@@ -37,7 +38,8 @@ class poweremail_templates(osv.osv):
         'def_cc':fields.char('Default CC',size=64,help="The default CC for the email. Placeholders can be used here."),
         'def_bcc':fields.char('Default BCC',size=64,help="The default BCC for the email. Placeholders can be used here."),
         'def_subject':fields.char('Default Subject',size=200, help="The default subject of email. Placeholders can be used here."),
-        'def_body':fields.text('Standard Body',help="The Signatures will be automatically appended"),
+        'def_body_text':fields.text('Standard Body (Text)',help="The text version of the mail"),
+        'def_body_html':fields.text('Body (Text-Web Client Only)',help="The text version of the mail"),
         'use_sign':fields.boolean('Use Signature',help="the signature from the User details will be appened to the mail"),
         'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"),
         'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
@@ -62,7 +64,9 @@ class poweremail_templates(osv.osv):
     _defaults = {
 
     }
-    
+    _sql_constraints = [
+        ('name', 'unique (name)', 'The template name must be unique !')
+    ]
     def create(self, cr, uid, vals, *args, **kwargs):
         src_obj = self.pool.get('ir.model').read(cr,uid,vals['object_name'],['model'])['model']
         win_val={
@@ -71,7 +75,7 @@ class poweremail_templates(osv.osv):
              'res_model':'poweremail.send.wizard',
              'src_model': src_obj,
              'view_type': 'form',
-             'context': "{'src_model':'" + src_obj + "'}",
+             'context': "{'src_model':'" + src_obj + "','template':'" + vals['name'] + "'}",
              'view_mode':'form,tree',
              'view_id':self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')])[0],
              'target': 'new',
@@ -171,6 +175,7 @@ class poweremail_preview(osv.osv_memory):
     _description = "Power Email Template Preview"
     
     def _get_model_recs(self,cr,uid,ctx={}):
+        #Fills up the selection box which allows records from the selected object to be displayed
         self.context = ctx
         if 'active_id' in ctx.keys():
             ref_obj_id = self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
@@ -197,82 +202,20 @@ class poweremail_preview(osv.osv_memory):
         'rel_model': lambda self,cr,uid,ctx:self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
     }
 
-    def strip_html(self,text):
-        if text:
-            def fixup(m):
-                text = m.group(0)
-                if text[:1] == "<":
-                    return "" # ignore tags
-                if text[:2] == "&#":
-                    try:
-                        if text[:3] == "&#x":
-                            return unichr(int(text[3:-1], 16))
-                        else:
-                            return unichr(int(text[2:-1]))
-                    except ValueError:
-                        pass
-                elif text[:1] == "&":
-                    import htmlentitydefs
-                    entity = htmlentitydefs.entitydefs.get(text[1:-1])
-                    if entity:
-                        if entity[:2] == "&#":
-                            try:
-                                return unichr(int(entity[2:-1]))
-                            except ValueError:
-                                pass
-                        else:
-                            return unicode(entity, "iso-8859-1")
-                return text # leave as is
-            return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
-
-    def parsevalue(self,cr,uid,id,message,template,context):
-        #id: ID of the template's model record to be used
-        #message: the complete text including placeholders
-        #template: the browserecord object of the template
-        #context: TODO
-        if message:
-            logger = netsvc.Logger()
-            def merge(match):
-                obj_pool = self.pool.get(template.object_name.model)
-                obj = obj_pool.browse(cr, uid, id)
-                exp = str(match.group()[2:-2]).strip()
-                #print "level 1:",exp
-                exp_spl = exp.split('/')
-                #print "level 2:",exp_spl
-                try:
-                    result = eval(exp_spl[0], {'object':obj, 'context': context,})
-                except:
-                    result = "Rendering Error"
-                #print "result:",result
-                try:
-                    if result in (None, False):
-                        if len(exp_spl)>1:
-                            return exp_spl[1]
-                        else:
-                            return 'Not Available'
-                    return str(result)
-                except:
-                    return "Rendering Error"
-            if message:
-                com = re.compile('(\[\[.+?\]\])')
-                message = com.sub(merge, message)
-            else:
-                message=""
-            return message
-
     def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
+        engine = self.pool.get("poweremail.engines")
         if rel_model_ref:
             vals={}
             if ctx == {}:
                 ctx = self.context
             template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
-            vals['to']= self.parsevalue(cr,uid,rel_model_ref,template.def_to,template,ctx)
-            vals['cc']= self.parsevalue(cr,uid,rel_model_ref,template.def_cc,template,ctx)
-            vals['bcc']= self.parsevalue(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
-            vals['subject']= self.parsevalue(cr,uid,rel_model_ref,template.def_subject,template,ctx)
-            vals['body_text']=self.parsevalue(cr,uid,rel_model_ref,self.strip_html(template.def_body),template,ctx)
-            vals['body_html']=self.parsevalue(cr,uid,rel_model_ref,template.def_body,template,ctx)
-            vals['report']= self.parsevalue(cr,uid,rel_model_ref,template.file_name,template,ctx)
+            vals['to']= engine.parsevalue(cr,uid,rel_model_ref,template.def_to,template.id,ctx)
+            vals['cc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_cc,template.id,ctx)
+            vals['bcc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_bcc,template.id,ctx)
+            vals['subject']= engine.parsevalue(cr,uid,rel_model_ref,template.def_subject,template.id,ctx)
+            vals['body_text']=engine.parsevalue(cr,uid,rel_model_ref,engine.strip_html(template.def_body),template.id,ctx)
+            vals['body_html']=engine.parsevalue(cr,uid,rel_model_ref,template.def_body,template.id,ctx)
+            vals['report']= engine.parsevalue(cr,uid,rel_model_ref,template.file_name,template.id,ctx)
             #print "Vals>>>>>",vals
             return {'value':vals}
         

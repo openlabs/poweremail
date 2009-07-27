@@ -9,7 +9,10 @@
             <field name="arch" type="xml">
                 <form string="Send mail Wizard">
                     <group col="6" colspan="4">
-                        <field name="from"/>
+                        <field name="rel_model"/>
+                       <!-- <field name="rel_model_ref" on_change="_on_change_ref(rel_model_ref)"/>-->
+                        <newline />
+                        <field name="from" />
                         <newline />
                         <field name="to" select="1" colspan="4" />
                         <newline />
@@ -22,13 +25,14 @@
                     </group>
                     <separator string="" colspan="4" />
                     <notebook>
-                        <page string="Body (Plan Text)">
+                        <page string="Body (Plain Text)">
                             <field name="body_text" select="2" colspan="4" nolabel="1"/>
                         </page>
                         <page string="Body(HTML - Only Web Client)">
                             <field name="body_html" select="2" colspan="4" nolabel="1"/>
                         </page>
                     </notebook>
+                    <field name="signature"/>
                 </form>
             </field>
         </record>
