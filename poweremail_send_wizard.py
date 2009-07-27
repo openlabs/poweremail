@@ -74,7 +74,7 @@ class poweremail_send_wizard(osv.osv_memory):
         'body_text':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_text),
         'body_html':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_html),
         'report': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.file_name),
-        'signature': lambda self,cr,uid,ctx: self.template.use_sign
+        #'signature': lambda self,cr,uid,ctx: self.template.use_sign
     }
 
 poweremail_send_wizard()
