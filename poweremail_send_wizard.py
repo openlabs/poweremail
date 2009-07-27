@@ -40,14 +40,16 @@ class poweremail_send_wizard(osv.osv_memory):
                 if self.template.enforce_from_account:
                     return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]
                 else:
-                    accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','yes'),('user','=',uid)])
+                    accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','no'),('user','=',uid)])
                     if accounts_id:
                         accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id)
                         return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
 
     def get_value(self,cr,uid,ctx={},message={}):
-        return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
-        
+        if message:
+            return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
+        else:
+            return ""
 
     _columns = {
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
