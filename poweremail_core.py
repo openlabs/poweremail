@@ -147,22 +147,34 @@ class poweremail_core_accounts(osv.osv):
 
     def in_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
-        ass= self.pool.get
         if rec:
-            try:
-                if rec.isssl:
-                    serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
-                else:
-                    serv = imaplib.IMAP4(rec.iserver,rec.isport)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
-            try:
-                serv.login(rec.isuser, rec.ispass)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-            raise osv.except_osv(_("Information"),_("Test Was Successful"))
-        
-        
+            if rec.iserver_type =='imap':
+                try:
+                    if rec.isssl:
+                        serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+                    else:
+                        serv = imaplib.IMAP4(rec.iserver,rec.isport)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.login(rec.isuser, rec.ispass)
+                except imaplib.IMAP4.error,error:
+                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                raise osv.except_osv(_("Information"),_("Test Was Successful"))
+            else:
+                try:
+                    if rec.isssl:
+                        serv = poplib.POP3_SSL(rec.iserver,rec.isport)
+                    else:
+                        serv = poplib.POP3(rec.iserver,rec.isport)
+                except Exception,error:
+                    raise osv.except_osv(_("POP3 Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.user(rec.isuser)
+                    serv.pass_(rec.ispass)
+                except Exception,error:
+                    raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
+                raise osv.except_osv(_("Information"),_("Test Was Successful"))
 
     def do_approval(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
@@ -176,7 +188,9 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
-
+    def test(self,*args):
+        print "chech",args
+        
 poweremail_core_accounts()
 
 
