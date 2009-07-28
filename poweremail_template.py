@@ -213,8 +213,8 @@ class poweremail_preview(osv.osv_memory):
             vals['cc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_cc,template.id,ctx)
             vals['bcc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_bcc,template.id,ctx)
             vals['subject']= engine.parsevalue(cr,uid,rel_model_ref,template.def_subject,template.id,ctx)
-            vals['body_text']=engine.parsevalue(cr,uid,rel_model_ref,engine.strip_html(template.def_body),template.id,ctx)
-            vals['body_html']=engine.parsevalue(cr,uid,rel_model_ref,template.def_body,template.id,ctx)
+            vals['body_text']=engine.parsevalue(cr,uid,rel_model_ref,engine.strip_html(template.def_body_text),template.id,ctx)
+            vals['body_html']=engine.parsevalue(cr,uid,rel_model_ref,template.def_body_html,template.id,ctx)
             vals['report']= engine.parsevalue(cr,uid,rel_model_ref,template.file_name,template.id,ctx)
             #print "Vals>>>>>",vals
             return {'value':vals}
