@@ -87,7 +87,7 @@
                            	</group>
                            	<group col="2" colspan="2">
                            		
-                           		<button name="in_connection" type="object" string="Check Incomming Connection"/>
+                           		<button name="in_connection" type="object" string="Check Incoming Connection"/>
                            	</group>
                         </page>
                     </notebook>

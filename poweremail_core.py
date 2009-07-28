@@ -188,8 +188,7 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
-    def test(self,*args):
-        print "chech",args
+   
         
 poweremail_core_accounts()
 
