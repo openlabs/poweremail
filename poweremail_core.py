@@ -93,6 +93,7 @@ class poweremail_core_accounts(osv.osv):
          'smtpssl':lambda *a:True,
          'state':lambda *a:'draft',
          'user':lambda self,cr,uid,ctx:uid,
+         'iserver_type':lambda *a:'imap',
          'isssl': lambda *a: True,
          
                  }

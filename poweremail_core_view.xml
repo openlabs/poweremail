@@ -52,7 +52,7 @@
                             <field name="smtpport" select="2" colspan="2"/>
                             <field name="smtpssl" select="2" colspan="2"/>
                             </group>
-                            <button name="out_connection" type="object" string="Check Outgoing Connection" states="draft"/>
+                            <button name="out_connection" type="object" string="Check Outgoing Connection" />
                             <separator string="User Information" colspan="4" />
                             <group col="2" colspan="2">
                             <field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" colspan="2"/>
@@ -75,7 +75,7 @@
                             <field name="iserver_type" select="2"  colspan="2" attrs="{'required':[('iserver','!=',False)]}"/>
                             <group col="4" colspan="2">
                             <field name="isfolder"  colspan="2" attrs="{'invisible':[('iserver_type','=','pop3')]}"/>
-                            <button name="%(act_selfolder_form)d" type="action" string="Select Folder" attrs="{'invisible':[('iserver_type','=','pop3')]}" states="draft" colspan="2"/>
+                            <button name="%(act_selfolder_form)d" type="action" string="Select Folder" attrs="{'invisible':[('iserver_type','=','pop3')]}" colspan="2"/>
                             </group>
                             </group>
                             
