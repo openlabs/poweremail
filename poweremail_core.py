@@ -60,16 +60,16 @@ class poweremail_core_accounts(osv.osv):
         'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'draft':[('readonly',False)]} ),
         'user':fields.many2one('res.users','Related User',required=True,readonly=True, states={'draft':[('readonly',False)]} ),
         
-        'email_id': fields.char('Email ID',size=120,required=True, readonly=True, states={'draft':[('readonly',False)]} ),
+        'email_id': fields.char('Email ID',size=120,required=True, readonly=True, states={'draft':[('readonly',False)]} , help=" eg:yourname@yourdomain.com "),
         
-        'smtpserver': fields.char('Server', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]} ),
-        'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly',False)]}),
+        'smtpserver': fields.char('Server', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]}, help="Enter name of outgoing server,eg:smtp.gmail.com " ),
+        'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly',False)]}, help="Enter port number,eg:SMTP-587 "),
         'smtpuname': fields.char('User Name', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]}),
         'smtppass': fields.char('Password', size=120, invisible=True, required=True, readonly=True, states={'draft':[('readonly',False)]}),
         'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly',False)]}),
         
-        'iserver':fields.char('Incoming Server',size=100, readonly=True, states={'draft':[('readonly',False)]}),
-        'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly',False)]}),
+        'iserver':fields.char('Incoming Server',size=100, readonly=True, states={'draft':[('readonly',False)]}, help="Enter name of incoming server,eg:imap.gmail.com "),
+        'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly',False)]}, help="For example IMAP: 993,POP3:995 "),
         'isuser':fields.char('User Name',size=100, readonly=True, states={'draft':[('readonly',False)]}),
         'ispass':fields.char('Password',size=100, readonly=True, states={'draft':[('readonly',False)]}),
         'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type',readonly=True, states={'draft':[('readonly',False)]}),
@@ -90,16 +90,9 @@ class poweremail_core_accounts(osv.osv):
 
     _defaults = {
          'name':lambda self,cr,uid,ctx:self.pool.get('res.users').read(cr,uid,uid,['name'])['name'],
-         'smtpserver':lambda *a:'smtp.gmail.com',
-         'smtpport':lambda *a:587,
-         'smtpuname':lambda *a:'yourname@yourdomain.com',
-         'email_id':lambda *a:'yourname@yourdomain.com',
          'smtpssl':lambda *a:True,
          'state':lambda *a:'draft',
          'user':lambda self,cr,uid,ctx:uid,
-         'iserver':lambda *a: 'imap.gmail.com',
-         'iserver_type': lambda *a: 'imap',
-         'isport': lambda *a: 993,
          'isssl': lambda *a: True,
          
                  }
@@ -108,7 +101,6 @@ class poweremail_core_accounts(osv.osv):
         ('email_uniq', 'unique (email_id)', 'Another setting already exists with this email ID !')
     ]
     def _constraint_unique(self, cr, uid, ids):
-        print self.read(cr,uid,ids,['company'])[0]['company']
         if self.read(cr,uid,ids,['company'])[0]['company']=='no':
             print self.read(cr,uid,ids,['email_id'])[0]['email_id']
             accounts = self.search(cr, uid,[('user','=',uid),('company','=','no')])
@@ -131,38 +123,52 @@ class poweremail_core_accounts(osv.osv):
     def out_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
         if rec:
-            try:
-                serv = smtplib.SMTP(rec.smtpserver,rec.smtpport)
-                if rec.smtpssl:
-                    serv.ehlo()
-                    serv.starttls()
-                    serv.ehlo()
-            except Exception,error:
-                raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
-            try:
-                serv.login(rec.smtpuname, rec.smtppass)
-            except Exception,error:
-                raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
-            raise osv.except_osv(_("Information"),_("Test Was Successful"))
+            if rec.smtpserver and rec.smtpport and rec.smtpuname and rec.smtppass:
+                try:
+                    serv = smtplib.SMTP(rec.smtpserver,rec.smtpport)
+                    if rec.smtpssl:
+                        serv.ehlo()
+                        serv.starttls()
+                        serv.ehlo()
+                except Exception,error:
+                    raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.login(rec.smtpuname, rec.smtppass)
+                except Exception,error:
+                    raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
+                raise osv.except_osv(_("Information"),_("SMTP Test Connection Was Successful"))
 
     def in_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
-        ass= self.pool.get
         if rec:
-            try:
-                if rec.isssl:
-                    serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+            if rec.iserver and rec.isport and rec.isuser and rec.ispass:
+                if rec.iserver_type =='imap':
+                    try:
+                        if rec.isssl:
+                            serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+                        else:
+                            serv = imaplib.IMAP4(rec.iserver,rec.isport)
+                    except imaplib.IMAP4.error,error:
+                        raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                    try:
+                        serv.login(rec.isuser, rec.ispass)
+                    except imaplib.IMAP4.error,error:
+                        raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("Information"),_("IMAP Test Connection Was Successful"))
                 else:
-                    serv = imaplib.IMAP4(rec.iserver,rec.isport)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
-            try:
-                serv.login(rec.isuser, rec.ispass)
-            except imaplib.IMAP4.error,error:
-                raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-            raise osv.except_osv(_("Information"),_("Test Was Successful"))
-        
-        
+                    try:
+                        if rec.isssl:
+                            serv = poplib.POP3_SSL(rec.iserver,rec.isport)
+                        else:
+                            serv = poplib.POP3(rec.iserver,rec.isport)
+                    except Exception,error:
+                        raise osv.except_osv(_("POP3 Server Error"), _("An error occurred : %s ") % error)
+                    try:
+                        serv.user(rec.isuser)
+                        serv.pass_(rec.ispass)
+                    except Exception,error:
+                        raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("Information"),_("POP3 Test Connection Was Successful"))
 
     def do_approval(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
@@ -176,7 +182,8 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
-
+   
+        
 poweremail_core_accounts()
 
 
