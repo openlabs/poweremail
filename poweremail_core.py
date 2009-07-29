@@ -102,7 +102,6 @@ class poweremail_core_accounts(osv.osv):
         ('email_uniq', 'unique (email_id)', 'Another setting already exists with this email ID !')
     ]
     def _constraint_unique(self, cr, uid, ids):
-        print self.read(cr,uid,ids,['company'])[0]['company']
         if self.read(cr,uid,ids,['company'])[0]['company']=='no':
             print self.read(cr,uid,ids,['email_id'])[0]['email_id']
             accounts = self.search(cr, uid,[('user','=',uid),('company','=','no')])
@@ -125,50 +124,52 @@ class poweremail_core_accounts(osv.osv):
     def out_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
         if rec:
-            try:
-                serv = smtplib.SMTP(rec.smtpserver,rec.smtpport)
-                if rec.smtpssl:
-                    serv.ehlo()
-                    serv.starttls()
-                    serv.ehlo()
-            except Exception,error:
-                raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
-            try:
-                serv.login(rec.smtpuname, rec.smtppass)
-            except Exception,error:
-                raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
-            raise osv.except_osv(_("Information"),_("SMTP Test Connection Was Successful"))
+            if rec.smtpserver and rec.smtpport and rec.smtpuname and rec.smtppass:
+                try:
+                    serv = smtplib.SMTP(rec.smtpserver,rec.smtpport)
+                    if rec.smtpssl:
+                        serv.ehlo()
+                        serv.starttls()
+                        serv.ehlo()
+                except Exception,error:
+                    raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
+                try:
+                    serv.login(rec.smtpuname, rec.smtppass)
+                except Exception,error:
+                    raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
+                raise osv.except_osv(_("Information"),_("SMTP Test Connection Was Successful"))
 
     def in_connection(self,cr,uid,ids,context={}):
         rec = self.browse(cr, uid, ids )[0]
         if rec:
-            if rec.iserver_type =='imap':
-                try:
-                    if rec.isssl:
-                        serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
-                    else:
-                        serv = imaplib.IMAP4(rec.iserver,rec.isport)
-                except imaplib.IMAP4.error,error:
-                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
-                try:
-                    serv.login(rec.isuser, rec.ispass)
-                except imaplib.IMAP4.error,error:
-                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-                raise osv.except_osv(_("Information"),_("IMAP Test Connection Was Successful"))
-            else:
-                try:
-                    if rec.isssl:
-                        serv = poplib.POP3_SSL(rec.iserver,rec.isport)
-                    else:
-                        serv = poplib.POP3(rec.iserver,rec.isport)
-                except Exception,error:
-                    raise osv.except_osv(_("POP3 Server Error"), _("An error occurred : %s ") % error)
-                try:
-                    serv.user(rec.isuser)
-                    serv.pass_(rec.ispass)
-                except Exception,error:
-                    raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
-                raise osv.except_osv(_("Information"),_("POP3 Test Connection Was Successful"))
+            if rec.iserver and rec.isport and rec.isuser and rec.ispass:
+                if rec.iserver_type =='imap':
+                    try:
+                        if rec.isssl:
+                            serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+                        else:
+                            serv = imaplib.IMAP4(rec.iserver,rec.isport)
+                    except imaplib.IMAP4.error,error:
+                        raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                    try:
+                        serv.login(rec.isuser, rec.ispass)
+                    except imaplib.IMAP4.error,error:
+                        raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("Information"),_("IMAP Test Connection Was Successful"))
+                else:
+                    try:
+                        if rec.isssl:
+                            serv = poplib.POP3_SSL(rec.iserver,rec.isport)
+                        else:
+                            serv = poplib.POP3(rec.iserver,rec.isport)
+                    except Exception,error:
+                        raise osv.except_osv(_("POP3 Server Error"), _("An error occurred : %s ") % error)
+                    try:
+                        serv.user(rec.isuser)
+                        serv.pass_(rec.ispass)
+                    except Exception,error:
+                        raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("Information"),_("POP3 Test Connection Was Successful"))
 
     def do_approval(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
