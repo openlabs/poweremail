@@ -121,8 +121,8 @@
             </field>
         </record>
 
-        <record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree">
-            <field name="name">Email Accounts</field>
+        <record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree_per">
+            <field name="name">Personal Account</field>
             <field name="res_model">poweremail.core_accounts</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
@@ -133,7 +133,7 @@
 
         <record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_all">
-            <field name="name">Email Server</field>
+            <field name="name">All Accounts</field>
             <field name="res_model">poweremail.core_accounts</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
@@ -142,7 +142,7 @@
 
         <record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_co">
-            <field name="name">Email Server</field>
+            <field name="name">Company Accounts</field>
             <field name="res_model">poweremail.core_accounts</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
@@ -153,7 +153,7 @@
         
         <record model="ir.actions.act_window"
 			id="action_poweremail_core_accounts_tree_my">
-            <field name="name">Email Server</field>
+            <field name="name">My Account</field>
             <field name="res_model">poweremail.core_accounts</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
@@ -172,12 +172,12 @@
         <menuitem name="All Account"
 			id="menu_poweremail_core_accounts_all"
 			parent="menu_poweremail_configuration_server"
-			action="action_poweremail_core_accounts_tree" />
+			action="action_poweremail_core_accounts_tree_all" />
 
         <menuitem name="Personal Accounts"
 			id="menu_poweremail_core_accounts_Personal"
 			parent="menu_poweremail_configuration_server"
-			action="action_poweremail_core_accounts_tree_all" />
+			action="action_poweremail_core_accounts_tree_per" />
 
         <menuitem name="Company Accounts"
 			id="menu_poweremail_core_accounts_Personal_co"
