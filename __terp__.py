@@ -40,7 +40,8 @@
         'poweremail_workflow.xml',
         'poweremail_core_view.xml',
         'poweremail_template_view.xml',
-        'poweremail_send_wizard.xml'
+        'poweremail_send_wizard.xml',
+        'poweremail_mailbox_view.xml',
     ],
     "demo_xml" : [],
     "installable": True,
