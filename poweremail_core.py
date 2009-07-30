@@ -183,8 +183,78 @@ class poweremail_core_accounts(osv.osv):
     def do_suspend(self,cr,uid,ids,context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
-   
-        
+
+#**************************** MAIL SENDING FEATURES ***********************#
+    def send_mail(self,cr,uid,ids,to=[],cc=[],bcc=[],subject="",body_text="",body_html="",payload={}):
+        #ids:(from) Account from which mail is to be sent
+        #to: To ids as list
+        #cc: CC ids as list
+        #bcc: BCC ids as list
+        #subject: Subject as string
+        #body_text: body as plain text
+        #body_html: body in html
+        #payload: attachments as binary dic. Eg:payload={'filename1.pdf':<binary>,'filename2.jpg':<binary>}
+        #################### For each account in chosen accounts ##################
+        logger = netsvc.Logger()
+        for id in ids:
+            core_obj = self.browse(cr,uid,id)
+            if core_obj.smtpserver and core_obj.smtpport and core_obj.smtpuname and core_obj.smtppass and core_obj.state=='approved':
+                try:
+                    serv = smtplib.SMTP(core_obj.smtpserver,core_obj.smtpport)
+                    if core_obj.smtpssl:
+                        serv.ehlo()
+                        serv.starttls()
+                        serv.ehlo()
+                except Exception,error:
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not connect to server\nError: %s")% (id,error))
+                    return False
+                try:
+                    serv.login(core_obj.smtpuname, core_obj.smtppass)
+                except Exception,error:
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
+                    return False
+                try:
+                    msg = MIMEMultipart('alternative')
+                    msg['Subject']= subject
+                    msg['From'] = str(core_obj.name + "<" + core_obj.email_id + ">")
+                    msg['To']=",".join(map(str, to))
+                    msg['cc']=",".join(map(str, cc)) or False
+                    msg['bcc']=",".join(map(str, bcc)) or False
+                    # Record the MIME types of both parts - text/plain and text/html.
+                    part1 = MIMEText(body_text, 'plain')
+                    if body_html:#If html body also exists, send that
+                        part2 = MIMEText(body_html, 'html')
+                    else:
+                        part2 = part1
+                    # Attach parts into message container.
+                    # According to RFC 2046, the last part of a multipart message, in this case
+                    # the HTML message, is best and preferred.
+                    msg.attach(part1)
+                    msg.attach(part2)
+                    #Now add attachments if any
+                    for file in payload.keys():
+                        part = MIMEBase('application', "octet-stream")
+                        part.set_payload(payload[file])
+                        Encoders.encode_base64(part)
+                        part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
+                        msg.attach(part)
+                    #msg is now complete, send it to everybody
+                except Exception,error:
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
+                    return False
+                try:
+                    serv.sendmail(msg['From'],to+cc+bcc)
+                except Exception,error:
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
+                    return False
+                #The mail sending is complete
+                serv.quit()
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s successfully Sent.")% (id))
+                return True
+            else:
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
+                return False
+
 poweremail_core_accounts()
 
 
