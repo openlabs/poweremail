@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Document   : poweremail_mailbox_view.xml
+	Created on : 29 July, 2009, 14:27
+	Author     : Sharoon Thomas
+	Description: View file for poweremail mailbox
+-->
+<openerp>
+	<data>
+		<!-- Power Email Template PReview -->
+		<record model="ir.ui.view" id="poweremail_mailbox_form">
+			<field name="name">poweremail.mailbox.form</field>
+			<field name="model">poweremail.mailbox</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Power Email Inbox">
+					<field name="name" />
+					<field name="pem_from" />
+					<field name="pem_to" />
+					<field name="pem_cc" />
+					<field name="pem_bcc" />
+					<field name="pem_subject" />
+					<field name="pem_body_text" />
+					<field name="pem_body_html" />
+					<field name="pem_attachments_ids" />
+					<field name="pem_account_id" />
+					<group>
+					<button name="rec_hdrs" type="object" string="Get Mails"/>
+					</group>
+				</form>
+			</field>
+		</record>
+
+
+
+		<record model="ir.ui.view" id="poweremail_mailbox_tree">
+			<field name="name">poweremail.mailbox.tree</field>
+			<field name="model">poweremail.mailbox</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<tree string="Power Email Inbox">
+					<field name="name" />
+					<field name="pem_from" select="1" />
+					<field name="pem_to" select="1"/>
+					<field name="pem_cc" select="1"/>
+					<field name="pem_bcc" select="1"/>
+					<field name="pem_subject" select="1"/>
+					<field name="pem_body_text" select="1"/>
+					<field name="pem_body_html" select="1"/>
+					<field name="pem_attachments_ids" select="1"/>
+					<field name="pem_account_id" select="1"/>
+				</tree>
+			</field>
+		</record>
+
+
+		<record model="ir.actions.act_window"
+			id="action_poweremail_mailboxe_tree_all">
+			<field name="name">Email Mailbox</field>
+			<field name="res_model">poweremail.mailbox</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form,tree</field>
+			<field name="view_id" ref="poweremail_mailbox_tree" />
+		</record>
+
+		<menuitem name="MailBox" id="menu_poweremail_mailbox_all"
+			parent="menu_poweremail_administration_server"
+			action="action_poweremail_mailboxe_tree_all" />
+
+
+	</data>
+</openerp>
+
+
+
+
+
