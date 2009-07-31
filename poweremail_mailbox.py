@@ -113,7 +113,7 @@ class poweremail_mailbox(osv.osv):
         core_obj = self.pool.get('poweremail.core_accounts')
         if 'server_ref' in context.keys():
             #Get mails from that ID only 
-            core_obj.get_fullmail(cr,uid,context['email_account'],ctx)
+            core_obj.get_fullmail(cr,uid,context['email_account'],context)
         else:
             raise osv.osv_except(_("Mail fetch exception"),_("No information on which mail should be fetched fully"))
                         
