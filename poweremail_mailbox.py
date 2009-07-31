@@ -55,12 +55,11 @@ else:
     
 
 class poweremail_mailbox(osv.osv):
-    print 'in poweremail mailbox'
     _name="poweremail.mailbox"
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
-
+    _rec_name="subject"
+    
     _columns = {
-        'name' : fields.char('Name of Template', size=100, required=True), 
         'pem_from':fields.char('From', size=64), 
         'pem_to':fields.char('Recepient (To)', size=64), 
         'pem_cc':fields.char(' CC', size=64), 
@@ -69,9 +68,27 @@ class poweremail_mailbox(osv.osv):
         'pem_body_text':fields.text('Standard Body (Text)'), 
         'pem_body_html':fields.text('Body (Text-Web Client Only)'), 
         'pem_attachments_ids':fields.many2many('ir.attachment', 'mail_attachments_rel', 'mail_id', 'att_id', 'Attachments'), 
-        'pem_account_id' :fields.many2many('poweremail.core_accounts', 'email_account_rel', 'email_id', 'core_acc_id', 'User account'), 
-        'server_ref':fields.integer('Server Reference of mail',help="Applicable for inward items only")
-        
+        'pem_account_id' :fields.many2one('poweremail.core_accounts', 'User account'),
+        'server_ref':fields.integer('Server Reference of mail',help="Applicable for inward items only"),
+        'pem_recd':fields.char('Received at',size=50),
+        'mail_type':fields.selection([
+                                ('multipart/mixed','Has Attachments'),
+                                ('multipart/alternative','Plain Text & HTML with no attachments'),
+                                ('text/plain','Plain Text'),
+                                ('text/html','HTML Body'),
+                                ],'Mail Contents'),
+        'folder':fields.selection([
+                                ('inbox','Inbox'),
+                                ('drafts','Drafts'),
+                                ('outbox','Outbox'),
+                                ('trash','Trash'),
+                                ('followup','Follow Up')
+                                ],'Folder'),
+        'status':fields.selection([
+                                ('read','Read'),
+                                ('unread','Un-Read')
+                                ],'Status'),
+        'date_mail':fields.datetime('Rec/Sent Date')
     }
 
     _defaults = {
@@ -80,6 +97,7 @@ class poweremail_mailbox(osv.osv):
     
     def get_headers(self,cr,uid,context={}):
         #email_account: THe ID of poweremil core account
+        #Context should also have the last downloaded mail for an account
         #Normlly this function is expected to trigger from scheduler hence the value will not be there
         core_obj = self.pool.get('poweremail.core_accounts')
         if 'email_account' in context.keys():

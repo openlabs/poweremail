@@ -75,7 +75,9 @@ class poweremail_core_accounts(osv.osv):
         'iserver_type': fields.selection([('imap','IMAP'),('pop3','POP3')], 'Server Type',readonly=True, states={'draft':[('readonly',False)]}),
         'isssl':fields.boolean('Use SSL', readonly=True, states={'draft':[('readonly',False)]} ),
         'isfolder':fields.char('Folder',readonly=True,size=100,help="Folder to be used for downloading IMAP mails\nClick on adjacent button to select from a list of folders"),
-        
+        'last_mail_id':fields.integer('Last Downloaded Mail',readonly=True),
+        'rec_headers_den_mail':fields.boolean('First Receive headers, then download mail'),
+        'dont_auto_down_attach':fields.boolean('Dont Download attachments automatically'),
         'company':fields.selection([
                                     ('yes','Yes'),
                                     ('no','No')
@@ -95,7 +97,9 @@ class poweremail_core_accounts(osv.osv):
          'user':lambda self,cr,uid,ctx:uid,
          'iserver_type':lambda *a:'imap',
          'isssl': lambda *a: True,
-         
+         'last_mail_id':lambda *a:0,
+         'rec_headers_den_mail':lambda *a:True,
+         'dont_auto_down_attach':lambda *a:True,
                  }
                  
     _sql_constraints = [
@@ -254,7 +258,152 @@ class poweremail_core_accounts(osv.osv):
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
                 return False
+    
+    def save_header(mail,coreaccountid):
+        #Internal function for saving of mail headers to mailbox
+        #mail: eMail Object
+        #coreaccounti: ID of poeremail core account
+        mail_obj = self.pool.get('poweremail.mailbox')
+        vals = {
+            'pem_from':mail['From'],
+            'pem_to':mail['To'],
+            'pem_cc':mail['cc'],
+            'pem_bcc':mail['bcc'],
+            'pem_recd':mail['date'],
+            'date_mail':time.strptime(mail[date].strip[0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'pem_subject':mail['subject'],
+            'server_ref':mail[0].split()[0],
+            'folder':'inbox',
+            'state':'unread',
+            'pem_body_text':'Mail not downloaded...',
+            'pem_body_html':'Mail not downloaded...',
+            'pem_account_id':coreaccountid
+            }
+        #Identify Mail Type
+        if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
+            vals['mail_type']=mail.get_content_type()
+        else:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload Account:%s.")% (coreaccountid))
+        #Create mailbox entry in Mail
+        try:
+            crid = mail_obj.create(cr,uid,vals)
+        except e:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
+        #Check if a create was success
+        if crid:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.")% (mail[0].split()[0],crid,coreaccountid))
+            crid=False
+        else:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
 
+    def save_fullmail(mail,coreaccountid):
+        #Internal function for saving of mails to mailbox
+        #mail: eMail Object
+        #coreaccounti: ID of poeremail core account
+        mail_obj = self.pool.get('poweremail.mailbox')
+        #TODO:If multipart save attachments and save ids 
+        vals = {
+            'pem_from':mail['From'],
+            'pem_to':mail['To'],
+            'pem_cc':mail['cc'],
+            'pem_bcc':mail['bcc'],
+            'pem_recd':mail['date'],
+            'date_mail':time.strptime(mail[date].strip[0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'pem_subject':mail['subject'],
+            'server_ref':mail[0].split()[0],
+            'folder':'inbox',
+            'state':'unread',
+            'pem_body_text':'Mail not downloaded...',#TODO:Replace with mail text
+            'pem_body_html':'Mail not downloaded...',#TODO:Replace
+            'pem_account_id':coreaccountid
+            }
+        #Identify Mail Type
+        if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
+            vals['mail_type']=mail.get_content_type()
+            if mail.get_content_type() in ['text/plain','text/html']:
+                val['pem_body_text']=mail.get_payload()
+                val['pem_body_html']=mail.get_payload()
+            elif mail.get_content_type() in 'multipart/alternative':
+                val['pem_body_text']=mail.get_payload(0).get_payload()
+                val['pem_body_html']=mail.get_payload(1).get_payload()
+            else:
+
+        else:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload Account:%s.")% (coreaccountid))
+        #Create mailbox entry in Mail
+        try:
+            crid = mail_obj.create(cr,uid,vals)
+        except e:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
+        #Check if a create was success
+        if crid:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.")% (mail[0].split()[0],crid,coreaccountid))
+            crid=False
+        else:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
+
+    
+    def get_headers(self,cr,uid,ids,ctx):
+        #The function downloads the headers from the mail box
+        #IDS should be list of id of poweremail_coreaccounts
+        logger = netsvc.Logger()
+        #The Main reception function starts here
+        for id in ids:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Starting Header reception for account:%s.")% (id))
+            rec = self.browse(cr, uid, id )
+            if rec:
+                if rec.iserver and rec.isport and rec.isuser and rec.ispass :
+                    if rec.iserver_type =='imap' and rec.isfolder:
+                        #Try Connecting to Server
+                        try:
+                            if rec.isssl:
+                                serv = imaplib.IMAP4_SSL(rec.iserver,rec.isport)
+                            else:
+                                serv = imaplib.IMAP4(rec.iserver,rec.isport)
+                        except imaplib.IMAP4.error,error:
+                            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Error Account:%s Error:%s.")% (id,error))
+                        #Try logging in to server
+                        try:
+                            serv.login(rec.isuser, rec.ispass)
+                        except imaplib.IMAP4.error,error:
+                            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Login Error Account:%s Error:%s.")% (id,error))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Server Connected & logged in successfully Account:%s.")% (id))
+                        #Select IMAP folder
+                        try:
+                            typ,msg_count = serv.select(rec.isfolder)
+                        except imaplib.IMAP4.error,error:
+                            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.")% (id,error))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.")% (id))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(res.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
+                        #If there are newer mails than the ones in mailbox
+                        if rec.last_mail_id < int(msg_count[0]):
+                            if rec.rec_headers_den_mail:
+                                #Download Headers Only
+                                typ,msg = serv.fetch(",".join(str(i) for i in range(rec.last_mail_id,msg_count[0])),'(BODY.PEEK[HEADER])')
+                                for mails in msg:
+                                    if type(mails)==type(('tuple','type')):
+                                        mail = email.message_from_string(mails[1])
+                                        self.save_header(mail,id)
+                            else:#Receive Full Mail first time itself
+                                self.imap_receive_full
+                    elif rec.iserver_type =='pop3':
+                        #Try Connecting to Server
+                        try:
+                            if rec.isssl:
+                                serv = poplib.POP3_SSL(rec.iserver,rec.isport)
+                            else:
+                                serv = poplib.POP3(rec.iserver,rec.isport)
+                        except Exception,error:
+                            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Error Account:%s Error:%s.")% (id,error))
+                        #Try logging in to server
+                        try:
+                            serv.user(rec.isuser)
+                            serv.pass_(rec.ispass)
+                        except Exception,error:
+                            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Login Error Account:%s Error:%s.")% (id,error))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Server Connected & logged in successfully Account:%s.")% (id))
+                    else:
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.")% (id))
 poweremail_core_accounts()
 
 
