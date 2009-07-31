@@ -482,7 +482,7 @@ class poweremail_core_accounts(osv.osv):
                                             self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
                             else:#Receive Full Mail first time itself
                                 #Download Full RF822 Mails
-                                typ,msg = serv.fetch(",".join(str(i) for i in range(rec.last_mail_id+1,int(msg_count[0])+1)),'(RF822)')
+                                typ,msg = serv.fetch(",".join(str(i) for i in range(rec.last_mail_id+1,int(msg_count[0])+1)),'(RFC822)')
                                 for mails in msg:
                                     if type(mails)==type(('tuple','type')):
                                         mail = email.message_from_string(mails[1])
@@ -506,19 +506,19 @@ class poweremail_core_accounts(osv.osv):
                         except Exception,error:
                             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Login Error Account:%s Error:%s.")% (id,error))
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Server Connected & logged in successfully Account:%s.")% (id))
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Statistics:%s mails of %s size for Account:%s:%s")% (serv.stat()[0],serv.stat()[1],id))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Statistics:%s mails of %s size for Account:%s")% (serv.stat()[0],serv.stat()[1],id))
                         #If there are newer mails than the ones in mailbox
                         if rec.last_mail_id < serv.stat()[0]:
                             if rec.rec_headers_den_mail:
                                 #Download Headers Only
-                                for msgid in range(rec.last_mail_id+1,len(serv.stat()[0])+1):
+                                for msgid in range(rec.last_mail_id+1,serv.stat()[0]+1):
                                     resp,msg,octet = serv.top(msgid,20) #20 Lines from the content
                                     mail = email.message_from_string(string.join(msg,"\n"))
                                     if self.save_header(cr,uid,mail,id,msgid):#If saved succedfully then increment last mail recd
                                         self.write(cr,uid,id,{'last_mail_id':msgid})
                             else:#Receive Full Mail first time itself
                                 #Download Full RF822 Mails
-                                for msgid in range(rec.last_mail_id+1,len(serv.stat()[0])+1):
+                                for msgid in range(rec.last_mail_id+1,serv.stat()[0]+1):
                                     resp,msg,octet = serv.retr(msgid) #Full Mail
                                     mail = email.message_from_string(string.join(msg,"\n"))
                                     if self.save_header(cr,uid,mail,id,msgid):#If saved succedfully then increment last mail recd
@@ -560,7 +560,7 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.")% (id))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(res.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
-                    typ,msg = serv.fetch(str(server_ref),'(RF822)')
+                    typ,msg = serv.fetch(str(server_ref),'(RFC822)')
                     for mails in msg:
                         if type(mails)==type(('tuple','type')):
                             mail = email.message_from_string(mails[1])
