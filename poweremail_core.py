@@ -259,7 +259,7 @@ class poweremail_core_accounts(osv.osv):
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
                 return False
     
-    def save_header(mail,coreaccountid,serv_ref):
+    def save_header(self,mail,coreaccountid,serv_ref):
         #Internal function for saving of mail headers to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
@@ -297,7 +297,7 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
 
-    def save_fullmail(mail,coreaccountid,serv_ref):
+    def save_fullmail(self,mail,coreaccountid,serv_ref):
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
@@ -365,7 +365,7 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
 
-    def complete_mail(mail,coreaccountid,serv_ref,mailboxref):
+    def complete_mail(self,mail,coreaccountid,serv_ref,mailboxref):
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
