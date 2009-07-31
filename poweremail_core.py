@@ -301,6 +301,7 @@ class poweremail_core_accounts(osv.osv):
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
 
     def save_fullmail(self,cr,uid,mail,coreaccountid,serv_ref):
+        val={}
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
@@ -357,8 +358,8 @@ class poweremail_core_accounts(osv.osv):
                                 'res_model':'poweremail.mailbox',
                                 'res_id':crid
                                     }
-                    att_ids.extend(att_obj.create(cr,uid,new_att_vals))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload()-1,coreaccountid)))
+                    att_ids.extend([att_obj.create(cr,uid,new_att_vals)])
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload())-1,coreaccountid))
                     #Now attach the attachment ids to mail
                     if mail_obj.write(cr,uid,crid,{'pem_attachments_ids':[[6, 0, att_ids]]}):
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Attachment to mail for %s relation success! Account:%s.")% (crid,coreaccountid))
@@ -486,8 +487,8 @@ class poweremail_core_accounts(osv.osv):
                                 for mails in msg:
                                     if type(mails)==type(('tuple','type')):
                                         mail = email.message_from_string(mails[1])
-                                        if self.save_fullmail(cr,uid,mail,id,mail[0].split()[0]):#If saved succedfully then increment last mail recd
-                                            self.write(cr,uid,id,{'last_mail_id':mail[0].split()[0]})
+                                        if self.save_fullmail(cr,uid,mail,id,mails[0].split()[0]):#If saved succedfully then increment last mail recd
+                                            self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
                         serv.close()
                         serv.logout()
                     elif rec.iserver_type =='pop3':
