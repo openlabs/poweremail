@@ -111,7 +111,7 @@ class poweremail_mailbox(osv.osv):
                     
     def get_fullmail(self,cr,uid,context={}):
         core_obj = self.pool.get('poweremail.core_accounts')
-        if 'server_ref' in context.keys():
+        if 'mailboxref' in context.keys():
             #Get mails from that ID only 
             core_obj.get_fullmail(cr,uid,context['email_account'],context)
         else:
