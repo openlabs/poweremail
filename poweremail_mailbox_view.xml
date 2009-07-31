@@ -8,6 +8,10 @@
 -->
 <openerp>
 	<data>
+
+		<menuitem name="MailBox" id="menu_poweremail_mailbox_all_main2"
+			parent="poweremail.menu_poweremail_administration_server" />
+
 		<!-- Power Email Template PReview -->
 		<record model="ir.ui.view" id="poweremail_mailbox_form">
 			<field name="name">poweremail.mailbox.form</field>
@@ -15,17 +19,56 @@
 			<field name="type">form</field>
 			<field name="arch" type="xml">
 				<form string="Power Email Inbox">
-					<field name="pem_from" />
-					<field name="pem_to" />
-					<field name="pem_cc" />
-					<field name="pem_bcc" />
-					<field name="pem_subject" />
-					<field name="pem_body_text" />
-					<field name="pem_body_html" />
-					<field name="pem_attachments_ids" />
-					<field name="pem_account_id" />
-					<group>
-					<button name="send_all_mail" type="object" string="Send Mails"/>
+					<group col="4" colspan="2">
+						<field name="pem_from" colspan="2" />
+						<field name="pem_cc" colspan="4" />
+						<field name="date_mail" colspan="4" />
+					</group>
+					<group col="4" colspan="2">
+						<field name="pem_to" colspan="2" />
+						<field name="pem_bcc" colspan="4" />
+						<field name="pem_subject" colspan="4" />
+					</group>
+					<notebook colspan="4">
+						<page string="Standard Body">
+							<separator colspan="4" string="Standard Body" />
+							<notebook colspan="4">
+								<page string="Standard Body (Text)">
+									<field name="pem_body_text"
+										nolabel="1" colspan="4" />
+								</page>
+								<page
+									string="Body (Text-Web Client Only)">
+									<field name="pem_body_html"
+										nolabel="1" colspan="4" />
+								</page>
+							</notebook>
+						</page>
+
+						
+						<page string="Attachments">
+							<group col="4">
+								<separator colspan="4" string="Attachments"/>
+								<field name="pem_attachments_ids"
+									colspan="4" nolabel="1"/>
+							 </group>
+						</page>
+						<page string="Advanced">
+							<group col="4">
+								<field name="pem_account_id"
+									colspan="2" />
+								<field name="server_ref" colspan="2" />
+								<field name="pem_recd" colspan="2" />
+								<field name="mail_type" colspan="2" />
+								<field name="folder" colspan="2" />
+							</group>
+						</page>
+					</notebook>
+					<separator colspan="4" string="" />
+					<group col="4" colspan="4">
+						<field name="status" colspan="2" />
+						<button name="rec_hdrs" type="object"
+							string="Get Mails" colspan="2" />
 					</group>
 				</form>
 			</field>
@@ -40,14 +83,14 @@
 			<field name="arch" type="xml">
 				<tree string="Power Email Inbox">
 					<field name="pem_from" select="1" />
-					<field name="pem_to" select="1"/>
-					<field name="pem_cc" select="1"/>
-					<field name="pem_bcc" select="1"/>
-					<field name="pem_subject" select="1"/>
-					<field name="pem_body_text" select="1"/>
-					<field name="pem_body_html" select="1"/>
-					<field name="pem_attachments_ids" select="1"/>
-					<field name="pem_account_id" select="1"/>
+					<field name="pem_to" select="1" />
+					<field name="pem_cc" select="1" />
+					<field name="pem_bcc" select="1" />
+					<field name="pem_subject" select="1" />
+					<field name="pem_body_text" select="1" />
+					<field name="pem_body_html" select="1" />
+					<field name="pem_attachments_ids" select="1" />
+					<field name="pem_account_id" select="1" />
 				</tree>
 			</field>
 		</record>
@@ -62,14 +105,14 @@
 			<field name="view_id" ref="poweremail_mailbox_tree" />
 		</record>
 
-		<menuitem name="MailBox" id="menu_poweremail_mailbox_all"
-			parent="menu_poweremail_administration_server"
+
+		<menuitem name="Inbox" id="menu_poweremail_mailbox_all_inbox"
+			parent="menu_poweremail_mailbox_all_main2"
 			action="action_poweremail_mailboxe_tree_all" />
 
 
 	</data>
 </openerp>
-
 
 
 
