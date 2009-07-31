@@ -31,6 +31,18 @@ class poweremail_mailbox(osv.osv):
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
     _rec_name="subject"
 
+    def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
+        print "automatimailllllllllc",use_new_cursor,context
+        '''
+        use_new_cursor: False or the dbname
+        '''
+        
+        if not context:
+            context={'email_account':1}
+        print "CONTEXT",context
+        self.get_headers(cr,uid,context)
+        
+        
     def get_headers(self,cr,uid,context={}):
         #email_account: THe ID of poweremil core account
         #Context should also have the last downloaded mail for an account
@@ -38,7 +50,7 @@ class poweremail_mailbox(osv.osv):
         core_obj = self.pool.get('poweremail.core_accounts')
         if 'email_account' in context.keys():
             #Get mails from that ID only
-            core_obj.get_headers(cr,uid,context['email_account'])
+            core_obj.get_headers(cr,uid,[context['email_account']])
         else:
             accounts = core_obj.search(cr,uid,[('state','=','approved')])
             #Now get mails for each account
@@ -61,7 +73,7 @@ class poweremail_mailbox(osv.osv):
             core_obj=self.pool.get('poweremail.core_accounts')
             values =  self.read(cr,uid,ids[0],[])
             
-            if core_obj.send_mail(cr,uid,ids,[values['pem_to']],[values['pem_cc']],[values['pem_bcc']],[values['pem_subject']],[values['pem_body_text']],body_html="",payload={})):
+            if core_obj.send_mail(cr,uid,ids,[values['pem_to']],[values['pem_cc']],[values['pem_bcc']],[values['pem_subject']],[values['pem_body_text']],body_html="",payload={}):
                 self.write(cr,uid,id,{'folder':'sent'})
 
     _columns = {
@@ -90,7 +102,7 @@ class poweremail_mailbox(osv.osv):
                                     ('followup','Follow Up'),
                                     ('sent','Sent Items'),
                                     ],'Folder'),
-            'status':fields.selection([
+            'state':fields.selection([
                                     ('read','Read'),
                                     ('unread','Un-Read')
                                     ],'Status'),
