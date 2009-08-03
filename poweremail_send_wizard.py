@@ -24,6 +24,7 @@
 #########################################################################
 from osv import osv, fields
 import netsvc
+import base64
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'
@@ -63,11 +64,12 @@ class poweremail_send_wizard(osv.osv_memory):
         'to':fields.char('To',size=100,readonly=True),
         'cc':fields.char('CC',size=100,),
         'bcc':fields.char('BCC',size=100,),
-        'subject':fields.char('Subject',size=200,),
+        'subject':fields.char('Subject',size=200,required=True),
         'body_text':fields.text('Body',),
         'body_html':fields.text('Body',),
         'report':fields.char('Report File Name',size=100,),
-        'signature':fields.boolean('Attach my signature to mail')
+        'signature':fields.boolean('Attach my signature to mail'),
+        'filename':fields.text('File Name')
                 }
 
     _defaults = {
@@ -80,9 +82,63 @@ class poweremail_send_wizard(osv.osv_memory):
         'body_text':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_text),
         'body_html':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_html),
         'report': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.file_name),
-        #'signature': lambda self,cr,uid,ctx: self.template.use_sign
+        'signature': lambda self,cr,uid,ctx: self.template.use_sign,
+        'ref_template':lambda self,cr,uid,ctx: self.template.id
     }
 
+    def sav_to_drafts(self,cr,uid,ids,ctx={}):
+        mailid = self.save_to_mailbox(cr,uid,ids,ctx)
+        if self.pool.get('poweremail.mailbox').write(cr,uid,mailid,{'folder':'drafts'}):
+            return {'type':'ir.actions.act_window_close' }
+
+    def send_mail(self,cr,uid,ids,ctx={}):
+        mailid = self.save_to_mailbox(cr,uid,ids,ctx)
+        if self.pool.get('poweremail.mailbox').write(cr,uid,mailid,{'folder':'outbox'}):
+            return {'type':'ir.actions.act_window_close' }
+        
+    def save_to_mailbox(self,cr,uid,ids,ctx={}):
+        for id in ids:
+            screen_vals = self.read(cr,uid,id,[])[0]
+            print screen_vals
+            accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'])
+            vals = {
+                'pem_from': ctx['src_model'],
+                'pem_to':screen_vals['to'],
+                'pem_cc':screen_vals['cc'],
+                'pem_bcc':screen_vals['bcc'],
+                'pem_subject':screen_vals['subject'],
+                'pem_body_text':screen_vals['body_text'],
+                'pem_body_html':screen_vals['body_html'],
+                'pem_account_id' :screen_vals['ref_template'],
+                'state':'na',
+                'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
+            }
+            if screen_vals['signature']:
+                sign = self.pool.get('res.users').read(cr,uid,uid,['signature'])['signature']
+                if vals['pem_body_text']:
+                    vals['pem_body_text']+=sign
+                if vals['pem_body_html']:
+                    vals['pem_body_html']+=sign
+            #Create partly the mail and later update attachments
+            mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
+            if self.template.report_template:
+                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,self.template.report_template.id,['report_name'])['report_name']
+                service = netsvc.LocalService(reportname)
+                (result, format) = service.create(cr, uid, [id], {}, {})
+                att_obj = self.pool.get('ir.attachment')
+                new_att_vals={
+                                'name':screen_vals['subject'] + ' (Email Attachment)',
+                                'datas':base64.b64encode(result),
+                                'datas_fname':str(screen_vals['filename'] or 'Report') + "." + format,
+                                'description':screen_vals['body_text'] or "No Description",
+                                'res_model':'poweremail.mailbox',
+                                'res_id':mail_id
+                                    }
+                attid = att_obj.create(cr,uid,new_att_vals)
+                if attid:
+                    self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'})
+            return mail_id
+        
 poweremail_send_wizard()
     
     

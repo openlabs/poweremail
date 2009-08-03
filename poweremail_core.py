@@ -375,7 +375,7 @@ class poweremail_core_accounts(osv.osv):
                 for i in range(1,len(mail.get_payload())):#Get each attachment
                     new_att_vals={
                                 'name':mail['subject'] + '(Email Attachment)',
-                                'datas':mail.get_payload(i).get_payload(),
+                                'datas':base64.b64encode(mail.get_payload(i).get_payload()),
                                 'datas_fname':mail.get_payload(i).get_filename(),
                                 'description':val['pem_body_text'],
                                 'res_model':'poweremail.mailbox',

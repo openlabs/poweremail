@@ -74,6 +74,7 @@
                                 <field name="def_subject" colspan="4"/>
                                 <field name="use_sign" colspan="4"/>
                                 <field name="file_name" colspan="4"/>
+                                <field name="report_template" colspan="4"/>
                             </group>
                             <separator colspan="4" string="Standard Body"/>
                             <separator colspan="4" string="Expression Builder"/>

@@ -33,6 +33,9 @@
                         </page>
                     </notebook>
                     <field name="signature"/>
+                    <button name="sav_to_drafts" string="Save in Drafts" type="object"/>
+                    <button name="send_mail" string="Send now" type="object"/>
+                    <button special="cancel" string="Discard"/>
                 </form>
             </field>
         </record>
