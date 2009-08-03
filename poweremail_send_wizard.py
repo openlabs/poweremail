@@ -23,6 +23,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 from osv import osv, fields
+import netsvc
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'
@@ -30,6 +31,7 @@ class poweremail_send_wizard(osv.osv_memory):
     _rec_name = "subject"
 
     def _get_accounts(self,cr,uid,ctx={}):
+        logger = netsvc.Logger()
         self.engine = self.pool.get("poweremail.engines")
         if 'template' in ctx.keys():
             self.model_ref = ctx['active_id']
@@ -44,6 +46,8 @@ class poweremail_send_wizard(osv.osv_memory):
                     if accounts_id:
                         accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id)
                         return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
+                    else:
+                       logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
@@ -54,7 +58,7 @@ class poweremail_send_wizard(osv.osv_memory):
     _columns = {
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
-        #'rel_model_ref':fields.selection(_get_model_recs,'Referred Document',readonly=True),
+        'rel_model_ref':fields.integer('Referred Document',readonly=True),
         'from':fields.selection(_get_accounts,'From Account',required=True),
         'to':fields.char('To',size=100,readonly=True),
         'cc':fields.char('CC',size=100,),

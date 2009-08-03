@@ -35,7 +35,7 @@ class poweremail_mailbox(osv.osv):
         self.get_mails(cr,uid,context={'all_accounts':True})
         
         
-    def get_mails(self,cr,uid,context={}):
+    def get_all_mail(self,cr,uid,context={}):
         #8888888888888 FETCHES MAILS 8888888888888888888#
         #email_account: THe ID of poweremil core account
         #Context should also have the last downloaded mail for an account
