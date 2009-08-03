@@ -24,7 +24,7 @@
 #########################################################################
 
 from osv import osv, fields
-   
+import time
 
 class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"
@@ -32,32 +32,24 @@ class poweremail_mailbox(osv.osv):
     _rec_name="subject"
 
     def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
-        print "automatimailllllllllc",use_new_cursor,context
-        '''
-        use_new_cursor: False or the dbname
-        '''
-        
-        if not context:
-            context={'email_account':1}
-        print "CONTEXT",context
-        self.get_headers(cr,uid,context)
+        self.get_mails(cr,uid,context={'all_accounts':True})
         
         
-    def get_headers(self,cr,uid,context={}):
+    def get_mails(self,cr,uid,context={}):
+        #8888888888888 FETCHES MAILS 8888888888888888888#
         #email_account: THe ID of poweremil core account
         #Context should also have the last downloaded mail for an account
         #Normlly this function is expected to trigger from scheduler hence the value will not be there
         core_obj = self.pool.get('poweremail.core_accounts')
-        if 'email_account' in context.keys():
+        if 'all_accounts' in context.keys():
             #Get mails from that ID only
-            core_obj.get_headers(cr,uid,[context['email_account']])
+            core_obj.get_mails(cr,uid,[context['email_account']])
         else:
             accounts = core_obj.search(cr,uid,[('state','=','approved')])
-            #Now get mails for each account
-            for account in accounts:
-                core_obj.get_headers(cr,uid,[account])
+            core_obj.get_mails(cr,uid,accounts)
 
     def get_fullmail(self,cr,uid,context={}):
+        #8888888888888 FETCHES MAILS 8888888888888888888#
         core_obj = self.pool.get('poweremail.core_accounts')
         if 'mailboxref' in context.keys():
             #Get mails from that ID only
@@ -65,27 +57,55 @@ class poweremail_mailbox(osv.osv):
         else:
             raise osv.osv_except(_("Mail fetch exception"),_("No information on which mail should be fetched fully"))
         
-    def send_all_mail(self,cr,uid,ids,ctx={}):
+    def send_all_mail(self,cr,uid,ids=[],ctx={}):
+        #8888888888888 SENDS MAILS IN OUTBOX 8888888888888888888#
         #get ids of mails in outbox
         ids = self.search(cr,uid,[('folder','=','outbox')])
         #send mails one by one
         for id in ids:
             core_obj=self.pool.get('poweremail.core_accounts')
-            values =  self.read(cr,uid,ids[0],[])
-            
-            if core_obj.send_mail(cr,uid,ids,[values['pem_to']],[values['pem_cc']],[values['pem_bcc']],[values['pem_subject']],[values['pem_body_text']],body_html="",payload={}):
-                self.write(cr,uid,id,{'folder':'sent'})
-
+            values =  self.read(cr,uid,id,[]) #Values will be a dictionary of all entries in the record ref by id
+            payload={}
+            if values['pem_attachments_ids']:
+                #Get filenames & binary of attachments
+                for attid in values['pem_attachments_ids']:
+                    attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
+                    payload[attachment.datas_fname] = attachment.datas
+            if core_obj.send_mail(cr,uid,[values['pem_account_id'][0]],[values['pem_to']or False],[values['pem_cc']or False],[values['pem_bcc']or False],values['pem_subject']or False,values['pem_body_text']or False,values['pem_body_html']or False,payload=payload):
+                self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
+    
+    def send_this_mail(self,cr,uid,ids=[],ctx={}):
+        #8888888888888 SENDS THIS MAIL IN OUTBOX 8888888888888888888#
+        #send mails one by one
+        for id in ids:
+            core_obj=self.pool.get('poweremail.core_accounts')
+            values =  self.read(cr,uid,id,[]) #Values will be a dictionary of all entries in the record ref by id
+            payload={}
+            if values['pem_attachments_ids']:
+                #Get filenames & binary of attachments
+                for attid in values['pem_attachments_ids']:
+                    attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
+                    payload[attachment.datas_fname] = attachment.datas
+            if core_obj.send_mail(cr,uid,[values['pem_account_id'][0]],[values['pem_to']or False],[values['pem_cc']or False],[values['pem_bcc']or False],values['pem_subject']or False,values['pem_body_text']or False,values['pem_body_html']or False,payload=payload):
+                self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
+                
+    def complete_mail(self,cr,uid,ids,ctx={}):
+        #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
+        #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,
+        for id in ids:
+            self.pool.get('poweremail.core_accounts').get_fullmail(self,cr,uid,id)
+    
     _columns = {
             'pem_from':fields.char('From', size=64),
-            'pem_to':fields.char('Recepient (To)', size=64),
+            'pem_to':fields.char('Recepient (To)', size=64, required=True),
             'pem_cc':fields.char(' CC', size=64),
             'pem_bcc':fields.char(' BCC', size=64),
-            'pem_subject':fields.char(' Subject', size=200),
+            'pem_subject':fields.char(' Subject', size=200, required=True),
             'pem_body_text':fields.text('Standard Body (Text)'),
             'pem_body_html':fields.text('Body (Text-Web Client Only)'),
             'pem_attachments_ids':fields.many2many('ir.attachment', 'mail_attachments_rel', 'mail_id', 'att_id', 'Attachments'),
             'pem_account_id' :fields.many2one('poweremail.core_accounts', 'User account'),
+            'pem_user':fields.related('pem_account_id','user',type="many2one",relation="res.users",string="User"),
             'server_ref':fields.integer('Server Reference of mail',help="Applicable for inward items only"),
             'pem_recd':fields.char('Received at',size=50),
             'mail_type':fields.selection([
@@ -104,7 +124,8 @@ class poweremail_mailbox(osv.osv):
                                     ],'Folder'),
             'state':fields.selection([
                                     ('read','Read'),
-                                    ('unread','Un-Read')
+                                    ('unread','Un-Read'),
+                                    ('na','Not Applicable'),
                                     ],'Status'),
             'date_mail':fields.datetime('Rec/Sent Date')
         }

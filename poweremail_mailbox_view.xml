@@ -7,111 +7,246 @@
 	Description: View file for poweremail mailbox
 -->
 <openerp>
-	<data>
-
-		<menuitem name="MailBox" id="menu_poweremail_mailbox_all_main2"
-			parent="poweremail.menu_poweremail_administration_server" />
-
-		<!-- Power Email Template PReview -->
-		<record model="ir.ui.view" id="poweremail_mailbox_form">
-			<field name="name">poweremail.mailbox.form</field>
-			<field name="model">poweremail.mailbox</field>
-			<field name="type">form</field>
-			<field name="arch" type="xml">
-				<form string="Power Email Inbox">
-					<group col="4" colspan="2">
-						<field name="pem_from" colspan="2" />
-						<field name="pem_cc" colspan="4" />
-						<field name="date_mail" colspan="4" />
-					</group>
-					<group col="4" colspan="2">
-						<field name="pem_to" colspan="2" />
-						<field name="pem_bcc" colspan="4" />
-						<field name="pem_subject" colspan="4" />
-					</group>
-					<notebook colspan="4">
-						<page string="Standard Body">
-							<separator colspan="4" string="Standard Body" />
-							<notebook colspan="4">
-								<page string="Standard Body (Text)">
-									<field name="pem_body_text"
+    <data>
+	<!-- Power Email Template PReview -->
+        <record model="ir.ui.view" id="poweremail_mailbox_form">
+            <field name="name">poweremail.mailbox.form</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Power Email Inbox">
+                    <group col="4" colspan="2">
+                        <field name="pem_from" colspan="2" />
+                        <field name="pem_cc" colspan="4" />
+                        <field name="date_mail" colspan="4" />
+                    </group>
+                    <group col="4" colspan="2">
+                        <field name="pem_to" colspan="2" />
+                        <field name="pem_bcc" colspan="4" />
+                        <field name="pem_subject" colspan="4" />
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Standard Body">
+                            <separator colspan="4" string="Standard Body" />
+                            <notebook colspan="4">
+                                <page string="Standard Body (Text)">
+                                    <field name="pem_body_text"
 										nolabel="1" colspan="4" />
-								</page>
-								<page
+                                </page>
+                                <page
 									string="Body (Text-Web Client Only)">
-									<field name="pem_body_html"
+                                    <field name="pem_body_html"
 										nolabel="1" colspan="4" />
-								</page>
-							</notebook>
-						</page>
+                                </page>
+                            </notebook>
+                        </page>
 
 						
-						<page string="Attachments">
-							<group col="4">
-								<separator colspan="4" string="Attachments"/>
-								<field name="pem_attachments_ids"
+                        <page string="Attachments">
+                            <group col="4">
+                                <separator colspan="4" string="Attachments"/>
+                                <field name="pem_attachments_ids"
 									colspan="4" nolabel="1"/>
-							 </group>
-						</page>
-						<page string="Advanced">
-							<group col="4">
-								<field name="pem_account_id"
+                            </group>
+                        </page>
+                        <page string="Advanced">
+                            <group col="4">
+                                <field name="pem_account_id"
 									colspan="2" />
-								<field name="server_ref" colspan="2" />
-								<field name="pem_recd" colspan="2" />
-								<field name="mail_type" colspan="2" />
-								<field name="folder" colspan="2" />
-							</group>
-						</page>
-					</notebook>
-					<separator colspan="4" string="" />
-					<group col="4" colspan="4">
-						<field name="status" colspan="2" />
-						<button name="rec_hdrs" type="object"
-							string="Get Mails" colspan="2" />
-					</group>
-				</form>
-			</field>
-		</record>
+                                <field name="server_ref" colspan="2" />
+                                <field name="pem_recd" colspan="2" />
+                                <field name="mail_type" colspan="2" />
+                                <field name="folder" colspan="2" />
+                            </group>
+                        </page>
+                    </notebook>
+                    <separator colspan="4" string="" />
+                    <group col="4" colspan="4">
+                        <field name="state" colspan="2" readonly="1"/>
+                        <button name="complete_mail" type="object"
+							string="Download Full Mail" colspan="2" states="read,unread"/>
+                        <button name="send_this_mail" type="object" string="Send Mail"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 
+        <!--8888888888888888888888888888888888 TREE VIEWS 8888888888888888888888888888888888888888-->
+        <!--INBOX-->
+        <record model="ir.ui.view" id="poweremail_inbox_tree">
+            <field name="name">poweremail.mailbox.inboxtree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Inbox">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--DRAFTS-->
+        <record model="ir.ui.view" id="poweremail_drafts_tree">
+            <field name="name">poweremail.mailbox.draftstree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Drafts">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--OUTBOX-->
+        <record model="ir.ui.view" id="poweremail_outbox_tree">
+            <field name="name">poweremail.mailbox.outboxtree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Outbox">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--SENT-->
+        <record model="ir.ui.view" id="poweremail_sentbox_tree">
+            <field name="name">poweremail.mailbox.sentboxtree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Sent">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--FOLLOWUP-->
+        <record model="ir.ui.view" id="poweremail_followbox_tree">
+            <field name="name">poweremail.mailbox.sentboxtree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Follow Up">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--TRASH-->
+        <record model="ir.ui.view" id="poweremail_trashbox_tree">
+            <field name="name">poweremail.mailbox.trashboxtree</field>
+            <field name="model">poweremail.mailbox</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Power Email Trash">
+                    <field name="pem_user"/>
+                    <field name="pem_from" select="1" />
+                    <field name="pem_subject" select="1" />
+                    <field name="pem_attachments_ids" select="2" />
+                    <field name="date_mail" select="2" />
+                </tree>
+            </field>
+        </record>
+        <!--8888888888888888888888888888888888 ACTIONS 8888888888888888888888888888888888888888-->
+        <!--INBOX-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_inbox_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_inbox_tree" />
+            <field name="domain">[('folder','=','inbox'),('pem_user','=',uid)]</field>
+        </record>
+        <!--OUTBOX-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_outbox_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_outbox_tree" />
+            <field name="domain">[('folder','=','outbox'),('pem_user','=',uid)]</field>
+        </record>
+        <!--DRAFTS-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_drafts_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_drafts_tree" />
+            <field name="domain">[('folder','=','drafts'),('pem_user','=',uid)]</field>
+        </record>
+        <!--FOLLOWUP-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_follow_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_followbox_tree" />
+            <field name="domain">[('folder','=','followup'),('pem_user','=',uid)]</field>
+        </record>
+        <!--SENT-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_sent_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_sentbox_tree" />
+            <field name="domain">[('folder','=','sent'),('pem_user','=',uid)]</field>
+        </record>
+        <!--TRASH-->
+        <record model="ir.actions.act_window"
+			id="action_poweremail_trash_tree">
+            <field name="name">Email Mailbox</field>
+            <field name="res_model">poweremail.mailbox</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="poweremail_trashbox_tree" />
+            <field name="domain">[('folder','=','trash'),('pem_user','=',uid)]</field>
+        </record>
 
-
-		<record model="ir.ui.view" id="poweremail_mailbox_tree">
-			<field name="name">poweremail.mailbox.tree</field>
-			<field name="model">poweremail.mailbox</field>
-			<field name="type">tree</field>
-			<field name="arch" type="xml">
-				<tree string="Power Email Inbox">
-					<field name="pem_from" select="1" />
-					<field name="pem_to" select="1" />
-					<field name="pem_cc" select="1" />
-					<field name="pem_bcc" select="1" />
-					<field name="pem_subject" select="1" />
-					<field name="pem_body_text" select="1" />
-					<field name="pem_body_html" select="1" />
-					<field name="pem_attachments_ids" select="1" />
-					<field name="pem_account_id" select="1" />
-				</tree>
-			</field>
-		</record>
-
-
-		<record model="ir.actions.act_window"
-			id="action_poweremail_mailboxe_tree_all">
-			<field name="name">Email Mailbox</field>
-			<field name="res_model">poweremail.mailbox</field>
-			<field name="view_type">form</field>
-			<field name="view_mode">form,tree</field>
-			<field name="view_id" ref="poweremail_mailbox_tree" />
-		</record>
-
-
-		<menuitem name="Inbox" id="menu_poweremail_mailbox_all_inbox"
+        <!--8888888888888888888888888888888888 MENUS 8888888888888888888888888888888888888888-->
+        <menuitem name="MailBox" id="menu_poweremail_mailbox_all_main2"
+			parent="poweremail.menu_poweremail_administration_server" />
+        <menuitem name="Inbox" id="menu_poweremail_inbox"
 			parent="menu_poweremail_mailbox_all_main2"
-			action="action_poweremail_mailboxe_tree_all" />
+			action="action_poweremail_inbox_tree" />
+        <menuitem name="Drafts" id="menu_poweremail_drafts"
+			parent="menu_poweremail_mailbox_all_main2"
+			action="action_poweremail_drafts_tree" />
+        <menuitem name="Outbox" id="menu_poweremail_outbox"
+			parent="menu_poweremail_mailbox_all_main2"
+			action="action_poweremail_outbox_tree" />
+        <menuitem name="Follow-up" id="menu_poweremail_follow"
+			parent="menu_poweremail_mailbox_all_main2"
+			action="action_poweremail_follow_tree" />
+        <menuitem name="Sent" id="menu_poweremail_sent"
+			parent="menu_poweremail_mailbox_all_main2"
+			action="action_poweremail_sent_tree" />
+        <menuitem name="Trash" id="menu_poweremail_trash"
+			parent="menu_poweremail_mailbox_all_main2"
+			action="action_poweremail_trash_tree" />
 
-
-	</data>
+    </data>
 </openerp>
 
 

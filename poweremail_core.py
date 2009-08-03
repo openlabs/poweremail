@@ -203,6 +203,7 @@ class poweremail_core_accounts(osv.osv):
         logger = netsvc.Logger()
         for id in ids:
             core_obj = self.browse(cr,uid,id)
+            #print "val:",ids,to,cc,bcc,subject,body_text,body_html,payload
             if core_obj.smtpserver and core_obj.smtpport and core_obj.smtpuname and core_obj.smtppass and core_obj.state=='approved':
                 try:
                     serv = smtplib.SMTP(core_obj.smtpserver,core_obj.smtpport)
@@ -218,43 +219,65 @@ class poweremail_core_accounts(osv.osv):
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
                     return False
-                try:
-                    msg = MIMEMultipart('alternative')
+                #try:
+                msg = MIMEMultipart()
+                if subject:
                     msg['Subject']= subject
-                    msg['From'] = str(core_obj.name + "<" + core_obj.email_id + ">")
-                    msg['To']=",".join(map(str, to))
-                    msg['cc']=",".join(map(str, cc)) or False
-                    msg['bcc']=",".join(map(str, bcc)) or False
-                    # Record the MIME types of both parts - text/plain and text/html.
-                    part1 = MIMEText(body_text, 'plain')
-                    if body_html:#If html body also exists, send that
-                        part2 = MIMEText(body_html, 'html')
-                    else:
-                        part2 = part1
-                    # Attach parts into message container.
-                    # According to RFC 2046, the last part of a multipart message, in this case
-                    # the HTML message, is best and preferred.
-                    msg.attach(part1)
-                    msg.attach(part2)
-                    #Now add attachments if any
-                    for file in payload.keys():
-                        part = MIMEBase('application', "octet-stream")
-                        part.set_payload(payload[file])
-                        Encoders.encode_base64(part)
-                        part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
-                        msg.attach(part)
+                msg['From'] = str(core_obj.name + "<" + core_obj.email_id + ">")
+                toadds = []
+                if to:
+                    while (type(to)==type([])) and (False in to):
+                        to = to.remove(False)
+                    msg['To'] = ",".join(map(str,to))
+                    toadds = to
+                if cc:
+                    while (type(cc)==type([])) and (False in cc):
+                        cc = cc.remove(False)
+                    if (type(cc)==type([])):
+                        msg['CC'] = ",".join(map(str,cc))
+                        toadds += cc
+                if bcc:
+                    while (type(bcc)==type([])) and (False in bcc):
+                        bcc = bcc.remove(False)
+                    print "BCCCCCE:",bcc
+                    if (type(bcc)==type([])):
+                        #msg['BCC'] = ",".join(map(str,bcc)) #Dont show somebody gets a BCC
+                        toadds += bcc
+                # Record the MIME types of both parts - text/plain and text/html.
+
+                if not body_text:
+                    body_text="Mail without body"
+                # Attach parts into message container.
+                # According to RFC 2046, the last part of a multipart message, in this case
+                # the HTML message, is best and preferred.
+                if body_html:#If html body exists, send that else text
+                    part1 = MIMEText(body_html, 'html')
+                else:
+                    part1 = MIMEText(body_text, 'text')
+                msg.attach(part1)
+                #Now add attachments if any
+                for file in payload.keys():
+                    part = MIMEBase('application', "octet-stream")
+                    part.set_payload(base64.decodestring(payload[file]))
+                    f = open(file,"wb")
+                    f.write(base64.decodestring(payload[file]))
+                    f.close()
+                    part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
+                    Encoders.encode_base64(part)
+                    msg.attach(part)
                     #msg is now complete, send it to everybody
-                except Exception,error:
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
-                    return False
+                #except Exception,error:
+                #    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
+                #    return False
                 try:
-                    serv.sendmail(msg['From'],to+cc+bcc)
+                    print msg['From'],toadds
+                    serv.sendmail(str(msg['From']),toadds,msg.as_string())
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
                     return False
                 #The mail sending is complete
                 serv.close()
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s successfully Sent.")% (id))
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Mail from Account %s successfully Sent.")% (id))
                 return True
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
@@ -373,7 +396,9 @@ class poweremail_core_accounts(osv.osv):
     def complete_mail(self,cr,uid,mail,coreaccountid,serv_ref,mailboxref):
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
-        #coreaccounti: ID of poeremail core account
+        #coreaccountid: ID of poeremail core account
+        #serv_ref:Mail ID in the IMAP/POP server
+        #mailboxref: ID of record in malbox to complete
         logger = netsvc.Logger()
         mail_obj = self.pool.get('poweremail.mailbox')
         #TODO:If multipart save attachments and save ids
@@ -438,8 +463,9 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
 
-    def get_headers(self,cr,uid,ids,ctx={}):
-        #The function downloads the headers from the mail box
+    def get_mails(self,cr,uid,ids,ctx={}):
+        #The function downloads the mails from the POP3 or IMAP server
+        #The headers/full mail download depends on settings in the account
         #IDS should be list of id of poweremail_coreaccounts
         logger = netsvc.Logger()
         #The Main reception function starts here
@@ -527,11 +553,11 @@ class poweremail_core_accounts(osv.osv):
                     else:
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.")% (id))
 
-    def get_fullmail(self,cr,uid,id,ctx):
+    def get_fullmail(self,cr,uid,mailid):
         #The function downloads the full mail for which only header was downloaded
         #ID:of poeremail core account
         #ctx : should have mailboxref, the ID of mailbox record
-        server_ref = self.pool.get('poweremail.mailbox').read(cr,uid,ctx['mailboxref'],['server_ref'])['server_ref']
+        server_ref,id = self.pool.get('poweremail.mailbox').read(cr,uid,mailid,['server_ref','pem_account_id'])['server_ref','pem_account_id']
         logger = netsvc.Logger()
         #The Main reception function starts here
         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Starting Full mail reception for account:%s.")% (id))
@@ -555,17 +581,17 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Server Connected & logged in successfully Account:%s.")% (id))
                     #Select IMAP folder
                     try:
-                        typ,msg_count = serv.select(rec.isfolder)
+                        typ,msg_count = serv.select(rec.isfolder)#typ,msg_count: practically not used here
                     except imaplib.IMAP4.error,error:
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.")% (id,error))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.")% (id))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(res.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(rec.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
                     typ,msg = serv.fetch(str(server_ref),'(RFC822)')
                     for mails in msg:
                         if type(mails)==type(('tuple','type')):
                             mail = email.message_from_string(mails[1])
-                            self.complete_mail(cr,uid,mail,id,server_ref)
+                            self.complete_mail(cr,uid,mail,id,server_ref,mailid)
                     serv.close()
                     serv.logout()
                 elif rec.iserver_type =='pop3':
