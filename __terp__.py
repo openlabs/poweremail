@@ -44,7 +44,7 @@
         'poweremail_send_wizard.xml',
         'poweremail_mailbox_view.xml',
     ],
-    "demo_xml" : ['poweremail_data.xml'],
+    "demo_xml" : ['poweremail_scheduler_data.xml'],
     "installable": True,
     "active": False,
 }

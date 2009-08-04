@@ -295,7 +295,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':datetime.datetime(*time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S')) or False,
+            'date_mail':time.strftime('%y-%m-%d %H:%M:%S ') or False,
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -324,7 +324,6 @@ class poweremail_core_accounts(osv.osv):
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
 
     def save_fullmail(self,cr,uid,mail,coreaccountid,serv_ref):
-        val={}
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
@@ -337,7 +336,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'date_mail':time.strftime('%y-%m-%d %H:%M:%S ') or False,
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -350,14 +349,14 @@ class poweremail_core_accounts(osv.osv):
         if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
             vals['mail_type']=mail.get_content_type()
             if mail.get_content_type() in ['text/plain','text/html']:
-                val['pem_body_text']=mail.get_payload()
-                val['pem_body_html']=mail.get_payload()
+                vals['pem_body_text']=mail.get_payload()
+                vals['pem_body_html']=mail.get_payload()
             elif mail.get_content_type() in 'multipart/alternative':
-                val['pem_body_text']=mail.get_payload(0).get_payload()
-                val['pem_body_html']=mail.get_payload(1).get_payload()
+                vals['pem_body_text']=mail.get_payload(0).get_payload()
+                vals['pem_body_html']=mail.get_payload(1).get_payload()
             elif mail.get_content_type() == 'multipart/mixed':
-                val['pem_body_text']=mail.get_payload(0).get_payload(0)
-                val['pem_body_html']=mail.get_payload(0).get_payload(1)
+                vals['pem_body_text']=mail.get_payload(0).get_payload(0)
+                vals['pem_body_html']=mail.get_payload(0).get_payload(1)
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Missed saving body of unknown payload Account:%s.")% (coreaccountid))
         #Create the mailbox item now
@@ -408,7 +407,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'date_mail':time.strftime('%y-%m-%d %H:%M:%S ') or False,
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -421,14 +420,14 @@ class poweremail_core_accounts(osv.osv):
         if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
             vals['mail_type']=mail.get_content_type()
             if mail.get_content_type() in ['text/plain','text/html']:
-                val['pem_body_text']=mail.get_payload()
-                val['pem_body_html']=mail.get_payload()
+                vals['pem_body_text']=mail.get_payload()
+                vals['pem_body_html']=mail.get_payload()
             elif mail.get_content_type() in 'multipart/alternative':
-                val['pem_body_text']=mail.get_payload(0).get_payload()
-                val['pem_body_html']=mail.get_payload(1).get_payload()
+                vals['pem_body_text']=mail.get_payload(0).get_payload()
+                vals['pem_body_html']=mail.get_payload(1).get_payload()
             elif mail.get_content_type() == 'multipart/mixed':
-                val['pem_body_text']=mail.get_payload(0).get_payload(0)
-                val['pem_body_html']=mail.get_payload(0).get_payload(1)
+                vals['pem_body_text']=mail.get_payload(0).get_payload(0)
+                vals['pem_body_html']=mail.get_payload(0).get_payload(1)
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Missed saving body of unknown payload Account:%s.")% (coreaccountid))
         #Create the mailbox item now
@@ -448,7 +447,7 @@ class poweremail_core_accounts(osv.osv):
                                 'name':mail['subject'] + '(Email Attachment)',
                                 'datas':base64.b64encode(mail.get_payload(i).get_payload()),
                                 'datas_fname':mail.get_payload(i).get_filename(),
-                                'description':val['pem_body_text'],
+                                'description':vals['pem_body_text'],
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mailboxref
                                     }
@@ -555,14 +554,15 @@ class poweremail_core_accounts(osv.osv):
                     else:
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.")% (id))
 
-    def get_fullmail(self,cr,uid,mailid):
+    def get_fullmail(self,cr,uid,mailid,ctx):
         #The function downloads the full mail for which only header was downloaded
         #ID:of poeremail core account
         #ctx : should have mailboxref, the ID of mailbox record
-        server_ref,id = self.pool.get('poweremail.mailbox').read(cr,uid,mailid,['server_ref','pem_account_id'])['server_ref','pem_account_id']
+        server_ref = self.pool.get('poweremail.mailbox').read(cr,uid,mailid,['server_ref'])['server_ref']
+        id = self.pool.get('poweremail.mailbox').read(cr,uid,mailid,['pem_account_id'])['pem_account_id'][0]
         logger = netsvc.Logger()
         #The Main reception function starts here
-        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Starting Full mail reception for account:%s.")% (id))
+        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Starting Full mail reception for mail:%s.")% (id))
         rec = self.browse(cr, uid, id )
         if rec:
             if rec.iserver and rec.isport and rec.isuser and rec.ispass :
