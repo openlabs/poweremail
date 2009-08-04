@@ -109,7 +109,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 'pem_subject':screen_vals['subject'],
                 'pem_body_text':screen_vals['body_text'],
                 'pem_body_html':screen_vals['body_html'],
-                'pem_account_id' :screen_vals['ref_template'],
+                'pem_account_id' :screen_vals['from'],
                 'state':'na',
                 'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
             }
