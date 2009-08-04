@@ -1,22 +1,47 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
-        <record model="ir.ui.view" id="view_server_action_form_poweremail">
-            <field name="name">ir.actions.server.form.poweremail</field>
-            <field name="model">ir.actions.server</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="base.view_server_action_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="/form/notebook" position="inside">
-                    <page string="Email Configuration" attrs="{'invisible':[('state','!=','poweremail')]}">
-                        <separator colspan="4" string="Email Configuration"/>
-                        <field name="poweremail_template" domain="[('object_name','=',model_id),('company','=','yes')]" attrs="{'required':[('state','=','poweremail')]}"/>
-                        <newline/>
-                        <label colspan="4" string="All values for the mail can be configured in the template editor itself." align="0.0"/>
-                    </page>
-                </xpath>
-            </field>
-        </record>
-    </data>
+	<data>
+		<record model="ir.ui.view"
+			id="view_server_action_form_poweremail_1">
+			<field name="name">ir.actions.server.form.poweremail_1</field>
+			<field name="model">ir.actions.server</field>
+			<field name="type">form</field>
+			<field name="inherit_id" ref="base.view_server_action_form" />
+			<field name="arch" type="xml">
+				<xpath expr="/form/notebook" position="inside">
+					<page string="Email Configuration"
+						attrs="{'invisible':[('state','!=','poweremail')]}">
+						<separator colspan="4"
+							string="Email Configuration" />
+						<field name="poweremail_template"
+							domain="[('object_name','=',model_id)]"
+							attrs="{'required':[('state','=','poweremail')]}" />
+						<newline />
+						<label colspan="4"
+							string="All values for the mail can be configured in the template editor itself."
+							align="0.0" />
+					</page>
+				</xpath>
+
+			</field>
+		</record>
+		<record model="ir.ui.view"
+			id="view_server_action_form_poweremail_2">
+			<field name="name">ir.actions.server.form.poweremail_2</field>
+			<field name="model">ir.actions.server</field>
+			<field name="type">form</field>
+			<field name="inherit_id" ref="base.view_server_action_form" />
+			<field name="arch" type="xml">
+
+
+				<xpath
+					expr="/form/notebook/page/field[@name='srcmodel_id']"
+					position="replace">
+					<field name="srcmodel_id" select="2"
+						attrs="{'required':[('state','!=','dummy'), ('state','!=','sms'), ('state','!=','code'), ('state','!=','loop'),('state','!=','trigger'), ('state','!=','client_action'), ('state','!=','email'), ('state','!=','sms'), ('state','!=','other'), ('state','!=','poweremail')]}" />
+				</xpath>
+			</field>
+		</record>
+	</data>
 </openerp>
 
