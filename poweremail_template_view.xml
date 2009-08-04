@@ -66,12 +66,12 @@
                     <notebook colspan="4">
                         <page string="Mail Details">
                             <group col="4" colspan="2">
-                                <field name="def_to" colspan="4"/>
+                                <field name="def_to" colspan="4" required="1"/>
                                 <field name="def_cc" colspan="4"/>
                                 <field name="def_bcc" colspan="4"/>
                             </group>
                             <group col="2" colspan="2">
-                                <field name="def_subject" colspan="4"/>
+                                <field name="def_subject" colspan="4" required="1"/>
                                 <field name="use_sign" colspan="4"/>
                                 <field name="file_name" colspan="4"/>
                                 <field name="report_template" colspan="4"/>

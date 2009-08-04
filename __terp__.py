@@ -34,6 +34,7 @@
     A module similar to the smtpclient and email_sale etc etc. But lot more powerful. Creates three user groups:1.Email Manager(obvious), 2.Email External(Send email to partners),3.Email Internal (mail to seniors etc). the module supports cc, bcc etc which the present smtp client does not. Most unique thing is you can create default settings for sale order, invoice, etc with default cc's,bcc's and default subject, report name and body. the subject, reportname and body takes placeholders which has over 12 functions eg. can get customer name with %(cust_name) etc etc.
         
     """,
+    "init_xml": ['poweremail_data.xml'],
     "update_xml": [
         #'security/poweremail_security.xml',
         #'security/ir.model.access.csv',
@@ -43,7 +44,7 @@
         'poweremail_send_wizard.xml',
         'poweremail_mailbox_view.xml',
     ],
-    "demo_xml" : [],
+    "demo_xml" : ['poweremail_data.xml'],
     "installable": True,
     "active": False,
 }

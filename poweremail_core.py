@@ -446,7 +446,7 @@ class poweremail_core_accounts(osv.osv):
                 for i in range(1,len(mail.get_payload())):#Get each attachment
                     new_att_vals={
                                 'name':mail['subject'] + '(Email Attachment)',
-                                'datas':mail.get_payload(i).get_payload(),
+                                'datas':base64.b64encode(mail.get_payload(i).get_payload()),
                                 'datas_fname':mail.get_payload(i).get_filename(),
                                 'description':val['pem_body_text'],
                                 'res_model':'poweremail.mailbox',
@@ -501,20 +501,22 @@ class poweremail_core_accounts(osv.osv):
                         if rec.last_mail_id < int(msg_count[0]):
                             if rec.rec_headers_den_mail:
                                 #Download Headers Only
-                                typ,msg = serv.fetch(",".join(str(i) for i in range(rec.last_mail_id+1,int(msg_count[0])+1)),'(BODY.PEEK[HEADER])')
-                                for mails in msg:
-                                    if type(mails)==type(('tuple','type')):
-                                        mail = email.message_from_string(mails[1])
-                                        if self.save_header(cr,uid,mail,id,mails[0].split()[0]):#If saved succedfully then increment last mail recd
-                                            self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
+                                for i in range(rec.last_mail_id+1,int(msg_count[0])+1):
+                                    typ,msg = serv.fetch(str(i),'(BODY.PEEK[HEADER])')
+                                    for mails in msg:
+                                        if type(mails)==type(('tuple','type')):
+                                            mail = email.message_from_string(mails[1])
+                                            if self.save_header(cr,uid,mail,id,mails[0].split()[0]):#If saved succedfully then increment last mail recd
+                                                self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
                             else:#Receive Full Mail first time itself
                                 #Download Full RF822 Mails
-                                typ,msg = serv.fetch(",".join(str(i) for i in range(rec.last_mail_id+1,int(msg_count[0])+1)),'(RFC822)')
-                                for mails in msg:
-                                    if type(mails)==type(('tuple','type')):
-                                        mail = email.message_from_string(mails[1])
-                                        if self.save_fullmail(cr,uid,mail,id,mails[0].split()[0]):#If saved succedfully then increment last mail recd
-                                            self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
+                                for i in range(rec.last_mail_id+1,int(msg_count[0])+1):
+                                    typ,msg = serv.fetch(str(i),'(RFC822)')
+                                    for mails in msg:
+                                        if type(mails)==type(('tuple','type')):
+                                            mail = email.message_from_string(mails[1])
+                                            if self.save_fullmail(cr,uid,mail,id,mails[0].split()[0]):#If saved succedfully then increment last mail recd
+                                                self.write(cr,uid,id,{'last_mail_id':mails[0].split()[0]})
                         serv.close()
                         serv.logout()
                     elif rec.iserver_type =='pop3':

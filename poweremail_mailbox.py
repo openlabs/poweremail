@@ -32,8 +32,8 @@ class poweremail_mailbox(osv.osv):
     _rec_name="subject"
 
     def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
-        self.get_mails(cr,uid,context={'all_accounts':True})
-        
+        self.get_all_mail(cr,uid,context={'all_accounts':True})
+        self.send_all_mail(cr,uid,context)
         
     def get_all_mail(self,cr,uid,context={}):
         #8888888888888 FETCHES MAILS 8888888888888888888#
@@ -41,7 +41,7 @@ class poweremail_mailbox(osv.osv):
         #Context should also have the last downloaded mail for an account
         #Normlly this function is expected to trigger from scheduler hence the value will not be there
         core_obj = self.pool.get('poweremail.core_accounts')
-        if 'all_accounts' in context.keys():
+        if not 'all_accounts' in context.keys():
             #Get mails from that ID only
             core_obj.get_mails(cr,uid,[context['email_account']])
         else:
