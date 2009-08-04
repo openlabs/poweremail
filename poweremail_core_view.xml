@@ -42,6 +42,9 @@
                 <form string="Power Email Configuration">
                     <group colspan="2">
                     <field name="name" select="1" />
+                    <field name="last_mail_id" select="1" />
+                    <field name="rec_headers_den_mail" select="1" />
+                    <field name="dont_auto_down_attach" select="1" />
                     </group>
                     <notebook colspan="4">
                         <page string="Outgoing">

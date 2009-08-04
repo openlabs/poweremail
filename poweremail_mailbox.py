@@ -94,7 +94,7 @@ class poweremail_mailbox(osv.osv):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
         #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,
         for id in ids:
-            self.pool.get('poweremail.core_accounts').get_fullmail(self,cr,uid,id)
+            self.pool.get('poweremail.core_accounts').get_fullmail(cr,uid,id,ctx)
     
     _columns = {
             'pem_from':fields.char('From', size=64),
