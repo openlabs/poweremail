@@ -27,3 +27,4 @@ import poweremail_core
 import poweremail_template
 import poweremail_send_wizard
 import poweremail_mailbox
+import poweremail_serveraction

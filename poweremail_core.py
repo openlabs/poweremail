@@ -211,8 +211,9 @@ class poweremail_core_accounts(osv.osv):
                 if to:
                     while (type(to)==type([])) and (False in to):
                         to = to.remove(False)
-                    msg['To'] = ",".join(map(str,to))
-                    toadds = to
+                    if (type(to)==type([])):
+                        msg['To'] = ",".join(map(str,to))
+                        toadds = to
                 if cc:
                     while (type(cc)==type([])) and (False in cc):
                         cc = cc.remove(False)

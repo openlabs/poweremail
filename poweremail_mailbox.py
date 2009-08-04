@@ -25,6 +25,7 @@
 
 from osv import osv, fields
 import time
+import poweremail_engines
 
 class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"

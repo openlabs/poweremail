@@ -45,9 +45,9 @@ class poweremail_engines(osv.osv):
             return re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)
 
     def parsevalue(self,cr,uid,id,message,templateid,context):
-        #id: ID of the template's MODEL record to be used
+        #id: ID of the template's model's record to be used
         #message: the complete text including placeholders
-        #template: the template id of the template
+        #templateid: the template id of the template
         #context: TODO
         #print cr,uid,id,message,templateid,context
         if message:

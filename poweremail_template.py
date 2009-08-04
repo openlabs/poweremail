@@ -24,7 +24,6 @@
 #########################################################################
 from osv import osv, fields
 import netsvc
-import re
 import poweremail_engines
 
 class poweremail_templates(osv.osv):
@@ -169,6 +168,62 @@ class poweremail_templates(osv.osv):
             #print "Object Value (_suto_compute):",obj_not
             #self.write(cr,uid,ids,{'copyvalue':obj_not})
             return {'value':{'copyvalue':obj_not}}
+
+    def get_value(self,cr,uid,recid,message={},template=None):
+        if message:
+            return self.engine.parsevalue(cr,uid,recid,message,template,{})
+        else:
+            return ""
+        
+    def generate_mail(self,cr,uid,id,recid,context={}):
+        #Generates an email an saves to outbox given the template id & record ID of a record in template's model
+        #id: ID of template to be used
+        #recid: record id for the mail
+        #Context: not currently used
+        logger = netsvc.Logger()
+        try:
+            self.engine = self.pool.get("poweremail.engines")
+            template = self.browse(cr,uid,id)
+            vals = {
+                    'pem_from': template.object_name.model,
+                    'pem_to':self.get_value(cr,uid,recid,template.def_to,template.id),
+                    'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template.id),
+                    'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template.id),
+                    'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template.id),
+                    'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template.id),
+                    'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template.id),
+                    'pem_account_id' :template.enforce_from_account,#This is a mandatory field when automatic emails are sent
+                    'state':'na',
+                    'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
+                }
+            if template.use_sign:
+                sign = self.pool.get('res.users').read(cr,uid,uid,['signature'])['signature']
+                if vals['pem_body_text']:
+                    vals['pem_body_text']+=sign
+                if vals['pem_body_html']:
+                    vals['pem_body_html']+=sign
+            #Create partly the mail and later update attachments
+            mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
+            if template.report_template:
+                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'])['report_name']
+                service = netsvc.LocalService(reportname)
+                (result, format) = service.create(cr, uid, [id], {}, {})
+                att_obj = self.pool.get('ir.attachment')
+                new_att_vals={
+                                'name':vals['pem_subject'] + ' (Email Attachment)',
+                                'datas':base64.b64encode(result),
+                                'datas_fname':str(self.get_value(template.file_name) or 'Report') + "." + format,
+                                'description':vals['pem_body_text'] or "No Description",
+                                'res_model':'poweremail.mailbox',
+                                'res_id':mail_id
+                                    }
+                attid = att_obj.create(cr,uid,new_att_vals)
+                if attid:
+                    self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed','folder':'outbox'})
+            return mail_id
+        except Exception,error:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Email Generation failed, Reason:%s")% (error))
+            return False
 
 poweremail_templates()
 
