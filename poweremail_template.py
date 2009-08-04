@@ -31,9 +31,15 @@ class poweremail_templates(osv.osv):
     _name="poweremail.templates"
     _description = 'Power Email Templates for Models'
 
+    def change_model(self,cr,uid,ids,object_name,ctx={}):
+       for id in ids:
+           mod_name = self.pool.get('ir.model').read(cr,uid,object_name,['model'])['model']
+           return {'value':{'model_int_name':mod_name}}
+
     _columns = {
         'name' : fields.char('Name of Template',size=100,required=True),
         'object_name':fields.many2one('ir.model','Model'),
+        'model_int_name':fields.char('Model Internal Name',size=200,readonly=200),
         'def_to':fields.char('Recepient (To)',size=64,help="The default recepient of email. Placeholders can be used here."),
         'def_cc':fields.char('Default CC',size=64,help="The default CC for the email. Placeholders can be used here."),
         'def_bcc':fields.char('Default BCC',size=64,help="The default BCC for the email. Placeholders can be used here."),
@@ -69,6 +75,7 @@ class poweremail_templates(osv.osv):
     _sql_constraints = [
         ('name', 'unique (name)', 'The template name must be unique !')
     ]
+
     def create(self, cr, uid, vals, *args, **kwargs):
         src_obj = self.pool.get('ir.model').read(cr,uid,vals['object_name'],['model'])['model']
         win_val={
@@ -94,16 +101,64 @@ class poweremail_templates(osv.osv):
         vals['ref_ir_value'] = self.pool.get('ir.values').create(cr, uid, value_vals)
         return super(poweremail_templates,self).create(cr, uid, vals, *args, **kwargs)   
 
+    def write(self,cr,uid,ids,datas={},ctx={}):
+        print datas
+        if 'auto_email' in datas.keys():#Has the auto email button toggled?
+            if datas['auto_email']: #If auto email was enabled
+                #Create Server Action
+                vals = {
+                        'state':'poweremail',
+                        'poweremail_template':id,
+                        'name':self.pool.get('poweremail.templates').read(cr,uid,id,['name'])['name'],
+                        'condition':'True',
+                        'model_id':self.read(cr,uid,id,['object_name'])['object_name'][0]
+                    }
+                datas['server_action'] = self.pool.get('ir.actions.server').create(cr,uid,vals)
+                #Attach Workflow to server action
+                #Check if workflow activity also changed
+                if 'attached_activity' in datas.keys():
+                    #The workflow has changed, so cancel the previous one
+                    ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+                    if ref_wf_act:          #Delete existing reference
+                        self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+                    #Now attach the server action to newly selected workflow activity
+                    self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':datas['server_action']})
+            else: #Auto email got disabled, so delete all workflow attachments and prev server action
+                ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
+                ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+                if ref_sr_act:          #Delete server action
+                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0])
+                if ref_wf_act:          #Delete Server action reference in workflow
+                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+
+        #If only attached workflow stage changed?
+        elif 'attached_activity' in datas.keys():
+            #The workflow only has changed, so cancel the previous one and add server action to new one
+            ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+            if ref_wf_act:          #Delete existing reference
+                self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+            #Now attach the server action to newly selected workflow activity
+            ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
+            self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':ref_sr_act[0]})
+
+        return super(poweremail_templates,self).write(cr, uid,ids, datas, ctx)
+
     def unlink(self, cr, uid, ids, ctx={}):
         for id in ids:
             try:
                 ref_ir_act_window = self.read(cr, uid, id, ['ref_ir_act_window'])['ref_ir_act_window']
                 ref_ir_value = self.read(cr, uid, id, ['ref_ir_value'])['ref_ir_value']
+                ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
+                ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
                 print ref_ir_act_window,ref_ir_value
-                if ref_ir_act_window:
+                if ref_ir_act_window:   #Delete Wizard buttin
                     self.pool.get('ir.actions.act_window').unlink(cr,uid,ref_ir_act_window[0])
                 if ref_ir_value:
                     self.pool.get('ir.values').unlink(cr,uid,ref_ir_value[0])
+                if ref_sr_act:          #Delete server action
+                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0])
+                if ref_wf_act:          #Delete Server action reference in workflow
+                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
                 super(poweremail_templates,self).unlink(cr,uid,id)
             except:
                 raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))

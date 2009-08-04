@@ -61,8 +61,8 @@
             <field name="arch" type="xml">
                 <form string="Power Email Templates">
                     <field name="name"/>
-                    <field name="object_name" required="1"/>
-                    
+                    <field name="object_name" required="1" on_change="change_model(object_name)"/>
+                    <field name="model_int_name" required="1"/>
                     <notebook colspan="4">
                         <page string="Mail Details">
                             <group col="4" colspan="2">
@@ -74,7 +74,7 @@
                                 <field name="def_subject" colspan="4" required="1"/>
                                 <field name="use_sign" colspan="4"/>
                                 <field name="file_name" colspan="4"/>
-                                <field name="report_template" colspan="4"/>
+                                <field name="report_template" colspan="4" domain="[('model','=',model_int_name)]"/>
                             </group>
                             <separator colspan="4" string="Standard Body"/>
                             <separator colspan="4" string="Expression Builder"/>
@@ -103,10 +103,10 @@
                             <field name="allowed_groups" string="Allowed User Groups" nolabel="1"/>
                         </page>
                         <page string="Advanced">
-                            <field name="enforce_from_account"/>
+                            <field name="enforce_from_account" attrs="{'required':[('auto_email','=',True)]}"/>
                             <field name="auto_email"/>
-                            <field name="attached_wkf"/>
-                            <field name="attached_activity"  domain="[('wkf_id', '=', attached_wkf)]"/>
+                            <field name="attached_wkf" domain="[('osv','=',model_int_name)]" attrs="{'required':[('auto_email','=',True)]}"/>
+                            <field name="attached_activity"  domain="[('wkf_id', '=', attached_wkf)]" attrs="{'required':[('auto_email','=',True)]}"/>
                             <field name="server_action" readonly="1"/>
                             <field name="ref_ir_act_window"/>
                             <field name="ref_ir_value"/>
