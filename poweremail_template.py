@@ -24,6 +24,7 @@
 #########################################################################
 from osv import osv, fields
 import netsvc
+import base64
 import poweremail_engines
 
 class poweremail_templates(osv.osv):
@@ -192,7 +193,7 @@ class poweremail_templates(osv.osv):
                     'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template.id),
                     'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template.id),
                     'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template.id),
-                    'pem_account_id' :template.enforce_from_account,#This is a mandatory field when automatic emails are sent
+                    'pem_account_id' :template.enforce_from_account.id,#This is a mandatory field when automatic emails are sent
                     'state':'na',
                     'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
                 }
@@ -212,7 +213,7 @@ class poweremail_templates(osv.osv):
                 new_att_vals={
                                 'name':vals['pem_subject'] + ' (Email Attachment)',
                                 'datas':base64.b64encode(result),
-                                'datas_fname':str(self.get_value(template.file_name) or 'Report') + "." + format,
+                                'datas_fname':str(self.get_value(cr,uid,recid,template.file_name) or 'Report') + "." + format,
                                 'description':vals['pem_body_text'] or "No Description",
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mail_id
