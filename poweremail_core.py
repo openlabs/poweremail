@@ -25,34 +25,18 @@
 
 from osv import osv, fields
 import re
-import pooler
 import smtplib
-import mimetypes
-import binascii
 import base64
-import time
-import datetime
-import os
-from optparse import OptionParser
 from email import Encoders
-from email.Message import Message
 from email.MIMEBase import MIMEBase
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
-from email.Utils import COMMASPACE, formatdate
 import netsvc
-import sys
 import poplib
 import imaplib
 import string
 import email
-
-
-
-if sys.version[0:3] > '2.4':
-    from hashlib import md5
-else:
-    from md5 import md5
+import time
 
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
@@ -108,7 +92,6 @@ class poweremail_core_accounts(osv.osv):
     ]
     def _constraint_unique(self, cr, uid, ids):
         if self.read(cr,uid,ids,['company'])[0]['company']=='no':
-            print self.read(cr,uid,ids,['email_id'])[0]['email_id']
             accounts = self.search(cr, uid,[('user','=',uid),('company','=','no')])
             if len(accounts) > 1 :
                 return False
@@ -239,7 +222,7 @@ class poweremail_core_accounts(osv.osv):
                 if bcc:
                     while (type(bcc)==type([])) and (False in bcc):
                         bcc = bcc.remove(False)
-                    print "BCCCCCE:",bcc
+                    #print "BCCCCCE:",bcc
                     if (type(bcc)==type([])):
                         #msg['BCC'] = ",".join(map(str,bcc)) #Dont show somebody gets a BCC
                         toadds += bcc
@@ -270,7 +253,7 @@ class poweremail_core_accounts(osv.osv):
                 #    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
                 #    return False
                 try:
-                    print msg['From'],toadds
+                    #print msg['From'],toadds
                     serv.sendmail(str(msg['From']),toadds,msg.as_string())
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
@@ -295,7 +278,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':datetime.datetime(*time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S')) or False,
+            'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -311,7 +294,7 @@ class poweremail_core_accounts(osv.osv):
             logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload Account:%s.")% (coreaccountid))
         #Create mailbox entry in Mail
         #try:
-        print vals
+        #print vals
         crid = mail_obj.create(cr,uid,vals)
         #except Exception,e:
             #logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
@@ -337,7 +320,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -408,7 +391,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            #'date_mail':time.strptime(mail['date'][0:25],'%a, %d %b %Y %H:%M:%S') or False,
+            'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -497,7 +480,7 @@ class poweremail_core_accounts(osv.osv):
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.")% (id))
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(rec.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                         #If there are newer mails than the ones in mailbox
-                        print int(msg_count[0]),rec.last_mail_id
+                        #print int(msg_count[0]),rec.last_mail_id
                         if rec.last_mail_id < int(msg_count[0]):
                             if rec.rec_headers_den_mail:
                                 #Download Headers Only
@@ -643,10 +626,10 @@ class poweremail_core_selfolder(osv.osv_memory):
         return False
     
     def _get_folders(self, cr, uid, ctx={}):
-        print cr, uid, ctx
+        #print cr, uid, ctx
         if 'active_ids' in ctx.keys():
             record = self.pool.get('poweremail.core_accounts').browse(cr, uid, ctx['active_ids'][0])
-            print record.email_id
+            #print record.email_id
             if record:
                 folderlist = []
                 try:
