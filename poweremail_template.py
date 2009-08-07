@@ -39,7 +39,7 @@ class poweremail_templates(osv.osv):
     _columns = {
         'name' : fields.char('Name of Template',size=100,required=True),
         'object_name':fields.many2one('ir.model','Model'),
-        'model_int_name':fields.char('Model Internal Name',size=200,readonly=200),
+        'model_int_name':fields.char('Model Internal Name',size=200,),
         'def_to':fields.char('Recepient (To)',size=64,help="The default recepient of email. Placeholders can be used here."),
         'def_cc':fields.char('Default CC',size=64,help="The default CC for the email. Placeholders can be used here."),
         'def_bcc':fields.char('Default BCC',size=64,help="The default BCC for the email. Placeholders can be used here."),

@@ -62,7 +62,7 @@
                 <form string="Power Email Templates">
                     <field name="name"/>
                     <field name="object_name" required="1" on_change="change_model(object_name)"/>
-                    <field name="model_int_name" required="1"/>
+                    <field name="model_int_name" invisible="1"/>
                     <notebook colspan="4">
                         <page string="Mail Details">
                             <group col="4" colspan="2">
