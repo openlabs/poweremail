@@ -32,9 +32,9 @@ class poweremail_templates(osv.osv):
     _description = 'Power Email Templates for Models'
 
     def change_model(self,cr,uid,ids,object_name,ctx={}):
-       for id in ids:
-           mod_name = self.pool.get('ir.model').read(cr,uid,object_name,['model'])['model']
-           return {'value':{'model_int_name':mod_name}}
+       mod_name = self.pool.get('ir.model').read(cr,uid,object_name,['model'])['model']
+       return {'value':{'model_int_name':mod_name}}
+       
 
     _columns = {
         'name' : fields.char('Name of Template',size=100,required=True),
