@@ -21,9 +21,9 @@
                         <field name="date_mail" colspan="4" />
                     </group>
                     <group col="4" colspan="2">
-                        <field name="pem_to" colspan="2" />
+                        <field name="pem_to" colspan="2" required="1" />
                         <field name="pem_bcc" colspan="4" />
-                        <field name="pem_subject" colspan="4" />
+                        <field name="pem_subject" colspan="4"  />
                     </group>
                     <notebook colspan="4">
                         <page string="Standard Body">
@@ -78,12 +78,13 @@
             <field name="model">poweremail.mailbox</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree string="Power Email Inbox">
+                <tree string="Power Email Inbox" colors="blue:state=='unread'">
                     <field name="pem_user"/>
                     <field name="pem_from" select="1" />
                     <field name="pem_subject" select="1" />
                     <field name="pem_attachments_ids" select="2" />
                     <field name="date_mail" select="2" />
+                    <field name="state" />
                 </tree>
             </field>
         </record>

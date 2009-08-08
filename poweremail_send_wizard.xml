@@ -40,27 +40,6 @@
             </field>
         </record>
 
-        <record id="act_poweremail_send_wizard_form" model="ir.actions.act_window">
-            <field name="name">Send Mail Wizard</field>
-            <field name="res_model">poweremail.send.wizard</field>
-            <field name="src_model">poweremail.templates</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="auto_refresh" eval="1" />
-            <field name="target">new</field>
-        </record>
-
-        <record id="ir_poweremail_wizard" model="ir.values">
-            <field eval="'client_action_multi'" name="key2" />
-            <field eval="'poweremail.templates'" name="model" />
-            <field name="name">Send Email</field>
-            <field eval="'ir.actions.act_window,'+str(act_poweremail_send_wizard_form)"
-				name="value" />
-            <field eval="True" name="object" />
-        </record>
-
-
     </data>
 </openerp>
 

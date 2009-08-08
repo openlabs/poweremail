@@ -273,9 +273,10 @@ class poweremail_core_accounts(osv.osv):
         #coreaccounti: ID of poeremail core account
         logger = netsvc.Logger()
         mail_obj = self.pool.get('poweremail.mailbox')
+        
         vals = {
             'pem_from':mail['From'],
-            'pem_to':mail['To'],
+            'pem_to':mail['To'] or 'no recepient',
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
@@ -387,7 +388,7 @@ class poweremail_core_accounts(osv.osv):
         #TODO:If multipart save attachments and save ids
         vals = {
             'pem_from':mail['From'],
-            'pem_to':mail['To'],
+            'pem_to':mail['To'] or 'no recepient',
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
@@ -415,11 +416,13 @@ class poweremail_core_accounts(osv.osv):
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Missed saving body of unknown payload Account:%s.")% (coreaccountid))
         #Create the mailbox item now
+       
         try:
             crid = mail_obj.write(cr,uid,mailboxref,vals)
         except Exception,e:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Mail->Mailbox write error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
         #Check if a create was success
+        print "crid",crid
         if mailboxref:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Mail %s Saved successfully as ID:%s for Account:%s.")% (serv_ref,crid,coreaccountid))
             #If there are attachments save them as well

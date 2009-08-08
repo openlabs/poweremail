@@ -98,10 +98,10 @@ class poweremail_mailbox(osv.osv):
     
     _columns = {
             'pem_from':fields.char('From', size=64),
-            'pem_to':fields.char('Recepient (To)', size=64, required=True),
+            'pem_to':fields.char('Recepient (To)', size=64,),
             'pem_cc':fields.char(' CC', size=64),
             'pem_bcc':fields.char(' BCC', size=64),
-            'pem_subject':fields.char(' Subject', size=200, required=True),
+            'pem_subject':fields.char(' Subject', size=200,),
             'pem_body_text':fields.text('Standard Body (Text)'),
             'pem_body_html':fields.text('Body (Text-Web Client Only)'),
             'pem_attachments_ids':fields.many2many('ir.attachment', 'mail_attachments_rel', 'mail_id', 'att_id', 'Attachments'),

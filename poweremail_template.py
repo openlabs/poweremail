@@ -108,24 +108,24 @@ class poweremail_templates(osv.osv):
                 #Create Server Action
                 vals = {
                         'state':'poweremail',
-                        'poweremail_template':id,
-                        'name':self.pool.get('poweremail.templates').read(cr,uid,id,['name'])['name'],
+                        'poweremail_template':ids[0],
+                        'name':self.pool.get('poweremail.templates').read(cr,uid,ids[0],['name'])['name'],
                         'condition':'True',
-                        'model_id':self.read(cr,uid,id,['object_name'])['object_name'][0]
+                        'model_id':self.read(cr,uid,ids[0],['object_name'])['object_name'][0]
                     }
                 datas['server_action'] = self.pool.get('ir.actions.server').create(cr,uid,vals)
                 #Attach Workflow to server action
                 #Check if workflow activity also changed
                 if 'attached_activity' in datas.keys():
                     #The workflow has changed, so cancel the previous one
-                    ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+                    ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
                     if ref_wf_act:          #Delete existing reference
                         self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
                     #Now attach the server action to newly selected workflow activity
                     self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':datas['server_action']})
             else: #Auto email got disabled, so delete all workflow attachments and prev server action
-                ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
-                ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+                ref_sr_act = self.read(cr, uid, ids[0], ['server_action'])['server_action']
+                ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
                 if ref_sr_act:          #Delete server action
                     self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0])
                 if ref_wf_act:          #Delete Server action reference in workflow
@@ -134,11 +134,11 @@ class poweremail_templates(osv.osv):
         #If only attached workflow stage changed?
         elif 'attached_activity' in datas.keys():
             #The workflow only has changed, so cancel the previous one and add server action to new one
-            ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+            ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
             if ref_wf_act:          #Delete existing reference
                 self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
             #Now attach the server action to newly selected workflow activity
-            ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
+            ref_sr_act = self.read(cr, uid, id[0], ['server_action'])['server_action']
             self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':ref_sr_act[0]})
 
         return super(poweremail_templates,self).write(cr, uid,ids, datas, ctx)
