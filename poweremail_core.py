@@ -37,6 +37,7 @@ import imaplib
 import string
 import email
 import time
+import poweremail_engines
 
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
@@ -333,8 +334,11 @@ class poweremail_core_accounts(osv.osv):
         #Identify Mail Type and get payload
         if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
             vals['mail_type']=mail.get_content_type()
-            if mail.get_content_type() in ['text/plain','text/html']:
+            if mail.get_content_type() in ['text/plain']:
                 vals['pem_body_text']=mail.get_payload()
+                vals['pem_body_html']='Mail is purely in Plain Text'
+            elif mail.get_content_type() in ['text/html']:
+                vals['pem_body_text']='Mail is purely in Plain Text\nStripped Version (BETA):\n' + self.pool.get("poweremail.engines").strip_html(mail.get_payload())
                 vals['pem_body_html']=mail.get_payload()
             elif mail.get_content_type() in 'multipart/alternative':
                 vals['pem_body_text']=mail.get_payload(0).get_payload()
