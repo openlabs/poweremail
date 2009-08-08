@@ -187,7 +187,7 @@
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_co" />
 		
-		<menuitem name="My Accounts"
+	<menuitem name="My Accounts"
 			id="menu_poweremail_core_accounts_Personal_my"
 			parent="menu_poweremail_configuration_server"
 			action="action_poweremail_core_accounts_tree_my" />
