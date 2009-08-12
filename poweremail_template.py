@@ -37,7 +37,7 @@ class poweremail_templates(osv.osv):
        
 
     _columns = {
-        'name' : fields.char('Name of Template',size=100,required=True),
+        'name' : fields.char('Name of Template',size=100),
         'object_name':fields.many2one('ir.model','Model'),
         'model_int_name':fields.char('Model Internal Name',size=200,),
         'def_to':fields.char('Recepient (To)',size=64,help="The default recepient of email. Placeholders can be used here."),

@@ -650,9 +650,13 @@ class poweremail_core_selfolder(osv.osv_memory):
                         serv = imaplib.IMAP4(record.iserver, record.isport)
                 except imaplib.IMAP4.error, error:
                     raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                except Exception,error:
+                    raise osv.except_osv(_("IMAP Server connection Error"), _("An error occurred : %s ") % error)
                 try:
                     serv.login(record.isuser, record.ispass)
                 except imaplib.IMAP4.error, error:
+                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                except Exception,error:
                     raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
                 try:
                     for folders in serv.list()[1]:
@@ -662,6 +666,8 @@ class poweremail_core_selfolder(osv.osv_memory):
                         if folder_readable_name == 'INBOX':
                             self.inboxvalue = folder_readable_name
                 except imaplib.IMAP4.error, error:
+                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+                except Exception,error:
                     raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
             else:
                 folderlist = [('invalid', 'Invalid')]
