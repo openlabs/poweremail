@@ -250,23 +250,7 @@ class poweremail_templates(osv.osv):
                     result['sub_model_object_field'] = False
                     result['null_value'] = null_value
                     return {'value':result}
-    
-    def generate_table(self,cr,uid,ids,ctx={},*args):
-        print "Context",ctx
-        if ctx['table_required_fields']:
-            result = {}
-            req_fields = ctx['table_required_fields'][0][2]
-            field_obj = self.pool.get('ir.model.fields')
-            result = "<table>"
-            result += "<tr>"
-            #Create table Headings
-            for each_field in req_fields:
-                field_rec = field_obj.browse(cr,uid,each_field)
-                result += "<td>" + field_rec.field_description + "</td>"
-            result += "</tr>"
-            #Use Mako Loop
-            #result += "% for o in object" + "." + 
-                
+                   
     def _onchange_table_model_object_field(self,cr,uid,ids,model_object_field):
         if model_object_field:
             result={}
