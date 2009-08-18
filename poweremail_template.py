@@ -23,6 +23,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 from osv import osv, fields
+from mako.template import Template
 import netsvc
 import base64
 import poweremail_engines
@@ -227,7 +228,9 @@ class poweremail_templates(osv.osv):
 
     def get_value(self,cr,uid,recid,message={},template=None):
         if message:
-            return self.engine.parsevalue(cr,uid,recid,message,template,{})
+            #return self.engine.parsevalue(cr,uid,recid,message,template,{})
+            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(object=object)
         else:
             return ""
         

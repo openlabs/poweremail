@@ -34,9 +34,9 @@
 										nolabel="1" colspan="4" />
                                 </page>
                                 <page
-									string="Body (Text-Web Client Only)">
+									string="Body (HTML-Web Client Only)">
                                     <field name="pem_body_html"
-										nolabel="1" colspan="4" />
+										nolabel="1" colspan="4" widget="text_html"/>
                                 </page>
                             </notebook>
                         </page>

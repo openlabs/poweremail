@@ -23,6 +23,7 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 from osv import osv, fields
+from mako.template import Template
 import netsvc
 import base64
 
@@ -50,9 +51,18 @@ class poweremail_send_wizard(osv.osv_memory):
                     else:
                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
+#    def get_value(self,cr,uid,ctx={},message={}):
+#        if message:
+#            return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
+#        else:
+#            return ""
+
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
-            return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
+            object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['active_id'])
+            reply = Template(message).render(object=object)
+            print reply
+            return reply
         else:
             return ""
 
