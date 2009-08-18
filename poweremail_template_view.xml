@@ -88,10 +88,10 @@
                                 </page>
                             </notebook>
                             <group col="4">
-                                <field name="model_object_field" domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_field_changed(model_object_field)" colspan="4"/>
-                                <field name="sub_object" readonly="1" colspan="4" on_change="_auto_compute(model_object_field,sub_model_object_field,null_value)"/>
-                                <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" colspan="4" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="_auto_compute(model_object_field,sub_model_object_field,null_value)"/>
-                                <field name="null_value" colspan="4" on_change="_auto_compute(model_object_field,sub_model_object_field,null_value)"/>
+                                <field name="model_object_field" domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_model_object_field(model_object_field)" colspan="4"/>
+                                <field name="sub_object" readonly="1" colspan="4" /><!--on_change="_auto_compute(model_object_field,sub_model_object_field,null_value)"/>-->
+                                <field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" colspan="4" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="_onchange_sub_model_object_field(model_object_field,sub_model_object_field)"/>
+                                <field name="null_value" colspan="4" on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value)"/>
                                 <field name="copyvalue" colspan="4"/>
                                 <!--<button name="_add_field" string="Compute Placeholder" type="object" colspan="4"/>-->
                                 <button name="%(wizard_poweremail_preview)d" string="Preview Template" type="action" colspan="4"/>

@@ -165,72 +165,93 @@ class poweremail_templates(osv.osv):
                 raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))
                 return False
         return True
-
-    def _field_changed(self,cr,uid,ids,parent_field):
-        #print "Parent:",parent_field
-        if parent_field:
-            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,parent_field)
-            #print field_obj.ttype
+    
+    def compute_pl(self,model_object_field,sub_model_object_field,null_value):
+        #Configure for MAKO
+        copy_val = ''
+        if model_object_field:
+            copy_val = "${object." + model_object_field
+        if sub_model_object_field:
+            copy_val += "." + sub_model_object_field
+        if null_value:
+            copy_val += " or '" + null_value + "'"
+        if model_object_field:
+            copy_val += "}"
+        return copy_val 
+            
+    def _onchange_model_object_field(self,cr,uid,ids,model_object_field):
+        if model_object_field:
+            result={}
+            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+            #Check if field is relational
             if field_obj.ttype in ['many2one','one2many','many2many']:
                 res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
                 #print res_ids[0]
                 if res_ids:
-                    self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':res_ids[0],'sub_model_object_field':False})
-                    expr_val = self._add_field(cr,uid,ids)
-                    return {'value':{'sub_object':res_ids[0],'copyvalue':expr_val['value']['copyvalue']}}
-                else:
-                    self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':False,'sub_model_object_field':False})
-                    expr_val = self._add_field(cr,uid,ids)
-                    return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
+                    result['sub_object'] = res_ids[0]
+                    result['copyvalue'] = self.compute_pl(False,False,False)
+                    result['sub_model_object_field'] = False
+                    result['null_value'] = False
+                    return {'value':result}
             else:
-                self.write(cr,uid,ids,{'model_object_field':parent_field,'sub_object':False,'sub_model_object_field':False,})
-                expr_val = self._add_field(cr,uid,ids)
-                return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
-        else:
-            expr_val = self._add_field(cr,uid,ids)
-            self.write(cr,uid,ids,{'sub_object':False,'sub_model_object_field':False})
-            return {'value':{'sub_object':False,'sub_model_object_field':False,'copyvalue':expr_val['value']['copyvalue']}}
-        
-    def _add_field(self,cr,uid,ids,ctx={}):
-        try:
-            if self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field']:
-                #print "Computing Field"
-                obj_id = self.read(cr,uid,ids,['model_object_field'])[0]['model_object_field'][0]
-                obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
-                obj_not = obj_br.name
-                if self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field']:
-                    obj_id = self.read(cr,uid,ids,['sub_model_object_field'])[0]['sub_model_object_field'][0]
-                    obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
-                    obj_not = obj_not + "." + obj_br.name
-                if self.read(cr,uid,ids,['null_value'])[0]['null_value']:
-                    obj_not = obj_not + "/" + self.read(cr,uid,ids,['null_value'])[0]['null_value']
-                obj_not = "[[object." + obj_not + "]]"
-                #print "Object Value (_add_field):",obj_not
-                self.write(cr,uid,ids,{'copyvalue':obj_not})
-                return {'value':{'copyvalue':obj_not}}
-        except:
-            raise osv.except_osv(_("Warning"),_("You need to save the template before expressions can be computed"))
+                #Its a simple field... just compute placeholder
+                    result['sub_object'] = False
+                    result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
+                    result['sub_model_object_field'] = False
+                    result['null_value'] = False
+                    return {'value':result}
+            
+    def _onchange_sub_model_object_field(self,cr,uid,ids,model_object_field,sub_model_object_field):
+        if model_object_field and sub_model_object_field:
+            result={}
+            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+            if field_obj.ttype in ['many2one','one2many','many2many']:
+                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+                sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+                #print res_ids[0]
+                if res_ids:
+                    result['sub_object'] = res_ids[0]
+                    result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,False)
+                    result['sub_model_object_field'] = sub_model_object_field
+                    result['null_value'] = False
+                    return {'value':result}
+            else:
+                #Its a simple field... just compute placeholder
+                    result['sub_object'] = False
+                    result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
+                    result['sub_model_object_field'] = False
+                    result['null_value'] = False
+                    return {'value':result}
 
-    def _auto_compute(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value,ctx={}):
-        if model_object_field:
-            obj_id = model_object_field
-            obj_br = self.pool.get('ir.model.fields').browse(cr,uid,obj_id)
-            obj_not = obj_br.name
-            if sub_model_object_field:
-                obj_br = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
-                obj_not = obj_not + "." + obj_br.name
-            if null_value:
-                obj_not = obj_not + "/" + null_value
-            obj_not = "[[object." + obj_not + "]]"
-            #print "Object Value (_suto_compute):",obj_not
-            #self.write(cr,uid,ids,{'copyvalue':obj_not})
-            return {'value':{'copyvalue':obj_not}}
-
+    def _onchange_null_value(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value):
+        if model_object_field and null_value:
+            result={}
+            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+            if field_obj.ttype in ['many2one','one2many','many2many']:
+                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+                sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+                #print res_ids[0]
+                if res_ids:
+                    result['sub_object'] = res_ids[0]
+                    result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,null_value)
+                    result['sub_model_object_field'] = sub_model_object_field
+                    result['null_value'] = null_value
+                    return {'value':result}
+            else:
+                #Its a simple field... just compute placeholder
+                    result['sub_object'] = False
+                    result['copyvalue'] = self.compute_pl(field_obj.name,False,null_value)
+                    result['sub_model_object_field'] = False
+                    result['null_value'] = null_value
+                    return {'value':result}
+    
     def get_value(self,cr,uid,recid,message={},template=None):
+        #Returns the computed expression
         if message:
             #return self.engine.parsevalue(cr,uid,recid,message,template,{})
             object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
             reply = Template(message).render(object=object)
+            return reply
         else:
             return ""
         
@@ -300,7 +321,17 @@ class poweremail_preview(osv.osv_memory):
             ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr,uid,ref_obj_ids)
             #print ref_obj_recs
             return ref_obj_recs
-
+    
+    def get_value(self,cr,uid,recid,message={},template=None,ctx={}):
+        #Returns the computed expression
+        if message:
+            #return self.engine.parsevalue(cr,uid,recid,message,template,{})
+            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(object=object)
+            return reply
+        else:
+            return ""
+        
     _columns = {
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
@@ -319,19 +350,18 @@ class poweremail_preview(osv.osv_memory):
     }
 
     def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
-        engine = self.pool.get("poweremail.engines")
         if rel_model_ref:
             vals={}
             if ctx == {}:
                 ctx = self.context
             template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
-            vals['to']= engine.parsevalue(cr,uid,rel_model_ref,template.def_to,template.id,ctx)
-            vals['cc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_cc,template.id,ctx)
-            vals['bcc']= engine.parsevalue(cr,uid,rel_model_ref,template.def_bcc,template.id,ctx)
-            vals['subject']= engine.parsevalue(cr,uid,rel_model_ref,template.def_subject,template.id,ctx)
-            vals['body_text']=engine.parsevalue(cr,uid,rel_model_ref,engine.strip_html(template.def_body_text),template.id,ctx)
-            vals['body_html']=engine.parsevalue(cr,uid,rel_model_ref,template.def_body_html,template.id,ctx)
-            vals['report']= engine.parsevalue(cr,uid,rel_model_ref,template.file_name,template.id,ctx)
+            vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,ctx)
+            vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,ctx)
+            vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
+            vals['subject']= self.get_value(cr,uid,rel_model_ref,template.def_subject,template,ctx)
+            vals['body_text']=self.get_value(cr,uid,rel_model_ref,template.def_body_text,template,ctx)
+            vals['body_html']=self.get_value(cr,uid,rel_model_ref,template.def_body_html,template,ctx)
+            vals['report']= self.get_value(cr,uid,rel_model_ref,template.file_name,template,ctx)
             #print "Vals>>>>>",vals
             return {'value':vals}
         

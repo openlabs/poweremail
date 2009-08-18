@@ -1,0 +1,7 @@
+__init__.pyc
+poweremail_core.pyc
+poweremail_engines.pyc
+poweremail_mailbox.pyc
+poweremail_send_wizard.pyc
+poweremail_serveraction.pyc
+poweremail_template.pyc
