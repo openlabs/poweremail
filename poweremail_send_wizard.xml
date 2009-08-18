@@ -29,7 +29,7 @@
                             <field name="body_text" select="2" colspan="4" nolabel="1"/>
                         </page>
                         <page string="Body(HTML - Only Web Client)">
-                            <field name="body_html" select="2" colspan="4" nolabel="1"/>
+                            <field name="body_html" select="2" colspan="4" nolabel="1" widget="text_html"/>
                         </page>
                     </notebook>
                     <field name="signature"/>

@@ -63,11 +63,17 @@ class poweremail_templates(osv.osv):
         'ref_ir_act_window':fields.many2one('ir.actions.act_window','Window Action',readonly=True,ondelete="cascade"),
         'ref_ir_value':fields.many2one('ir.values','Wizard Button',readonly=True,ondelete="cascade"),
         #Expression Builder fields
-        'model_object_field':fields.many2one('ir.model.fields',string="Field",help="Select the field from the model you want to use.\nIf it is a relationship field you will be able to choose the nested values in the box below\n(Note:If there are no values make sure you have selected the correct model)"),
-        'sub_object':fields.many2one('ir.model','Sub-model',help='When a relation field is used this field will show you the type of field you have selected'),
-        'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field',help='When you choose relationship fields this field will specify the sub value you can use.'),
-        'null_value':fields.char('Null Value',help="This Value is used if the field is empty",size=50),
-        'copyvalue':fields.char('Expression',size=100,help="Copy and paste the value in the location you want to use a system value.")
+        #Simple Fields
+        'model_object_field':fields.many2one('ir.model.fields',string="Field",help="Select the field from the model you want to use.\nIf it is a relationship field you will be able to choose the nested values in the box below\n(Note:If there are no values make sure you have selected the correct model)",store=False),
+        'sub_object':fields.many2one('ir.model','Sub-model',help='When a relation field is used this field will show you the type of field you have selected',store=False),
+        'sub_model_object_field':fields.many2one('ir.model.fields','Sub Field',help='When you choose relationship fields this field will specify the sub value you can use.',store=False),
+        'null_value':fields.char('Null Value',help="This Value is used if the field is empty",size=50,store=False),
+        'copyvalue':fields.char('Expression',size=100,help="Copy and paste the value in the location you want to use a system value.",store=False),
+        #Table Fields
+        'table_model_object_field':fields.many2one('ir.model.fields',string="Table Field",help="Select the field from the model you want to use.\nOnly one2many & many2many fields can be used for tables)",store=False),
+        'table_sub_object':fields.many2one('ir.model','Table-model',help='This field shows the model you will be using for your table',store=False),
+        'table_required_fields':fields.many2many('ir.model.fields','fields_table_rel','field_id','table_id',string="Required Fields",help="Select the fieldsyou require in the table)",store=False),
+        'table_html':fields.text('HTML code',help="Copy this html code to your HTML message body for displaying the info in your mail.",store=False)
     }
 
     _defaults = {
@@ -85,7 +91,7 @@ class poweremail_templates(osv.osv):
              'res_model':'poweremail.send.wizard',
              'src_model': src_obj,
              'view_type': 'form',
-             'context': "{'src_model':'" + src_obj + "','template':'" + vals['name'] + "'}",
+             'context': "{'src_model':'" + src_obj + "','template':'" + vals['name'] + "','src_rec_id':active_id}",
              'view_mode':'form,tree',
              'view_id':self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')])[0],
              'target': 'new',
@@ -170,7 +176,7 @@ class poweremail_templates(osv.osv):
         #Configure for MAKO
         copy_val = ''
         if model_object_field:
-            copy_val = "${object." + model_object_field
+            copy_val = "${peobject." + model_object_field
         if sub_model_object_field:
             copy_val += "." + sub_model_object_field
         if null_value:
@@ -245,12 +251,66 @@ class poweremail_templates(osv.osv):
                     result['null_value'] = null_value
                     return {'value':result}
     
+    def generate_table(self,cr,uid,ids,ctx={},*args):
+        print "Context",ctx
+        if ctx['table_required_fields']:
+            result = {}
+            req_fields = ctx['table_required_fields'][0][2]
+            field_obj = self.pool.get('ir.model.fields')
+            result = "<table>"
+            result += "<tr>"
+            #Create table Headings
+            for each_field in req_fields:
+                field_rec = field_obj.browse(cr,uid,each_field)
+                result += "<td>" + field_rec.field_description + "</td>"
+            result += "</tr>"
+            #Use Mako Loop
+            #result += "% for o in object" + "." + 
+                
+    def _onchange_table_model_object_field(self,cr,uid,ids,model_object_field):
+        if model_object_field:
+            result={}
+            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+            if field_obj.ttype in ['many2one','one2many','many2many']:
+                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+                if res_ids:
+                    result['table_sub_object'] = res_ids[0]
+                    return {'value':result}
+            else:
+                #Its a simple field... just compute placeholder
+                    result['sub_object'] = False
+                    return {'value':result}
+    
+    def _onchange_table_required_fields(self,cr,uid,ids,table_model_object_field,table_required_fields):
+        print table_model_object_field,table_required_fields
+        if table_model_object_field and table_required_fields:
+            result=''
+            table_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,table_model_object_field)
+            field_obj = self.pool.get('ir.model.fields')         
+            #Generate Html Header
+            result +="<p>\n<table>\n<tr>"
+            for each_rec in table_required_fields[0][2]:
+                result += "\n<td>"
+                record = field_obj.browse(cr,uid,each_rec)
+                result += record.field_description
+                result += "</td>"
+            result +="\n</tr>\n"
+            #Table header is defined,  now mako for table
+            result += "%for o in peobject." + table_field_obj.name + ":\n<tr>"
+            for each_rec in table_required_fields[0][2]:
+                result += "\n<td>${o."
+                record = field_obj.browse(cr,uid,each_rec)
+                result += record.name
+                result += "}</td>"
+            result +="\n</tr>\n%endfor\n</table>\n</p>"
+            return {'value':{'table_html':result}}
+
     def get_value(self,cr,uid,recid,message={},template=None):
         #Returns the computed expression
         if message:
             #return self.engine.parsevalue(cr,uid,recid,message,template,{})
-            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(object=object)
+            peobject = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(peobject=peobject)
             return reply
         else:
             return ""
@@ -266,14 +326,15 @@ class poweremail_templates(osv.osv):
             template = self.browse(cr,uid,id)
             vals = {
                     'pem_from': template.object_name.model,
-                    'pem_to':self.get_value(cr,uid,recid,template.def_to,template.id),
-                    'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template.id),
-                    'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template.id),
-                    'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template.id),
-                    'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template.id),
-                    'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template.id),
+                    'pem_to':self.get_value(cr,uid,recid,template.def_to,template),
+                    'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template),
+                    'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template),
+                    'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template),
+                    'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template),
+                    'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template),
                     'pem_account_id' :template.enforce_from_account.id,#This is a mandatory field when automatic emails are sent
                     'state':'na',
+                    'folder':'outbox',
                     'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
                 }
             if template.use_sign:
@@ -299,7 +360,7 @@ class poweremail_templates(osv.osv):
                                     }
                 attid = att_obj.create(cr,uid,new_att_vals)
                 if attid:
-                    self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed','folder':'outbox'})
+                    self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'})
             return mail_id
         except Exception,error:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Email Generation failed, Reason:%s")% (error))
@@ -326,8 +387,8 @@ class poweremail_preview(osv.osv_memory):
         #Returns the computed expression
         if message:
             #return self.engine.parsevalue(cr,uid,recid,message,template,{})
-            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(object=object)
+            peobject = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(peobject=peobject)
             return reply
         else:
             return ""

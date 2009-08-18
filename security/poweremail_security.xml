@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-<data noupdate="0">
+	<data noupdate="0">
 
-    <record id="res_groups_manager" model="res.groups">
-        <field name="name">Poweremail / Settings_Manager</field>
-    </record>
-    
-    <record id="res_groups_users" model="res.groups">
-	<field name="name">Poweremail / External_users</field>
-    </record>    
+		<record id="res_groups_manager" model="res.groups">
+			<field name="name">Poweremail / Settings_Manager</field>
+		</record>
 
-    <record id="res_groups_user" model="res.groups">
-	<field name="name">Poweremail / Internal_users</field>
-    </record>
-    
+		<record id="res_groups_users" model="res.groups">
+			<field name="name">Poweremail / External_users</field>
+		</record>
 
-</data>
+		<record id="res_groups_user" model="res.groups">
+			<field name="name">Poweremail / Internal_users</field>
+		</record>
+
+
+	</data>
 </openerp>
