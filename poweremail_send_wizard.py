@@ -50,7 +50,7 @@ class poweremail_send_wizard(osv.osv_memory):
                         return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
                     else:
                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
-
+                       raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 #    def get_value(self,cr,uid,ctx={},message={}):
 #        if message:
 #            return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)

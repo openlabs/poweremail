@@ -133,13 +133,13 @@
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
 				<tree string="Power Email Templates">
-					<field name="name" />
-					<field name="object_name" required="1" />
-					<field name="def_to" colspan="4" />
-					<field name="def_cc" colspan="4" />
-					<field name="def_bcc" colspan="4" />
-					<field name="def_subject" colspan="4" />
-					<field name="use_sign" colspan="4" />
+					<field name="name" select="1"/>
+					<field name="object_name" required="1" select="1"/>
+					<field name="def_to" colspan="4" select="2"/>
+					<field name="def_cc" colspan="4" select="2"/>
+					<field name="def_bcc" colspan="4" select="2"/>
+					<field name="def_subject" colspan="4" select="2"/>
+					<field name="use_sign" colspan="4" select="2"/>
 					<field name="file_name" colspan="4" />
 					<field name="enforce_from_account" />
 				</tree>
