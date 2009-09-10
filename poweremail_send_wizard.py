@@ -34,28 +34,38 @@ class poweremail_send_wizard(osv.osv_memory):
 
     def _get_accounts(self,cr,uid,ctx={}):
         logger = netsvc.Logger()
-        self.engine = self.pool.get("poweremail.engines")
+        tmpl_id = False
         if 'template' in ctx.keys():
             self.model_ref = ctx['active_id']
             tmpl_id = self.pool.get('poweremail.templates').search(cr,uid,[('name','=',ctx['template'])])
-            if tmpl_id:
-                self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0])
-                #print self.template.allowed_groups
-                if self.template.enforce_from_account:
-                    return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]
+        self.ctx = ctx
+        if tmpl_id:
+            self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0])
+            #print self.template.allowed_groups
+            if self.template.enforce_from_account:
+                return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]
+            else:
+                accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','no'),('user','=',uid)])
+                if accounts_id:
+                    accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id)
+                    return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
                 else:
-                    accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','no'),('user','=',uid)])
-                    if accounts_id:
-                        accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id)
-                        return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
-                    else:
-                       logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
-                       raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
-#    def get_value(self,cr,uid,ctx={},message={}):
-#        if message:
-#            return self.engine.parsevalue(cr,uid,ctx['active_id'],message,self.template.id,ctx)
-#        else:
-#            return ""
+                   logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+                   raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+
+    def _get_generated(self,cr,uid,ids=[],context={}):
+        logger = netsvc.Logger()
+        screen_vals = self.read(cr,uid,ids[0],[])
+        context['account_id'] = screen_vals[0]['from']
+        if self.ctx['src_rec_ids'] and len(self.ctx['src_rec_ids'])>1 and self.template.id:
+            #Means there are multiple items selected for email. Just send them no need preview
+            result =self.pool.get('poweremail.templates').generate_mail(cr,uid,self.template.id,self.ctx['src_rec_ids'],context) 
+            if result:
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
+                self.write(cr,uid,ids,{'generated':len(result),'state':'done'})
+                #return {'value':{'generated':len(result)}}
+            else:
+                raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
 
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
@@ -66,22 +76,31 @@ class poweremail_send_wizard(osv.osv_memory):
             return ""
 
     _columns = {
+        'state':fields.selection([
+                        ('single','Simple Mail Wizard Step 1'),
+                        ('multi','Multiple Mail Wizard Step 1'),
+                        ('done','Wizard Complete')
+                                  ],'Status',readonly=True),
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
         'rel_model_ref':fields.integer('Referred Document',readonly=True),
-        'from':fields.selection(_get_accounts,'From Account',required=True),
+        'from':fields.selection(_get_accounts,'From Account',select=True),
         'to':fields.char('To',size=100,readonly=True),
         'cc':fields.char('CC',size=100,),
         'bcc':fields.char('BCC',size=100,),
-        'subject':fields.char('Subject',size=200,required=True),
+        'subject':fields.char('Subject',size=200),
         'body_text':fields.text('Body',),
         'body_html':fields.text('Body',),
         'report':fields.char('Report File Name',size=100,),
         'signature':fields.boolean('Attach my signature to mail'),
-        'filename':fields.text('File Name')
+        'filename':fields.text('File Name'),
+        'requested':fields.integer('No of requested Mails',readonly=True),
+        'generated':fields.integer('No of generated Mails',readonly=True), 
+        'full_success':fields.boolean('Complete Success',readonly=True)
                 }
 
     _defaults = {
+        'state': lambda self,cr,uid,ctx: len(ctx['src_rec_ids']) > 1 and 'multi' or 'single',
         'rel_model': lambda self,cr,uid,ctx:self.pool.get('ir.model').search(cr,uid,[('model','=',ctx['src_model'])])[0],
         'rel_model_ref': lambda self,cr,uid,ctx:ctx['active_id'],
         'to': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_to),
@@ -92,7 +111,9 @@ class poweremail_send_wizard(osv.osv_memory):
         'body_html':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_html),
         'report': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.file_name),
         'signature': lambda self,cr,uid,ctx: self.template.use_sign,
-        'ref_template':lambda self,cr,uid,ctx: self.template.id
+        'ref_template':lambda self,cr,uid,ctx: self.template.id,
+        'requested':lambda self,cr,uid,ctx: len(ctx['src_rec_ids']),
+        'full_success': lambda *a:False
     }
 
     def sav_to_drafts(self,cr,uid,ids,ctx={}):
@@ -108,10 +129,10 @@ class poweremail_send_wizard(osv.osv_memory):
     def save_to_mailbox(self,cr,uid,ids,ctx={}):
         for id in ids:
             screen_vals = self.read(cr,uid,id,[])[0]
-            print screen_vals
+            #print screen_vals
             accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'])
             vals = {
-                'pem_from': ctx['src_model'],
+                'pem_from': str(accounts['name']) + "<" + str(accounts['email_id']) + ">",
                 'pem_to':screen_vals['to'],
                 'pem_cc':screen_vals['cc'],
                 'pem_bcc':screen_vals['bcc'],
