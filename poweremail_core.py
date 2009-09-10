@@ -232,14 +232,15 @@ class poweremail_core_accounts(osv.osv):
 
                 if not body_text:
                     body_text="Mail without body"
+                if not body_html:
+                    body_html=body_text
                 # Attach parts into message container.
                 # According to RFC 2046, the last part of a multipart message, in this case
                 # the HTML message, is best and preferred.
-                if body_html:#If html body exists, send that else text
-                    part1 = MIMEText(body_html, 'html')
-                else:
-                    part1 = MIMEText(body_text, 'html')
+                part1 = MIMEText(body_text, 'text')
+                part2 = MIMEText(body_html, 'html')
                 msg.attach(part1)
+                msg.attach(part2)
                 #Now add attachments if any
                 for file in payload.keys():
                     part = MIMEBase('application', "octet-stream")
