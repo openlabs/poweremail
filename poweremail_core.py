@@ -52,7 +52,7 @@ class poweremail_core_accounts(osv.osv):
         'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly',False)]}, help="Enter port number,eg:SMTP-587 "),
         'smtpuname': fields.char('User Name', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]}),
         'smtppass': fields.char('Password', size=120, invisible=True, required=True, readonly=True, states={'draft':[('readonly',False)]}),
-        'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly',False)]}),
+        'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly',False)]}, readonly=True),
         
         'iserver':fields.char('Incoming Server',size=100, readonly=True, states={'draft':[('readonly',False)]}, help="Enter name of incoming server,eg:imap.gmail.com "),
         'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly',False)]}, help="For example IMAP: 993,POP3:995 "),
