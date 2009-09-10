@@ -36,7 +36,7 @@ class poweremail_send_wizard(osv.osv_memory):
         logger = netsvc.Logger()
         tmpl_id = False
         if 'template' in ctx.keys():
-            self.model_ref = ctx['active_id']
+            self.model_ref = ctx['src_rec_ids'][0]
             tmpl_id = self.pool.get('poweremail.templates').search(cr,uid,[('name','=',ctx['template'])])
         self.ctx = ctx
         if tmpl_id:
@@ -69,7 +69,7 @@ class poweremail_send_wizard(osv.osv_memory):
 
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
-            peobject = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_id'])
+            peobject = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
             reply = Template(message).render(peobject=peobject)
             return reply
         else:
