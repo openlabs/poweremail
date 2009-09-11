@@ -24,6 +24,7 @@
 #########################################################################
 
 from osv import osv, fields
+from html2text import html2text
 import re
 import smtplib
 import base64
@@ -53,7 +54,11 @@ class poweremail_core_accounts(osv.osv):
         'smtpuname': fields.char('User Name', size=120, required=True, readonly=True, states={'draft':[('readonly',False)]}),
         'smtppass': fields.char('Password', size=120, invisible=True, required=True, readonly=True, states={'draft':[('readonly',False)]}),
         'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly',False)]}, readonly=True),
-        
+        'send_pref':fields.selection([
+                                      ('html','HTML otherwise Text'),
+                                      ('text','Text otherwise HTML'),
+                                      ('both','Both HTML & Text')
+                                      ],'Mail Format',required=True),
         'iserver':fields.char('Incoming Server',size=100, readonly=True, states={'draft':[('readonly',False)]}, help="Enter name of incoming server,eg:imap.gmail.com "),
         'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly',False)]}, help="For example IMAP: 993,POP3:995 "),
         'isuser':fields.char('User Name',size=100, readonly=True, states={'draft':[('readonly',False)]}),
@@ -86,6 +91,7 @@ class poweremail_core_accounts(osv.osv):
          'last_mail_id':lambda *a:0,
          'rec_headers_den_mail':lambda *a:True,
          'dont_auto_down_attach':lambda *a:True,
+         'send_pref':lambda *a: 'html',
                  }
                  
     _sql_constraints = [
@@ -229,18 +235,28 @@ class poweremail_core_accounts(osv.osv):
                         #msg['BCC'] = ",".join(map(str,bcc)) #Dont show somebody gets a BCC
                         toadds += bcc
                 # Record the MIME types of both parts - text/plain and text/html.
-
+                if body_text:
+                    l= body_text.replace(' ','')
+                    l= l.replace('\r','')
+                    l= l.replace('\n','')
+                    l = len(l)
+                    if l == 0:
+                        body_text = False
+                        
                 if not body_text:
-                    body_text="Mail without body"
+                    if body_html:
+                        body_text=html2text(body_html)
+                    else:
+                        body_text="Mail without body"
                 if not body_html:
                     body_html=body_text
                 # Attach parts into message container.
                 # According to RFC 2046, the last part of a multipart message, in this case
                 # the HTML message, is best and preferred.
-                part1 = MIMEText(body_text, 'text')
-                part2 = MIMEText(body_html, 'html')
-                msg.attach(part1)
-                msg.attach(part2)
+                if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
+                    msg.attach(MIMEText(body_html, 'html'))
+                if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
+                    msg.attach(MIMEText(body_text, 'text'))
                 #Now add attachments if any
                 for file in payload.keys():
                     part = MIMEBase('application', "octet-stream")
