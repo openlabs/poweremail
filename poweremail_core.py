@@ -256,7 +256,7 @@ class poweremail_core_accounts(osv.osv):
                 if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
                     msg.attach(MIMEText(body_html, 'html'))
                 if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_text, 'text'))
+                    msg.attach(MIMEText(body_text, 'plain'))
                 #Now add attachments if any
                 for file in payload.keys():
                     part = MIMEBase('application', "octet-stream")

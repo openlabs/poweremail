@@ -64,7 +64,7 @@
 								<field name="smtpuname" select="1" colspan="2" />
 								<field name="user" select="2" colspan="2" />
 								<separator string="Sending Preferences" colspan="4" />
-								<field name="mail_type" colspan="2" />
+								<field name="send_pref" colspan="2" />
 							</group>
 						</page>
 						<page string="Incoming">
