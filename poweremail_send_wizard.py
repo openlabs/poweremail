@@ -69,8 +69,8 @@ class poweremail_send_wizard(osv.osv_memory):
 
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
-            peobject = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
-            reply = Template(message).render(peobject=peobject)
+            object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
+            reply = Template(message).render(object=object,peobject=object)
             return reply
         else:
             return ""

@@ -431,10 +431,10 @@ class poweremail_core_accounts(osv.osv):
             elif mail.get_content_type() in ['text/html']:
                 vals['pem_body_text']='Mail is purely in Plain Text\nStripped Version (BETA):\n' + self.pool.get("poweremail.engines").strip_html(mail.get_payload())
                 vals['pem_body_html']=mail.get_payload()
-            elif mail.get_content_type() in 'multipart/alternative':
+            elif mail.get_content_type() in ['multipart/alternative']:
                 vals['pem_body_text']=mail.get_payload(0).get_payload()
                 vals['pem_body_html']=mail.get_payload(1).get_payload()
-            elif mail.get_content_type() == 'multipart/mixed':
+            elif mail.get_content_type() == ['multipart/mixed']:
                 vals['pem_body_text']=mail.get_payload(0).get_payload(0)
                 vals['pem_body_html']=mail.get_payload(0).get_payload(1)
             else:

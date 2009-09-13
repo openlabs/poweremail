@@ -176,7 +176,7 @@ class poweremail_templates(osv.osv):
         #Configure for MAKO
         copy_val = ''
         if model_object_field:
-            copy_val = "${peobject." + model_object_field
+            copy_val = "${object." + model_object_field
         if sub_model_object_field:
             copy_val += "." + sub_model_object_field
         if null_value:
@@ -280,7 +280,7 @@ class poweremail_templates(osv.osv):
                 result += "</td>"
             result +="\n</tr>\n"
             #Table header is defined,  now mako for table
-            result += "%for o in peobject." + table_field_obj.name + ":\n<tr>"
+            result += "%for o in object." + table_field_obj.name + ":\n<tr>"
             for each_rec in table_required_fields[0][2]:
                 result += "\n<td>${o."
                 record = field_obj.browse(cr,uid,each_rec)
@@ -293,8 +293,8 @@ class poweremail_templates(osv.osv):
         #Returns the computed expression
         if message:
             #return self.engine.parsevalue(cr,uid,recid,message,template,{})
-            peobject = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(peobject=peobject)
+            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(object=object,peobject=object)
             return reply
         else:
             return ""
@@ -382,8 +382,8 @@ class poweremail_preview(osv.osv_memory):
         #Returns the computed expression
         if message:
             #return self.engine.parsevalue(cr,uid,recid,message,template,{})
-            peobject = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(peobject=peobject)
+            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+            reply = Template(message).render(object=object,peobject=object)
             return reply
         else:
             return ""
