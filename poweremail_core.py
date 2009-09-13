@@ -446,7 +446,6 @@ class poweremail_core_accounts(osv.osv):
         except Exception,e:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Mail->Mailbox write error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
         #Check if a create was success
-        print "crid",crid
         if mailboxref:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Mail %s Saved successfully as ID:%s for Account:%s.")% (serv_ref,crid,coreaccountid))
             #If there are attachments save them as well
