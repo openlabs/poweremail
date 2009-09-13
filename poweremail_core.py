@@ -631,7 +631,11 @@ class poweremail_core_accounts(osv.osv):
                     self.complete_mail(cr,uid,mail,id,server_ref)
                 else:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.")% (id))
-
+    
+    def send_receive(self,cr,uid,ids,context={}):
+        self.get_mails(cr, uid, ids, context)
+        for id in ids:
+            self.pool.get('poweremail.mailbox').send_all_mail(cr,uid,[],ctx={'filters':[('pem_account_id','=',id)]})
 poweremail_core_accounts()
 
 

@@ -61,7 +61,11 @@ class poweremail_mailbox(osv.osv):
     def send_all_mail(self,cr,uid,ids=[],ctx={}):
         #8888888888888 SENDS MAILS IN OUTBOX 8888888888888888888#
         #get ids of mails in outbox
-        ids = self.search(cr,uid,[('folder','=','outbox')])
+        filters = [('folder','=','outbox')]
+        if 'filters' in ctx.keys():
+            for each_filter in ctx['filters']:
+                filters.append(each_filter)
+        ids = self.search(cr,uid,filters)
         #send mails one by one
         for id in ids:
             core_obj=self.pool.get('poweremail.core_accounts')

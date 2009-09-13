@@ -97,6 +97,7 @@
 						<button string="Approve Account" name="button_approval" states="draft" type="workflow" colspan="2" />
 						<button string="Suspend Account" name="button_suspended" states="approved" type="workflow" colspan="2" />
 						<button string="Request Re-activation" name="get_reapprove" states="suspended" type="workflow" colspan="2" />
+						<button string="Send/Receive" name="send_receive" states="approved" type="object" colspan="2" />
 					</group>
 				</form>
 			</field>
