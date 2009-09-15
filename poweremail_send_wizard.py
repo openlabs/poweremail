@@ -72,7 +72,7 @@ class poweremail_send_wizard(osv.osv_memory):
             if not type(message) in [unicode]:
                 message = unicode(message,'UTF-8')
             object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
-            reply = Template(message).render(object=object,peobject=object)
+            reply = Template(message).render_unicode(object=object,peobject=object)
             return reply
         else:
             return ""

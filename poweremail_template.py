@@ -295,7 +295,7 @@ class poweremail_templates(osv.osv):
             if not type(message) in [unicode]:
                 message = unicode(message,'UTF-8')
             object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(object=object,peobject=object)
+            reply = Template(message).render_unicode(object=object,peobject=object)
             return reply
         else:
             return ""
@@ -385,7 +385,7 @@ class poweremail_preview(osv.osv_memory):
             if not type(message) in [unicode]:
                 message = unicode(message,'UTF-8')
             object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render(object=object,peobject=object)
+            reply = Template(message).render_unicode(object=object,peobject=object)
             return reply
         else:
             return ""
