@@ -292,7 +292,8 @@ class poweremail_templates(osv.osv):
     def get_value(self,cr,uid,recid,message={},template=None):
         #Returns the computed expression
         if message:
-            message = unicode(message,'UTF-8')
+            if not type(message) in [unicode]:
+                message = unicode(message,'UTF-8')
             object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
             reply = Template(message).render(object=object,peobject=object)
             return reply
@@ -381,7 +382,8 @@ class poweremail_preview(osv.osv_memory):
     def get_value(self,cr,uid,recid,message={},template=None,ctx={}):
         #Returns the computed expression
         if message:
-            message = unicode(message,'UTF-8')
+            if not type(message) in [unicode]:
+                message = unicode(message,'UTF-8')
             object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
             reply = Template(message).render(object=object,peobject=object)
             return reply
