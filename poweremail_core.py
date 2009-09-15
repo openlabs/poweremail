@@ -29,8 +29,8 @@ import re
 import smtplib
 import base64
 from email import Encoders
-from email.mime.base import MIMEBase 
-from email.mime.multipart import MIMEMultipart 
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import netsvc
 import poplib
