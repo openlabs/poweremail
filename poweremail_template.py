@@ -294,8 +294,9 @@ class poweremail_templates(osv.osv):
         if message:
             if not type(message) in [unicode]:
                 message = unicode(message,'UTF-8')
-            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render_unicode(object=object,peobject=object)
+            object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
+            templ = Template(message,input_encoding='utf-8')
+            reply = templ.render_unicode(object=object,peobject=object)
             return reply
         else:
             return ""
