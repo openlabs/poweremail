@@ -254,9 +254,9 @@ class poweremail_core_accounts(osv.osv):
                 # According to RFC 2046, the last part of a multipart message, in this case
                 # the HTML message, is best and preferred.
                 if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_text, 'plain'))
+                    msg.attach(MIMEText(body_text, _charset='iso-8859-1'))
                 if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_html, 'html'))
+                    msg.attach(MIMEText(body_html, _subtype='html',_charset='iso-8859-1'))
 
                 #Now add attachments if any
                 for file in payload.keys():
@@ -274,7 +274,7 @@ class poweremail_core_accounts(osv.osv):
                 #    return False
                 try:
                     #print msg['From'],toadds
-                    serv.sendmail(str(msg['From']),toadds,msg.as_string())
+                    serv.sendmail(unicode(msg['From']),toadds,msg.as_string())
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
                     return False
