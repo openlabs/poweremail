@@ -253,10 +253,11 @@ class poweremail_core_accounts(osv.osv):
                 # Attach parts into message container.
                 # According to RFC 2046, the last part of a multipart message, in this case
                 # the HTML message, is best and preferred.
-                if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_html, 'html'))
                 if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
                     msg.attach(MIMEText(body_text, 'plain'))
+                if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
+                    msg.attach(MIMEText(body_html, 'html'))
+
                 #Now add attachments if any
                 for file in payload.keys():
                     part = MIMEBase('application', "octet-stream")
