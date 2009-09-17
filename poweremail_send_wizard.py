@@ -135,7 +135,7 @@ class poweremail_send_wizard(osv.osv_memory):
             #print screen_vals
             accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'])
             vals = {
-                'pem_from': str(accounts['name']) + "<" + str(accounts['email_id']) + ">",
+                'pem_from': unicode(accounts['name']) + "<" + unicode(accounts['email_id']) + ">",
                 'pem_to':screen_vals['to'],
                 'pem_cc':screen_vals['cc'],
                 'pem_bcc':screen_vals['bcc'],
@@ -162,7 +162,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 new_att_vals={
                                 'name':screen_vals['subject'] + ' (Email Attachment)',
                                 'datas':base64.b64encode(result),
-                                'datas_fname':str(screen_vals['filename'] or 'Report') + "." + format,
+                                'datas_fname':unicode(screen_vals['filename'] or 'Report') + "." + format,
                                 'description':screen_vals['body_text'] or "No Description",
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mail_id

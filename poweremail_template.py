@@ -320,7 +320,7 @@ class poweremail_templates(osv.osv):
                 self.engine = self.pool.get("poweremail.engines")
                 
                 vals = {
-                        'pem_from': str(from_account['name']) + "<" + str(from_account['email_id']) + ">",
+                        'pem_from': unicode(from_account['name']) + "<" + unicode(from_account['email_id']) + ">",
                         'pem_to':self.get_value(cr,uid,recid,template.def_to,template),
                         'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template),
                         'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template),
@@ -348,7 +348,7 @@ class poweremail_templates(osv.osv):
                     new_att_vals={
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
                                     'datas':base64.b64encode(result),
-                                    'datas_fname':str(self.get_value(cr,uid,recid,template.file_name) or 'Report') + "." + format,
+                                    'datas_fname':unicode(self.get_value(cr,uid,recid,template.file_name) or 'Report') + "." + format,
                                     'description':vals['pem_body_text'] or "No Description",
                                     'res_model':'poweremail.mailbox',
                                     'res_id':mail_id

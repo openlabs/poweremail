@@ -213,26 +213,26 @@ class poweremail_core_accounts(osv.osv):
                 msg = MIMEMultipart()
                 if subject:
                     msg['Subject']= subject
-                msg['From'] = str(core_obj.name + "<" + core_obj.email_id + ">")
+                msg['From'] = unicode(core_obj.name + "<" + core_obj.email_id + ">")
                 toadds = []
                 if to:
                     while (type(to)==type([])) and (False in to):
                         to = to.remove(False)
                     if (type(to)==type([])):
-                        msg['To'] = ",".join(map(str,to))
+                        msg['To'] = ",".join(map(unicode,to))
                         toadds = to
                 if cc:
                     while (type(cc)==type([])) and (False in cc):
                         cc = cc.remove(False)
                     if (type(cc)==type([])):
-                        msg['CC'] = ",".join(map(str,cc))
+                        msg['CC'] = ",".join(map(unicode,cc))
                         toadds += cc
                 if bcc:
                     while (type(bcc)==type([])) and (False in bcc):
                         bcc = bcc.remove(False)
                     #print "BCCCCCE:",bcc
                     if (type(bcc)==type([])):
-                        #msg['BCC'] = ",".join(map(str,bcc)) #Dont show somebody gets a BCC
+                        #msg['BCC'] = ",".join(map(unicode,bcc)) #Dont show somebody gets a BCC
                         toadds += bcc
                 # Record the MIME types of both parts - text/plain and text/html.
                 if body_text:
