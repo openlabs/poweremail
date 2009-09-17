@@ -292,12 +292,15 @@ class poweremail_templates(osv.osv):
     def get_value(self,cr,uid,recid,message={},template=None):
         #Returns the computed expression
         if message:
-            if not type(message) in [unicode]:
-                message = unicode(message,'UTF-8')
-            object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
-            templ = Template(message,input_encoding='utf-8')
-            reply = templ.render_unicode(object=object,peobject=object)
-            return reply
+            try:
+                if not type(message) in [unicode]:
+                    message = unicode(message,'UTF-8')
+                object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
+                templ = Template(message,input_encoding='utf-8')
+                reply = templ.render_unicode(object=object,peobject=object)
+                return reply
+            except Exception,e:
+                return ""
         else:
             return ""
         
@@ -383,11 +386,14 @@ class poweremail_preview(osv.osv_memory):
     def get_value(self,cr,uid,recid,message={},template=None,ctx={}):
         #Returns the computed expression
         if message:
-            if not type(message) in [unicode]:
-                message = unicode(message,'UTF-8')
-            object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-            reply = Template(message).render_unicode(object=object,peobject=object)
-            return reply
+            try:
+                if not type(message) in [unicode]:
+                    message = unicode(message,'UTF-8')
+                object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+                reply = Template(message).render_unicode(object=object,peobject=object)
+                return reply
+            except Exception,e:
+                return ""
         else:
             return ""
         
