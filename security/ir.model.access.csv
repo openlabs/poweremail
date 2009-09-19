@@ -1,4 +1,13 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_poweremail_settings_manager","poweremail.settings.manager","poweremail.model_poweremail_core_selfolder","res_groups_manager",1,1,1,1
-"access_poweremail_external_users","poweremail.external.users","poweremail.model_poweremail_core_selfolder","res_groups_users",1,1,1,0
-"access_poweremail_internal_users","poweremail.internal.users","poweremail.model_poweremail_core_selfolder","res_groups_user",1,1,0,0
+"access_pe_coresel_settings_manager","poweremail.coresel_folder","model_poweremail_core_selfolder","res_groups_pemanager",1,1,1,1
+"access_pe_coresel_external_users","poweremail.coresel_folder","model_poweremail_core_selfolder","res_groups_peuserse",1,1,1,1
+"access_pe_coresel_internal_users","poweremail.coresel_folder","model_poweremail_core_selfolder","res_groups_peusersi",1,1,1,1
+"access_pe_core_settings_manager","poweremail.core","model_poweremail_core_accounts","res_groups_pemanager",1,1,1,1
+"access_pe_core_external_users","poweremail.core","model_poweremail_core_accounts","res_groups_peuserse",1,1,1,0
+"access_pe_core_internal_users","poweremail.core","model_poweremail_core_accounts","res_groups_peusersi",1,1,1,0
+"access_pe_template_settings_manager","poweremail.templates","model_poweremail_templates","res_groups_pemanager",1,1,1,1
+"access_pe_template_external_users","poweremail.templates","model_poweremail_templates","res_groups_peuserse",1,1,0,0
+"access_pe_template_internal_users","poweremail.templates","model_poweremail_templates","res_groups_peusersi",1,1,0,0
+"access_pe_mailbox_settings_manager","poweremail.mailbox","model_poweremail_mailbox","res_groups_pemanager",1,1,1,1
+"access_pe_mailbox_external_users","poweremail.mailbox","model_poweremail_mailbox","res_groups_peuserse",1,1,1,1
+"access_pe_mailbox_internal_users","poweremail.mailbox","model_poweremail_mailbox","res_groups_peusersi",1,1,1,1
