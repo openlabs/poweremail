@@ -387,7 +387,7 @@ class poweremail_core_accounts(osv.osv):
                                 'res_model':'poweremail.mailbox',
                                 'res_id':crid
                                     }
-                    att_ids.extend([att_obj.create(cr,uid,new_att_vals)])
+                    att_ids.append([att_obj.create(cr,uid,new_att_vals)])
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload())-1,coreaccountid))
                     #Now attach the attachment ids to mail
                     if mail_obj.write(cr,uid,crid,{'pem_attachments_ids':[[6, 0, att_ids]]}):
@@ -462,7 +462,7 @@ class poweremail_core_accounts(osv.osv):
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mailboxref
                                     }
-                    att_ids.extend(att_obj.create(cr,uid,new_att_vals))
+                    att_ids.append(att_obj.create(cr,uid,new_att_vals))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload()-1,coreaccountid)))
                     #Now attach the attachment ids to mail
                     if mail_obj.write(cr,uid,mailboxref,{'pem_attachments_ids':[[6, 0, att_ids]]}):
