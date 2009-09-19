@@ -116,6 +116,7 @@ class poweremail_mailbox(osv.osv):
             'mail_type':fields.selection([
                                     ('multipart/mixed','Has Attachments'),
                                     ('multipart/alternative','Plain Text & HTML with no attachments'),
+                                    ('multipart/related','Intermixed content'),
                                     ('text/plain','Plain Text'),
                                     ('text/html','HTML Body'),
                                     ],'Mail Contents'),

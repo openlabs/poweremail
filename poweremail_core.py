@@ -42,7 +42,12 @@ import poweremail_engines
 
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
-
+    _known_content_types = ['multipart/mixed',
+                            'multipart/alternative',
+                            'multipart/related',
+                            'text/plain',
+                            'text/html'
+                            ]
     _columns = {
         'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'draft':[('readonly',False)]} ),
         'user':fields.many2one('res.users','Related User',required=True,readonly=True, states={'draft':[('readonly',False)]} ),
@@ -117,6 +122,7 @@ class poweremail_core_accounts(osv.osv):
     
     
     def out_connection(self,cr,uid,ids,context={}):
+        #checks SMTP credentials and confirms if outgoing connection works
         rec = self.browse(cr, uid, ids )[0]
         if rec:
             if rec.smtpserver and rec.smtpport and rec.smtpuname and rec.smtppass:
@@ -135,6 +141,7 @@ class poweremail_core_accounts(osv.osv):
                 raise osv.except_osv(_("Information"),_("SMTP Test Connection Was Successful"))
 
     def in_connection(self,cr,uid,ids,context={}):
+        #Checks IMAP or POP3 credentials and returns if credentials are right
         rec = self.browse(cr, uid, ids )[0]
         if rec:
             if rec.iserver and rec.isport and rec.isuser and rec.ispass:
@@ -179,6 +186,31 @@ class poweremail_core_accounts(osv.osv):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
 
+    def smtp_connection(self,cr,uid,id):
+        #This function returns a SMTP server object
+        logger = netsvc.Logger()
+        core_obj = self.browse(cr,uid,id)
+        if core_obj.smtpserver and core_obj.smtpport and core_obj.smtpuname and core_obj.smtppass and core_obj.state=='approved':
+            try:
+                serv = smtplib.SMTP(core_obj.smtpserver,core_obj.smtpport)
+                if core_obj.smtpssl:
+                    serv.ehlo()
+                    serv.starttls()
+                    serv.ehlo()
+            except Exception,error:
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not connect to server\nError: %s")% (id,error))
+                return False
+            try:
+                serv.login(core_obj.smtpuname, core_obj.smtppass)
+            except Exception,error:
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
+                return False
+            #Everything is complete, now return the connection
+            return serv
+        else:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
+            return False
+                      
 #**************************** MAIL SENDING FEATURES ***********************#
     def send_mail(self,cr,uid,ids,to=[],cc=[],bcc=[],subject="",body_text="",body_html="",payload={}):
         #ids:(from) Account from which mail is to be sent
@@ -193,85 +225,71 @@ class poweremail_core_accounts(osv.osv):
         logger = netsvc.Logger()
         for id in ids:
             core_obj = self.browse(cr,uid,id)
-            #print "val:",ids,to,cc,bcc,subject,body_text,body_html,payload
-            if core_obj.smtpserver and core_obj.smtpport and core_obj.smtpuname and core_obj.smtppass and core_obj.state=='approved':
+            serv = self.smtp_connection(cr, uid, id)
+            if serv:
                 try:
-                    serv = smtplib.SMTP(core_obj.smtpserver,core_obj.smtpport)
-                    if core_obj.smtpssl:
-                        serv.ehlo()
-                        serv.starttls()
-                        serv.ehlo()
+                    msg = MIMEMultipart()
+                    if subject:
+                        msg['Subject']= subject
+                    msg['From'] = unicode(core_obj.name + "<" + core_obj.email_id + ">")
+                    toadds = []
+                    if to:
+                        while (type(to)==type([])) and (False in to):
+                            to = to.remove(False)
+                        if (type(to)==type([])):
+                            msg['To'] = ",".join(map(unicode,to))
+                            toadds = to
+                    if cc:
+                        while (type(cc)==type([])) and (False in cc):
+                            cc = cc.remove(False)
+                        if (type(cc)==type([])):
+                            msg['CC'] = ",".join(map(unicode,cc))
+                            toadds += cc
+                    if bcc:
+                        while (type(bcc)==type([])) and (False in bcc):
+                            bcc = bcc.remove(False)
+                        #print "BCCCCCE:",bcc
+                        if (type(bcc)==type([])):
+                            #msg['BCC'] = ",".join(map(unicode,bcc)) #Dont show somebody gets a BCC
+                            toadds += bcc
+                    # Record the MIME types of both parts - text/plain and text/html.
+                    if body_text:
+                        l= body_text.replace(' ','')
+                        l= l.replace('\r','')
+                        l= l.replace('\n','')
+                        l = len(l)
+                        if l == 0:
+                            body_text = False
+                            
+                    if not body_text:
+                        if body_html:
+                            body_text=html2text(body_html)
+                        else:
+                            body_text="Mail without body"
+                    if not body_html:
+                        body_html=body_text
+                    # Attach parts into message container.
+                    # According to RFC 2046, the last part of a multipart message, in this case
+                    # the HTML message, is best and preferred.
+                    if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
+                        msg.attach(MIMEText(body_text, _charset='UTF-8'))
+                    if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
+                        msg.attach(MIMEText(body_html, _subtype='html',_charset='UTF-8'))
+    
+                    #Now add attachments if any
+                    for file in payload.keys():
+                        part = MIMEBase('application', "octet-stream")
+                        part.set_payload(base64.decodestring(payload[file]))
+                        f = open(file,"wb")
+                        f.write(base64.decodestring(payload[file]))
+                        f.close()
+                        part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
+                        Encoders.encode_base64(part)
+                        msg.attach(part)
+                        #msg is now complete, send it to everybody
                 except Exception,error:
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not connect to server\nError: %s")% (id,error))
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
                     return False
-                try:
-                    serv.login(core_obj.smtpuname, core_obj.smtppass)
-                except Exception,error:
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
-                    return False
-                #try:
-                msg = MIMEMultipart()
-                if subject:
-                    msg['Subject']= subject
-                msg['From'] = unicode(core_obj.name + "<" + core_obj.email_id + ">")
-                toadds = []
-                if to:
-                    while (type(to)==type([])) and (False in to):
-                        to = to.remove(False)
-                    if (type(to)==type([])):
-                        msg['To'] = ",".join(map(unicode,to))
-                        toadds = to
-                if cc:
-                    while (type(cc)==type([])) and (False in cc):
-                        cc = cc.remove(False)
-                    if (type(cc)==type([])):
-                        msg['CC'] = ",".join(map(unicode,cc))
-                        toadds += cc
-                if bcc:
-                    while (type(bcc)==type([])) and (False in bcc):
-                        bcc = bcc.remove(False)
-                    #print "BCCCCCE:",bcc
-                    if (type(bcc)==type([])):
-                        #msg['BCC'] = ",".join(map(unicode,bcc)) #Dont show somebody gets a BCC
-                        toadds += bcc
-                # Record the MIME types of both parts - text/plain and text/html.
-                if body_text:
-                    l= body_text.replace(' ','')
-                    l= l.replace('\r','')
-                    l= l.replace('\n','')
-                    l = len(l)
-                    if l == 0:
-                        body_text = False
-                        
-                if not body_text:
-                    if body_html:
-                        body_text=html2text(body_html)
-                    else:
-                        body_text="Mail without body"
-                if not body_html:
-                    body_html=body_text
-                # Attach parts into message container.
-                # According to RFC 2046, the last part of a multipart message, in this case
-                # the HTML message, is best and preferred.
-                if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_text, _charset='UTF-8'))
-                if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
-                    msg.attach(MIMEText(body_html, _subtype='html',_charset='UTF-8'))
-
-                #Now add attachments if any
-                for file in payload.keys():
-                    part = MIMEBase('application', "octet-stream")
-                    part.set_payload(base64.decodestring(payload[file]))
-                    f = open(file,"wb")
-                    f.write(base64.decodestring(payload[file]))
-                    f.close()
-                    part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
-                    Encoders.encode_base64(part)
-                    msg.attach(part)
-                    #msg is now complete, send it to everybody
-                #except Exception,error:
-                #    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
-                #    return False
                 try:
                     #print msg['From'],toadds
                     serv.sendmail(unicode(msg['From']),toadds,msg.as_string())
@@ -309,16 +327,16 @@ class poweremail_core_accounts(osv.osv):
             'pem_account_id':coreaccountid
             }
         #Identify Mail Type
-        if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
+        if mail.get_content_type() in self._known_content_types:
             vals['mail_type']=mail.get_content_type()
         else:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload Account:%s.")% (coreaccountid))
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload (%s) Account:%s.")% (mail.get_content_type(),coreaccountid))
         #Create mailbox entry in Mail
-        #try:
+        try:
         #print vals
-        crid = mail_obj.create(cr,uid,vals)
-        #except Exception,e:
-            #logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
+            crid = mail_obj.create(cr,uid,vals)
+        except Exception,e:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
         #Check if a create was success
         if crid:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.")% (serv_ref,crid,coreaccountid))
@@ -349,23 +367,9 @@ class poweremail_core_accounts(osv.osv):
             'pem_body_html':'Mail not downloaded...',#TODO:Replace
             'pem_account_id':coreaccountid
             }
-        #Identify Mail Type and get payload
-        if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
-            vals['mail_type']=mail.get_content_type()
-            if mail.get_content_type() in ['text/plain']:
-                vals['pem_body_text']=mail.get_payload()
-                vals['pem_body_html']='Mail is purely in Plain Text'
-            elif mail.get_content_type() in ['text/html']:
-                vals['pem_body_text']='Mail is purely in Plain Text\nStripped Version (BETA):\n' + self.pool.get("poweremail.engines").strip_html(mail.get_payload())
-                vals['pem_body_html']=mail.get_payload()
-            elif mail.get_content_type() in 'multipart/alternative':
-                vals['pem_body_text']=mail.get_payload(0).get_payload()
-                vals['pem_body_html']=mail.get_payload(1).get_payload()
-            elif mail.get_content_type() == 'multipart/mixed':
-                vals['pem_body_text']=mail.get_payload(0).get_payload(0)
-                vals['pem_body_html']=mail.get_payload(0).get_payload(1)
-            else:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Missed saving body of unknown payload Account:%s.")% (coreaccountid))
+        parsed_mail = self.get_payloads(mail)
+        vals['pem_body_text']=parsed_mail['text']
+        vals['pem_body_html']=parsed_mail['html']
         #Create the mailbox item now
         try:
             crid = mail_obj.create(cr,uid,vals)
@@ -375,25 +379,8 @@ class poweremail_core_accounts(osv.osv):
         if crid:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.")% (serv_ref,crid,coreaccountid))
             #If there are attachments save them as well
-            if mail.get_content_type() == 'multipart/mixed':
-                att_obj = self.pool.get('ir.attachment')
-                att_ids = []
-                for i in range(1,len(mail.get_payload())):#Get each attachment
-                    new_att_vals={
-                                'name':mail['subject'] + '(Email Attachment)',
-                                'datas':base64.b64encode(mail.get_payload(i).get_payload()),
-                                'datas_fname':mail.get_payload(i).get_filename(),
-                                'description':val['pem_body_text'],
-                                'res_model':'poweremail.mailbox',
-                                'res_id':crid
-                                    }
-                    att_ids.append([att_obj.create(cr,uid,new_att_vals)])
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload())-1,coreaccountid))
-                    #Now attach the attachment ids to mail
-                    if mail_obj.write(cr,uid,crid,{'pem_attachments_ids':[[6, 0, att_ids]]}):
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Attachment to mail for %s relation success! Account:%s.")% (crid,coreaccountid))
-                    else:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Attachment to mail for %s relation failed Account:%s.")% (crid,coreaccountid))
+            if parsed_mail['attachments']:
+                self.save_attachments(self,cr,uid,mail,crid,parsed_mail,coreaccountid)
             crid=False
             return True
         else:
@@ -424,55 +411,47 @@ class poweremail_core_accounts(osv.osv):
             'pem_account_id':coreaccountid
             }
         #Identify Mail Type and get payload
-        if mail.get_content_type() in ['multipart/mixed','multipart/alternative','text/plain','text/html']:
-            vals['mail_type']=mail.get_content_type()
-            if mail.get_content_type() in ['text/plain']:
-                vals['pem_body_text']=mail.get_payload()
-                vals['pem_body_html']='Mail is purely in Plain Text'
-            elif mail.get_content_type() in ['text/html']:
-                vals['pem_body_text']='Mail is purely in Plain Text\nStripped Version (BETA):\n' + self.pool.get("poweremail.engines").strip_html(mail.get_payload())
-                vals['pem_body_html']=mail.get_payload()
-            elif mail.get_content_type() in ['multipart/alternative']:
-                vals['pem_body_text']=mail.get_payload(0).get_payload()
-                vals['pem_body_html']=mail.get_payload(1).get_payload()
-            elif mail.get_content_type() == ['multipart/mixed']:
-                vals['pem_body_text']=mail.get_payload(0).get_payload(0)
-                vals['pem_body_html']=mail.get_payload(0).get_payload(1)
-            else:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Missed saving body of unknown payload Account:%s.")% (coreaccountid))
+        parsed_mail = self.get_payloads(mail)
+        vals['pem_body_text'] = unicode(parsed_mail['text'])
+        vals['pem_body_html'] = unicode(parsed_mail['html'])
         #Create the mailbox item now
-       
+        crid=False
         try:
             crid = mail_obj.write(cr,uid,mailboxref,vals)
         except Exception,e:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Mail->Mailbox write error Account:%s,Mail:%s")% (coreaccountid,serv_ref))
         #Check if a create was success
-        if mailboxref:
+        if crid:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Mail %s Saved successfully as ID:%s for Account:%s.")% (serv_ref,crid,coreaccountid))
             #If there are attachments save them as well
-            if mail.get_content_type() == 'multipart/mixed':
-                att_obj = self.pool.get('ir.attachment')
-                att_ids = []
-                for i in range(1,len(mail.get_payload())):#Get each attachment
-                    new_att_vals={
-                                'name':mail['subject'] + '(Email Attachment)',
-                                'datas':base64.b64encode(mail.get_payload(i).get_payload()),
-                                'datas_fname':mail.get_payload(i).get_filename(),
-                                'description':vals['pem_body_text'],
-                                'res_model':'poweremail.mailbox',
-                                'res_id':mailboxref
-                                    }
-                    att_ids.append(att_obj.create(cr,uid,new_att_vals))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(mail.get_payload()-1,coreaccountid)))
-                    #Now attach the attachment ids to mail
-                    if mail_obj.write(cr,uid,mailboxref,{'pem_attachments_ids':[[6, 0, att_ids]]}):
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Attachment to mail for %s relation success! Account:%s.")% (crid,coreaccountid))
-                    else:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Attachment to mail for %s relation failed Account:%s.")% (crid,coreaccountid))
+            if parsed_mail['attachments']:
+                self.save_attachments(cr,uid,mail,mailboxref,parsed_mail,coreaccountid)
             return True
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s")% (coreaccountid,mail[0].split()[0]))
 
+    def save_attachments(self,cr,uid,mail,id,parsed_mail,coreaccountid):
+        logger = netsvc.Logger()
+        att_obj = self.pool.get('ir.attachment')
+        mail_obj = self.pool.get('poweremail.mailbox')
+        att_ids = []
+        for each in parsed_mail['attachments']:#Get each attachment
+            new_att_vals={
+                        'name':mail['subject'] + '(' + each[0] + ')',
+                        'datas':base64.b64encode(each[2]),
+                        'datas_fname':each[1],
+                        'description':mail['subject'] + " [Type:" + each[0] + ", Filename:" + each[1] + "]",
+                        'res_model':'poweremail.mailbox',
+                        'res_id':id
+                            }
+            att_ids.append(att_obj.create(cr,uid,new_att_vals))
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Downloaded & saved %s attachments Account:%s.")% (len(att_ids),coreaccountid))
+            #Now attach the attachment ids to mail
+            if mail_obj.write(cr,uid,id,{'pem_attachments_ids':[[6, 0, att_ids]]}):
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Attachment to mail for %s relation success! Account:%s.")% (id,coreaccountid))
+            else:
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Attachment to mail for %s relation failed Account:%s.")% (id,coreaccountid))
+                        
     def get_mails(self,cr,uid,ids,ctx={}):
         #The function downloads the mails from the POP3 or IMAP server
         #The headers/full mail download depends on settings in the account
@@ -636,6 +615,24 @@ class poweremail_core_accounts(osv.osv):
         self.get_mails(cr, uid, ids, context)
         for id in ids:
             self.pool.get('poweremail.mailbox').send_all_mail(cr,uid,[],ctx={'filters':[('pem_account_id','=',id)]})
+            
+    def get_payloads(self,mail):
+        #This function will go through the mail and identify the payloads and return them
+        parsed_mail = {
+                'text':False,
+                'html':False,
+                'attachments':[]
+                       }
+        for part in mail.walk():
+            mail_part_type = part.get_content_type()
+            if mail_part_type == 'text/plain':
+                parsed_mail['text']=unicode(part.get_payload())
+            elif mail_part_type == 'text/html':
+                parsed_mail['html']=unicode(part.get_payload())
+            elif not mail_part_type.startswith('multipart'):
+                parsed_mail['attachments'].append((mail_part_type,part.get_filename(),part.get_payload(decode=True)))
+        return parsed_mail
+
 poweremail_core_accounts()
 
 
