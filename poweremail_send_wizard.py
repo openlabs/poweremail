@@ -158,9 +158,10 @@ class poweremail_send_wizard(osv.osv_memory):
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
             if self.template.report_template:
+                record_id = screen_vals['rel_model_ref']
                 reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,self.template.report_template.id,['report_name'])['report_name']
                 service = netsvc.LocalService(reportname)
-                (result, format) = service.create(cr, uid, [id], {}, {})
+                (result, format) = service.create(cr, uid, [record_id], {}, {})
                 att_obj = self.pool.get('ir.attachment')
                 new_att_vals={
                                 'name':screen_vals['subject'] + ' (Email Attachment)',
