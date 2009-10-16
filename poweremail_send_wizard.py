@@ -152,9 +152,9 @@ class poweremail_send_wizard(osv.osv_memory):
             if screen_vals['signature']:
                 sign = self.pool.get('res.users').read(cr,uid,uid,['signature'])['signature']
                 if vals['pem_body_text']:
-                    vals['pem_body_text']+=sign
+                    vals['pem_body_text'] = unicode(vals['pem_body_text'],'UTF-8')+sign
                 if vals['pem_body_html']:
-                    vals['pem_body_html']+=sign
+                    vals['pem_body_html'] = unicode(vals['pem_body_html'],'UTF-8')+sign
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
             if self.template.report_template:
