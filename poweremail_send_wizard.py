@@ -99,7 +99,7 @@ class poweremail_send_wizard(osv.osv_memory):
         'body_html':fields.text('Body',),
         'report':fields.char('Report File Name',size=100,),
         'signature':fields.boolean('Attach my signature to mail'),
-        'filename':fields.text('File Name'),
+        #'filename':fields.text('File Name'),
         'requested':fields.integer('No of requested Mails',readonly=True),
         'generated':fields.integer('No of generated Mails',readonly=True), 
         'full_success':fields.boolean('Complete Success',readonly=True)
@@ -166,7 +166,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 new_att_vals={
                                 'name':screen_vals['subject'] + ' (Email Attachment)',
                                 'datas':base64.b64encode(result),
-                                'datas_fname':unicode(screen_vals['filename'] or 'Report') + "." + format,
+                                'datas_fname':unicode(screen_vals['report'] or 'Report') + "." + format,
                                 'description':screen_vals['body_text'] or "No Description",
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mail_id
