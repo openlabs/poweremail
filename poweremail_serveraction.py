@@ -61,5 +61,5 @@ class actions_server(osv.osv):
                 self.pool.get('poweremail.templates').generate_mail(cr,uid,templ_id,[context['active_id']])
                 return False
             else:
-                return Super(actions_server,self).run(cr, uid, ids, context)
+                return super(actions_server,self).run(cr, uid, ids, context)
 actions_server()
