@@ -295,7 +295,7 @@ class poweremail_templates(osv.osv):
             try:
                 if not type(message) in [unicode]:
                     message = unicode(message,'UTF-8')
-                object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
+                object = self.pool.get(self.template.model_int_name).browse(cr,uid,recid)
                 templ = Template(message,input_encoding='utf-8')
                 reply = templ.render_unicode(object=object,peobject=object)
                 return reply
