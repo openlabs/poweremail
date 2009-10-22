@@ -145,7 +145,7 @@ class poweremail_templates(osv.osv):
             if ref_wf_act:          #Delete existing reference
                 self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
             #Now attach the server action to newly selected workflow activity
-            ref_sr_act = self.read(cr, uid, id[0], ['server_action'])['server_action']
+            ref_sr_act = self.read(cr, uid, ids[0], ['server_action'])['server_action']
             self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':ref_sr_act[0]})
 
         return super(poweremail_templates,self).write(cr, uid,ids, datas, ctx)
@@ -295,7 +295,7 @@ class poweremail_templates(osv.osv):
             try:
                 if not type(message) in [unicode]:
                     message = unicode(message,'UTF-8')
-                object = self.pool.get(self.template.model_int_name).browse(cr,uid,recid)
+                object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
                 templ = Template(message,input_encoding='utf-8')
                 reply = templ.render_unicode(object=object,peobject=object)
                 return reply
@@ -346,12 +346,12 @@ class poweremail_templates(osv.osv):
                 if template.report_template:
                     reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'])['report_name']
                     service = netsvc.LocalService(reportname)
-                    (result, format) = service.create(cr, uid, [id], {}, {})
+                    (result, format) = service.create(cr, uid, [recid], {}, {})
                     att_obj = self.pool.get('ir.attachment')
                     new_att_vals={
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
                                     'datas':base64.b64encode(result),
-                                    'datas_fname':unicode(self.get_value(cr,uid,recid,template.file_name) or 'Report') + "." + format,
+                                    'datas_fname':unicode(self.get_value(cr,uid,recid,template.file_name,template) or 'Report') + "." + format,
                                     'description':vals['pem_body_text'] or "No Description",
                                     'res_model':'poweremail.mailbox',
                                     'res_id':mail_id
