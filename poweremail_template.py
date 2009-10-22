@@ -54,7 +54,7 @@ class poweremail_templates(osv.osv):
         'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
         'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
 
-        'auto_email':fields.boolean('Auto Email', help="Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created."),
+        'auto_email':fields.boolean('Auto Email', help="Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\nNote:Auto email can be enabled only after saving template."),
         #Referred Stuff - Dont delete even if template is deleted
         'attached_wkf':fields.many2one('workflow','Workflow'),
         'attached_activity':fields.many2one('workflow.activity','Activity'),
@@ -109,7 +109,6 @@ class poweremail_templates(osv.osv):
         return super(poweremail_templates,self).create(cr, uid, vals, *args, **kwargs)   
 
     def write(self,cr,uid,ids,datas={},ctx={}):
-        print datas
         if 'auto_email' in datas.keys():#Has the auto email button toggled?
             if datas['auto_email']: #If auto email was enabled
                 #Create Server Action
