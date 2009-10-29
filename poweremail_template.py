@@ -345,7 +345,9 @@ class poweremail_templates(osv.osv):
                 if template.report_template:
                     reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'])['report_name']
                     service = netsvc.LocalService(reportname)
-                    (result, format) = service.create(cr, uid, [recid], {}, {})
+                    data = {}
+                    data['model'] = template.model_int_name
+                    (result, format) = service.create(cr, uid, [recid], data, context)
                     att_obj = self.pool.get('ir.attachment')
                     new_att_vals={
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
