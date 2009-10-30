@@ -91,9 +91,9 @@ class poweremail_send_wizard(osv.osv_memory):
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
         'rel_model_ref':fields.integer('Referred Document',readonly=True),
         'from':fields.selection(_get_accounts,'From Account',select=True),
-        'to':fields.char('To',size=100,readonly=True),
-        'cc':fields.char('CC',size=100,),
-        'bcc':fields.char('BCC',size=100,),
+        'to':fields.char('To',size=250,readonly=True),
+        'cc':fields.char('CC',size=250,),
+        'bcc':fields.char('BCC',size=250,),
         'subject':fields.char('Subject',size=200),
         'body_text':fields.text('Body',),
         'body_html':fields.text('Body',),
@@ -177,7 +177,4 @@ class poweremail_send_wizard(osv.osv_memory):
                 if attid:
                     self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'})
             return mail_id
-        
 poweremail_send_wizard()
-    
-    

@@ -102,9 +102,9 @@ class poweremail_mailbox(osv.osv):
     
     _columns = {
             'pem_from':fields.char('From', size=64),
-            'pem_to':fields.char('Recepient (To)', size=64,),
-            'pem_cc':fields.char(' CC', size=64),
-            'pem_bcc':fields.char(' BCC', size=64),
+            'pem_to':fields.char('Recepient (To)', size=250,),
+            'pem_cc':fields.char(' CC', size=250),
+            'pem_bcc':fields.char(' BCC', size=250),
             'pem_subject':fields.char(' Subject', size=200,),
             'pem_body_text':fields.text('Standard Body (Text)'),
             'pem_body_html':fields.text('Body (Text-Web Client Only)'),
