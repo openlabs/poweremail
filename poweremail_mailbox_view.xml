@@ -38,6 +38,11 @@
                                     <field name="pem_body_html"
 										nolabel="1" colspan="4" widget="text_html"/>
                                 </page>
+<page
+									string="Body (HTML-Raw)">
+                                    <field name="pem_body_html"
+										nolabel="1" colspan="4"/>
+                                </page>
                             </notebook>
                         </page>
 
