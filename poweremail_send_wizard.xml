@@ -32,9 +32,7 @@
 							<page string="Body(HTML - Only Web Client)">
 								<field name="body_html" select="2" colspan="4" nolabel="1" widget="text_html" />
 							</page>
-							<page string="Body(HTML - Raw HTML)">
-								<field name="body_html" select="2" colspan="4" nolabel="1" />
-							</page>
+
 						</notebook>
 						<field name="signature" colspan="4" />
 						<button name="sav_to_drafts" string="Save in Drafts" type="object" />
