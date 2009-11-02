@@ -33,8 +33,14 @@ class poweremail_mailbox(osv.osv):
     _rec_name="subject"
 
     def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
-        self.get_all_mail(cr,uid,context={'all_accounts':True})
-        self.send_all_mail(cr,uid,context)
+        try:
+            self.get_all_mail(cr,uid,context={'all_accounts':True})
+        except Exception,e:
+            print e
+        try:
+            self.send_all_mail(cr,uid,context)
+        except Exception,e:
+            print e
         
     def get_all_mail(self,cr,uid,context={}):
         #8888888888888 FETCHES MAILS 8888888888888888888#
