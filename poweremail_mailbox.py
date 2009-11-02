@@ -36,11 +36,11 @@ class poweremail_mailbox(osv.osv):
         try:
             self.get_all_mail(cr,uid,context={'all_accounts':True})
         except Exception,e:
-            print e
+            print "Err in receiving mail",e
         try:
             self.send_all_mail(cr,uid,context)
         except Exception,e:
-            print e
+            print "Err in sending mail",e
         
     def get_all_mail(self,cr,uid,context={}):
         #8888888888888 FETCHES MAILS 8888888888888888888#
