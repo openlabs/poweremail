@@ -155,7 +155,9 @@ class poweremail_mailbox(osv.osv):
                 account = self.pool.get('poweremail.core_accounts').browse(cr,uid,each_account_id)
                 for each_group in account.allowed_groups:
                     if not account.id in group_acc_rel.get(each_group,[]):
-                        group_acc_rel[each_group] = group_acc_rel.get(each_group,[]).append(account.id)
+                        groups = group_acc_rel.get(each_group,[])
+                        groups.append(account.id)
+                        group_acc_rel[each_group] = groups
             users_company_accounts = []
             for each_group in group_acc_rel.keys():
                 if each_group in users_groups:
