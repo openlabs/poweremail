@@ -165,7 +165,7 @@ class poweremail_mailbox(osv.osv):
                         if not each_account in users_company_accounts:
                             users_company_accounts.append(each_account)
             print users_company_accounts
-            args.append(['pem_id', 'in',users_company_accounts])
+            args.append(('pem_account_id', 'in',users_company_accounts))
         return super(poweremail_mailbox, self).search(cr, uid, args, offset, limit,
                 order, context=context, count=count)
 
