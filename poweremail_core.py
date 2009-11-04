@@ -74,6 +74,7 @@ class poweremail_core_accounts(osv.osv):
         'last_mail_id':fields.integer('Last Downloaded Mail',readonly=True),
         'rec_headers_den_mail':fields.boolean('First Receive headers, then download mail'),
         'dont_auto_down_attach':fields.boolean('Dont Download attachments automatically'),
+        'allowed_groups':fields.many2many('res.groups','account_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
         'company':fields.selection([
                                     ('yes','Yes'),
                                     ('no','No')

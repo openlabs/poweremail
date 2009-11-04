@@ -91,6 +91,9 @@
 								<button name="in_connection" type="object" string="Check Incoming Connection" />
 							</group>
 						</page>
+						<page string="security" attrs="{'invisible':[('company','!=','yes')]}">
+							<field name="allowed_groups" attrs="{'required':[('company','=','yes')]}" />
+						</page>
 					</notebook>
 					<field name="state" select="1" colspan="2" />
 					<group col="2">
@@ -158,15 +161,15 @@
 			<field name="context">{'company':'yes'}</field>
 		</record>
 
-		<menuitem name="Power Email" id="menu_poweremail_administration_server"/>
+		<menuitem name="Power Email" id="menu_poweremail_administration_server" />
 
 		<menuitem name="Configuration" id="menu_poweremail_configuration_server" parent="menu_poweremail_administration_server" />
 
-		<menuitem name="All Accounts" id="menu_poweremail_core_accounts_all" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_all" groups="res_groups_pemanager"/>
+		<menuitem name="All Accounts" id="menu_poweremail_core_accounts_all" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_all" groups="res_groups_pemanager" />
 
-		<menuitem name="Personal Accounts" id="menu_poweremail_core_accounts_Personal" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_per" groups="res_groups_pemanager"/>
+		<menuitem name="Personal Accounts" id="menu_poweremail_core_accounts_Personal" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_per" groups="res_groups_pemanager" />
 
-		<menuitem name="Company Accounts" id="menu_poweremail_core_accounts_Personal_co" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_co" groups="res_groups_pemanager"/>
+		<menuitem name="Company Accounts" id="menu_poweremail_core_accounts_Personal_co" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_co" groups="res_groups_pemanager" />
 
 		<menuitem name="My Accounts" id="menu_poweremail_core_accounts_Personal_my" parent="menu_poweremail_configuration_server" action="action_poweremail_core_accounts_tree_my" />
 

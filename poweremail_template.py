@@ -51,7 +51,7 @@ class poweremail_templates(osv.osv):
         'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"),
         'report_template':fields.many2one('ir.actions.report.xml','Report to send'),
         #'report_template':fields.reference('Report to send',[('ir.actions.report.xml','Reports')],size=128),
-        'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this ID"),
+        'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this Template"),
         'enforce_from_account':fields.many2one('poweremail.core_accounts',string="Enforce From Account",help="Emails will be sent only from this account.",domain="[('company','=','yes')]"),
 
         'auto_email':fields.boolean('Auto Email', help="Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\nNote:Auto email can be enabled only after saving template."),

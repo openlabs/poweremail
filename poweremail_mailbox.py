@@ -146,7 +146,26 @@ class poweremail_mailbox(osv.osv):
 
     } 
 
-
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context={}, count=False):
+        if context.get('company',False):
+            users_groups = self.pool.get('res.users').browse(cr,uid,uid).groups_id
+            group_acc_rel = {}
+            #get all accounts and get a table of {group1:[account1,account2],group2:[account1]}
+            for each_account_id in self.pool.get('poweremail.core_accounts').search(cr,uid,[('state','=','approved'),('company','=','yes')]):
+                account = self.pool.get('poweremail.core_accounts').browse(cr,uid,each_account_id)
+                for each_group in account.allowed_groups:
+                    if not account.id in group_acc_rel.get(each_group,[]):
+                        group_acc_rel[each_group] = group_acc_rel.get(each_group,[]).append(account.id)
+            users_company_accounts = []
+            for each_group in group_acc_rel.keys():
+                if each_group in users_groups:
+                    for each_account in group_acc_rel[each_group]:
+                        if not each_account in users_company_accounts:
+                            users_company_accounts.append(each_account)
+            print users_company_accounts
+            args.append(['pem_id', 'in',users_company_accounts])
+        return super(poweremail_mailbox, self).search(cr, uid, args, offset, limit,
+                order, context=context, count=count)
 
 poweremail_mailbox()
 
