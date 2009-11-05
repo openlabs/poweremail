@@ -27,6 +27,7 @@ from mako.template import Template
 import netsvc
 import base64
 import poweremail_engines
+import random
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
@@ -170,6 +171,17 @@ class poweremail_templates(osv.osv):
                 raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))
                 return False
         return True
+    
+    def copy(self, cr, uid, id, default=None, context=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        new_name = "Copy of template " + default.get('name','No Name')
+        check = self.search(cr,uid,[('name','=',new_name)])
+        if check:
+            new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
+        default.update({'name':new_name,})
+        return super(poweremail_templates, self).copy(cr, uid, id, default, context)
     
     def compute_pl(self,model_object_field,sub_model_object_field,null_value):
         #Configure for MAKO
