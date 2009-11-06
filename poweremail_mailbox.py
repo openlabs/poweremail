@@ -63,7 +63,7 @@ class poweremail_mailbox(osv.osv):
             #Get mails from that ID only
             core_obj.get_fullmail(cr,uid,context['email_account'],context)
         else:
-            raise osv.osv_except(_("Mail fetch exception"),_("No information on which mail should be fetched fully"))
+            raise osv.except_osv(_("Mail fetch exception"),_("No information on which mail should be fetched fully"))
         
     def send_all_mail(self,cr,uid,ids=[],ctx={}):
         #8888888888888 SENDS MAILS IN OUTBOX 8888888888888888888#

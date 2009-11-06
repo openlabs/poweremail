@@ -484,7 +484,7 @@ class poweremail_core_accounts(osv.osv):
                             typ,msg_count = serv.select(rec.isfolder)
                         except imaplib.IMAP4.error,error:
                             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.")% (id,error))
-                            raise osv.osv_except(_('Power Email'),_('IMAP Server Folder Selection Error Account:%s Error:%s.\nCheck account settings if you have selected a folder.')% (id,error))
+                            raise osv.except_osv(_('Power Email'),_('IMAP Server Folder Selection Error Account:%s Error:%s.\nCheck account settings if you have selected a folder.')% (id,error))
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.")% (id))
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s")% (id,serv.status(rec.isfolder,'(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                         #If there are newer mails than the ones in mailbox
