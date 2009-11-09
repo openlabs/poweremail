@@ -90,22 +90,33 @@ class poweremail_mailbox(osv.osv):
                     for attid in values['pem_attachments_ids']:
                         attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
                         payload[attachment.datas_fname] = attachment.datas
-                if core_obj.send_mail(cr,uid,
+                result = core_obj.send_mail(cr,uid,
                                   [values['pem_account_id'][0]],
                                   {'To':values.get('pem_to',u''),'CC':values.get('pem_cc',u''),'BCC':values.get('pem_bcc',u'')},
                                   values['pem_subject'] or u'',
                                   {'text':values.get('pem_body_text',u''),'html':values.get('pem_body_html',u'')},
-                                  payload=payload):
+                                  payload=payload)
+                if result == True:
                     self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
+                    self.historise(cr, uid, [id], "Email sent successfully")
+                else:
+                    self.historise(cr,uid,[id],result)
             except Exception,error:
                 logger = netsvc.Logger()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
+                self.historise(cr, uid, [id], error)
+    
+    def historise(self,cr,uid,ids,message=''):
+        for id in ids:
+            history = self.read(cr,uid,id,['history']).get('history','')
+            self.write(cr,uid,id,{'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message})
     
     def complete_mail(self,cr,uid,ids,ctx={}):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
         #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,
         for id in ids:
             self.pool.get('poweremail.core_accounts').get_fullmail(cr,uid,id,ctx)
+            self.historise(cr, uid, [id], "Full email downloaded")
     
     _columns = {
             'pem_from':fields.char('From', size=64),
@@ -140,7 +151,8 @@ class poweremail_mailbox(osv.osv):
                                     ('unread','Un-Read'),
                                     ('na','Not Applicable'),
                                     ],'Status'),
-            'date_mail':fields.datetime('Rec/Sent Date')
+            'date_mail':fields.datetime('Rec/Sent Date'),
+            'history':fields.text('History',readonly=True,store=True)
         }
 
     _defaults = {

@@ -268,20 +268,19 @@ class poweremail_core_accounts(osv.osv):
                         msg.attach(part)
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
-                    return False
+                    return error
                 try:
                     #print msg['From'],toadds
                     serv.sendmail(unicode(msg['From']),addresses_l['all'],msg.as_string())
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
-                    return False
+                    return error
                 #The mail sending is complete
                 serv.close()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Mail from Account %s successfully Sent.")% (id))
                 return True
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
-                return False
                                                        
     def save_header(self,cr,uid,mail,coreaccountid,serv_ref):
         #Internal function for saving of mail headers to mailbox
