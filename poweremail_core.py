@@ -214,7 +214,7 @@ class poweremail_core_accounts(osv.osv):
                       
 #**************************** MAIL SENDING FEATURES ***********************#
     def split_to_ids(self,ids_as_str):
-        email_sep_by_commas = s.replace('; ',',').replace(';',',').replace(', ',',')
+        email_sep_by_commas = ids_as_str.replace('; ',',').replace(';',',').replace(', ',',')
         return email_sep_by_commas.split(',')
     
     def get_ids_from_dict(self,addresses={}):
