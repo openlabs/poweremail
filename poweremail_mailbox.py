@@ -75,16 +75,7 @@ class poweremail_mailbox(osv.osv):
         ids = self.search(cr,uid,filters)
         #send mails one by one
         for id in ids:
-            core_obj=self.pool.get('poweremail.core_accounts')
-            values =  self.read(cr,uid,id,[]) #Values will be a dictionary of all entries in the record ref by id
-            payload={}
-            if values['pem_attachments_ids']:
-                #Get filenames & binary of attachments
-                for attid in values['pem_attachments_ids']:
-                    attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
-                    payload[attachment.datas_fname] = attachment.datas
-            if core_obj.send_mail(cr,uid,[values['pem_account_id'][0]],[values['pem_to']or False],[values['pem_cc']or False],[values['pem_bcc']or False],values['pem_subject']or False,values['pem_body_text']or False,values['pem_body_html']or False,payload=payload):
-                self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
+            self.send_this_mail(cr, uid, [id], ctx)
     
     def send_this_mail(self,cr,uid,ids=[],ctx={}):
         #8888888888888 SENDS THIS MAIL IN OUTBOX 8888888888888888888#
@@ -99,11 +90,17 @@ class poweremail_mailbox(osv.osv):
                     for attid in values['pem_attachments_ids']:
                         attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
                         payload[attachment.datas_fname] = attachment.datas
-                if core_obj.send_mail(cr,uid,[values['pem_account_id'][0]],[values['pem_to']or False],[values['pem_cc']or False],[values['pem_bcc']or False],values['pem_subject']or False,values['pem_body_text']or False,values['pem_body_html']or False,payload=payload):
+                if core_obj.send_mail(cr,uid,
+                                  [values['pem_account_id'][0]],
+                                  {'To':values.get('pem_to',u''),'CC':values.get('pem_cc',u''),'BCC':values.get('pem_bcc',u'')},
+                                  values['pem_subject'] or u'',
+                                  {'text':values.get('pem_body_text',u''),'html':values.get('pem_body_html',u'')},
+                                  payload=payload):
                     self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
             except Exception,error:
                 logger = netsvc.Logger()
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sendin of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
+    
     def complete_mail(self,cr,uid,ids,ctx={}):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
         #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,

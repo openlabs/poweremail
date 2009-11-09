@@ -213,18 +213,22 @@ class poweremail_core_accounts(osv.osv):
             return False
                       
 #**************************** MAIL SENDING FEATURES ***********************#
-    def send_mail(self,cr,uid,ids,to=[],cc=[],bcc=[],subject="",body_text="",body_html="",payload={}):
-        #ids:(from) Account from which mail is to be sent
-        #to: To ids as list
-        #cc: CC ids as list
-        #bcc: BCC ids as list
-        #subject: Subject as string
-        #body_text: body as plain text
-        #body_html: body in html
-        #payload: attachments as binary dic. Eg:payload={'filename1.pdf':<binary>,'filename2.jpg':<binary>}
-        #################### For each account in chosen accounts ##################
+    def split_to_ids(self,ids_as_str):
+        email_sep_by_commas = s.replace('; ',',').replace(';',',').replace(', ',',')
+        return email_sep_by_commas.split(',')
+    
+    def get_ids_from_dict(self,addresses={}):
+        result = {'all':[]}
+        keys = ['To','CC','BCC']
+        for each in keys:
+            ids_as_list = self.split_to_ids(addresses.get(each,''))
+            result[each] = ids_as_list
+            result['all'].append(ids_as_list)
+        return result
+    
+    def send_mail(self,cr,uid,ids,addresses,subject='',body={},payload={}):
         logger = netsvc.Logger()
-        for id in ids:
+        for id in ids:  
             core_obj = self.browse(cr,uid,id)
             serv = self.smtp_connection(cr, uid, id)
             if serv:
@@ -233,50 +237,25 @@ class poweremail_core_accounts(osv.osv):
                     if subject:
                         msg['Subject']= subject
                     msg['From'] = unicode(core_obj.name + "<" + core_obj.email_id + ">")
-                    toadds = []
-                    if to:
-                        while (type(to)==type([])) and (False in to):
-                            to = to.remove(False)
-                        if (type(to)==type([])):
-                            msg['To'] = ",".join(map(unicode,to))
-                            toadds = to
-                    if cc:
-                        while (type(cc)==type([])) and (False in cc):
-                            cc = cc.remove(False)
-                        if (type(cc)==type([])):
-                            msg['CC'] = ",".join(map(unicode,cc))
-                            toadds += cc
-                    if bcc:
-                        while (type(bcc)==type([])) and (False in bcc):
-                            bcc = bcc.remove(False)
-                        #print "BCCCCCE:",bcc
-                        if (type(bcc)==type([])):
-                            #msg['BCC'] = ",".join(map(unicode,bcc)) #Dont show somebody gets a BCC
-                            toadds += bcc
-                    # Record the MIME types of both parts - text/plain and text/html.
-                    if body_text:
-                        l= body_text.replace(' ','')
-                        l= l.replace('\r','')
-                        l= l.replace('\n','')
-                        l = len(l)
+                    addresses_l = self.get_ids_from_dict(addresses) 
+                    if addresses_l['To']:
+                        msg['To'] = u','.join(addresses_l['To'])
+                    if addresses_l['CC']:
+                        msg['CC'] = u','.join(addresses_l['CC'])
+#                    if addresses_l['BCC']:
+#                        msg['BCC'] = u','.join(addresses_l['BCC'])
+                    if body.get('text',False):
+                        temp_body_text = body.get('text','')
+                        l= len(temp_body_text.replace(' ','').replace('\r','').replace('\n',''))
                         if l == 0:
-                            body_text = False
-                            
-                    if not body_text:
-                        if body_html:
-                            body_text=html2text(body_html)
-                        else:
-                            body_text="Mail without body"
-                    if not body_html:
-                        body_html=body_text
+                            body['text'] = u'No Mail Message'
                     # Attach parts into message container.
                     # According to RFC 2046, the last part of a multipart message, in this case
                     # the HTML message, is best and preferred.
                     if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
-                        msg.attach(MIMEText(body_text, _charset='UTF-8'))
+                        msg.attach(MIMEText(body.get('text',u'No Mail Message'), _charset='UTF-8'))
                     if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
-                        msg.attach(MIMEText(body_html, _subtype='html',_charset='UTF-8'))
-    
+                        msg.attach(MIMEText(body.get('html',u'<html><body>No Mail Message</body></html>'), _subtype='html',_charset='UTF-8'))
                     #Now add attachments if any
                     for file in payload.keys():
                         part = MIMEBase('application', "octet-stream")
@@ -287,13 +266,12 @@ class poweremail_core_accounts(osv.osv):
                         part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
                         Encoders.encode_base64(part)
                         msg.attach(part)
-                        #msg is now complete, send it to everybody
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:MIME Error\nDescription: %s")% (id,error))
                     return False
                 try:
                     #print msg['From'],toadds
-                    serv.sendmail(unicode(msg['From']),toadds,msg.as_string())
+                    serv.sendmail(unicode(msg['From']),addresses_l['all'],msg.as_string())
                 except Exception,error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s")% (id,error))
                     return False
@@ -304,7 +282,7 @@ class poweremail_core_accounts(osv.osv):
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved")% id)
                 return False
-    
+                                                       
     def save_header(self,cr,uid,mail,coreaccountid,serv_ref):
         #Internal function for saving of mail headers to mailbox
         #mail: eMail Object
