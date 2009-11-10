@@ -92,9 +92,9 @@ class poweremail_mailbox(osv.osv):
                         payload[attachment.datas_fname] = attachment.datas
                 result = core_obj.send_mail(cr,uid,
                                   [values['pem_account_id'][0]],
-                                  {'To':values.get('pem_to',u''),'CC':values.get('pem_cc',u''),'BCC':values.get('pem_bcc',u'')},
+                                  {'To':values.get('pem_to',u'') or u'','CC':values.get('pem_cc',u'') or u'','BCC':values.get('pem_bcc',u'') or u''},
                                   values['pem_subject'] or u'',
-                                  {'text':values.get('pem_body_text',u''),'html':values.get('pem_body_html',u'')},
+                                  {'text':values.get('pem_body_text',u'') or u'','html':values.get('pem_body_html',u'') or u''},
                                   payload=payload)
                 if result == True:
                     self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})

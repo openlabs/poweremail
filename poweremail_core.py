@@ -221,9 +221,11 @@ class poweremail_core_accounts(osv.osv):
         result = {'all':[]}
         keys = ['To','CC','BCC']
         for each in keys:
-            ids_as_list = self.split_to_ids(addresses.get(each,''))
+            ids_as_list = self.split_to_ids(addresses.get(each,u''))
+            while u'' in ids_as_list:
+                ids_as_list.remove(u'')
             result[each] = ids_as_list
-            result['all'].append(ids_as_list)
+            result['all'].extend(ids_as_list)
         return result
     
     def send_mail(self,cr,uid,ids,addresses,subject='',body={},payload={}):
