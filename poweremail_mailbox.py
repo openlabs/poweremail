@@ -27,6 +27,7 @@ from osv import osv, fields
 import time
 import poweremail_engines
 import netsvc
+from tools.translate import _
 
 class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"

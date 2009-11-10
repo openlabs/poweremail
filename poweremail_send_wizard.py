@@ -26,6 +26,7 @@ from osv import osv, fields
 from mako.template import Template
 import netsvc
 import base64
+from tools.translate import _
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'

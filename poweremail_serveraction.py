@@ -26,6 +26,7 @@
 #__date__ ="$4 Aug, 2009 1:47:16 PM$"
 from osv import fields,osv
 import netsvc
+from tools.translate import _
 
 class actions_server(osv.osv):
     _inherit = 'ir.actions.server'

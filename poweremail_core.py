@@ -39,6 +39,7 @@ import string
 import email
 import time
 import poweremail_engines
+from tools.translate import _
 
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"

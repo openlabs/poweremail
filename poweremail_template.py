@@ -28,6 +28,7 @@ import netsvc
 import base64
 import poweremail_engines
 import random
+from tools.translate import _
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
