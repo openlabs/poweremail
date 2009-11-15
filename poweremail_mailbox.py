@@ -185,5 +185,18 @@ class poweremail_mailbox(osv.osv):
 
 poweremail_mailbox()
 
-    
+class poweremail_conversation(osv.osv):
+    _name="poweremail.conversation"
+    _description="Conversations are groups of related emails"
+    _columns = {
+        'name':fields.char('Name',size=250),
+        'mails':fields.one2many('poweremail.mailbox','conversation_id','Related Emails'),
+                }
+poweremail_conversation()
 
+class poweremail_mailbox(osv.osv):
+    _inherit="poweremail.mailbox"
+    _columns = {
+        'conversation_id':fields.many2one('poweremail.conversation','Conversation')
+                }
+poweremail_mailbox()

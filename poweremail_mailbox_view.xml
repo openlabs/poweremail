@@ -16,21 +16,22 @@
 			<field name="arch" type="xml">
 				<form string="Power Email Inbox">
 					<group col="4" colspan="2">
-						<field name="pem_from" colspan="2" />
-						<field name="pem_cc" colspan="4" />
-						<field name="date_mail" colspan="4" />
+						<field name="pem_from" colspan="2" select="1"/>
+						<field name="pem_cc" colspan="4" select="1"/>
+						<field name="date_mail" colspan="4" select="2"/>
+						<field name="pem_recd" colspan="2" select="1"/>
 					</group>
 					<group col="4" colspan="2">
-						<field name="pem_to" colspan="2" required="1" />
-						<field name="pem_bcc" colspan="4" />
-						<field name="pem_subject" colspan="4" />
+						<field name="pem_to" colspan="2" required="1" select="1" />
+						<field name="pem_bcc" colspan="4" select="2"/>
+						<field name="pem_subject" colspan="4" select="1"/>
 					</group>
 					<notebook colspan="4">
 						<page string="Standard Body">
 							<separator colspan="4" string="Standard Body" />
 							<notebook colspan="4">
 								<page string="Standard Body (Text)">
-									<field name="pem_body_text" nolabel="1" colspan="4" />
+									<field name="pem_body_text" nolabel="1" colspan="4" select="1"/>
 								</page>
 								<page string="Body (HTML-Web Client Only)">
 									<field name="pem_body_html" nolabel="1" colspan="4" widget="text_html" />
@@ -50,9 +51,8 @@
 							<group col="4">
 								<field name="pem_account_id" colspan="2" />
 								<field name="server_ref" colspan="2" />
-								<field name="pem_recd" colspan="2" />
 								<field name="mail_type" colspan="2" />
-								<field name="folder" colspan="2" />
+								<field name="folder" colspan="2" select="2"/>
 								<separator string="History" colspan="4" />
 								<field name="history" nolabel="1" colspan="4"/>
 							</group>
@@ -81,6 +81,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 					<field name="state" />
 				</tree>
 			</field>
@@ -97,6 +98,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 				</tree>
 			</field>
 		</record>
@@ -112,6 +114,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 				</tree>
 			</field>
 		</record>
@@ -127,6 +130,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 				</tree>
 			</field>
 		</record>
@@ -142,6 +146,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 				</tree>
 			</field>
 		</record>
@@ -157,6 +162,7 @@
 					<field name="pem_subject" select="1" />
 					<field name="pem_attachments_ids" select="2" />
 					<field name="date_mail" select="2" />
+					<field name="pem_recd" colspan="2" />
 				</tree>
 			</field>
 		</record>
