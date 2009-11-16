@@ -180,7 +180,7 @@ class poweremail_mailbox(osv.osv):
                             users_company_accounts.append(each_account)
             print users_company_accounts
             args.append(('pem_account_id', 'in',users_company_accounts))
-        return super(poweremail_mailbox, self).search(cr, uid, args, offset, limit,
+        return super(osv.osv, self).search(cr, uid, args, offset, limit,
                 order, context=context, count=count)
 
 poweremail_mailbox()
