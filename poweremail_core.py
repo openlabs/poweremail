@@ -37,7 +37,7 @@ import poplib
 import imaplib
 import string
 import email
-import time
+import time,datetime
 import poweremail_engines
 from tools.translate import _
 
@@ -285,7 +285,27 @@ class poweremail_core_accounts(osv.osv):
                 return True
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved") % id)
-                                                       
+                                
+    def extracttime(self,time_as_string):
+        logger = netsvc.Logger()
+        #The standard email dates are of format similar to:
+        #Thu, 8 Oct 2009 09:35:42 +0200
+        #print time_as_string
+        date_as_date = False
+        convertor = {'+':1,'-':-1}
+        try:
+            date_list = time_as_string.split(' ')
+            date_temp_str = ' '.join(date_list[1:5])
+            sign = convertor[date_list[5][0]]
+            offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
+            dt = datetime.datetime.strptime(' '.join(date_list[1:5]),"%d %b %Y %H:%M:%S")
+            dt = dt + offset
+            date_as_date = dt.strftime('%Y-%m-%d %H:%M:%S')
+            #print date_as_date
+        except Exception,e:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Datetime Extraction failed.Date:%s\tError:%s") % (time_as_string,e))
+        return date_as_date
+        
     def save_header(self, cr, uid, mail, coreaccountid, serv_ref):
         #Internal function for saving of mail headers to mailbox
         #mail: eMail Object
@@ -299,7 +319,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
+            'date_mail':self.extracttime(mail['date']) or time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -340,7 +360,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':mail['cc'],
             'pem_bcc':mail['bcc'],
             'pem_recd':mail['date'],
-            'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
+            'date_mail':self.extracttime(mail['date']) or time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',

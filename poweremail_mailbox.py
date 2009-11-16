@@ -33,7 +33,7 @@ class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
     _rec_name="subject"
-
+    _order = "date_mail desc"
     def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
         try:
             self.get_all_mail(cr,uid,context={'all_accounts':True})
