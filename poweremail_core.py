@@ -297,8 +297,11 @@ class poweremail_core_accounts(osv.osv):
             date_list = time_as_string.split(' ')
             date_temp_str = ' '.join(date_list[1:5])
             sign = convertor[date_list[5][0]]
-            offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
             dt = datetime.datetime.strptime(' '.join(date_list[1:5]),"%d %b %Y %H:%M:%S")
+            try:
+                offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
+            except Exception,e2:
+                """Looks like UT or GMT, just forget decoding"""
             dt = dt + offset
             date_as_date = dt.strftime('%Y-%m-%d %H:%M:%S')
             #print date_as_date
@@ -306,7 +309,7 @@ class poweremail_core_accounts(osv.osv):
             logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Datetime Extraction failed.Date:%s\tError:%s") % (time_as_string,e))
         return date_as_date
         
-    def save_header(self, cr, uid, mail, coreaccountid, serv_ref):
+    def save_header(self, cr, uid, mail, coreaccountid, serv_ref,ctx={}):
         #Internal function for saving of mail headers to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
@@ -323,7 +326,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':'unread',
+            'state':ctx.get('state','unread'),
             'pem_body_text':'Mail not downloaded...',
             'pem_body_html':'Mail not downloaded...',
             'pem_account_id':coreaccountid
@@ -364,7 +367,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':'unread',
+            'state':ctx.get('state','unread'),
             'pem_body_text':'Mail not downloaded...', #TODO:Replace with mail text
             'pem_body_html':'Mail not downloaded...', #TODO:Replace
             'pem_account_id':coreaccountid
@@ -388,7 +391,7 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, mail[0].split()[0]))
 
-    def complete_mail(self, cr, uid, mail, coreaccountid, serv_ref, mailboxref):
+    def complete_mail(self, cr, uid, mail, coreaccountid, serv_ref, mailboxref,ctx={}):
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccountid: ID of poeremail core account
@@ -407,7 +410,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':mail['subject'],
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':'unread',
+            'state':ctx.get('state','unread'),
             'pem_body_text':'Mail not downloaded...', #TODO:Replace with mail text
             'pem_body_html':'Mail not downloaded...', #TODO:Replace
             'pem_account_id':coreaccountid
@@ -494,20 +497,26 @@ class poweremail_core_accounts(osv.osv):
                             if rec.rec_headers_den_mail:
                                 #Download Headers Only
                                 for i in range(rec.last_mail_id + 1, int(msg_count[0]) + 1):
-                                    typ, msg = serv.fetch(str(i), '(BODY.PEEK[HEADER])')
+                                    typ, msg = serv.fetch(str(i), '(FLAGS BODY.PEEK[HEADER])')
                                     for mails in msg:
                                         if type(mails) == type(('tuple', 'type')):
                                             mail = email.message_from_string(mails[1])
-                                            if self.save_header(cr, uid, mail, id, mails[0].split()[0]):#If saved succedfully then increment last mail recd
+                                            if '\Seen' in mails[0]:
+                                                ctx['state'] = 'read' 
+                                            if self.save_header(cr, uid, mail, id, mails[0].split()[0],ctx):#If saved succedfully then increment last mail recd
                                                 self.write(cr, uid, id, {'last_mail_id':mails[0].split()[0]})
                             else:#Receive Full Mail first time itself
                                 #Download Full RF822 Mails
                                 for i in range(rec.last_mail_id + 1, int(msg_count[0]) + 1):
-                                    typ, msg = serv.fetch(str(i), '(RFC822)')
-                                    for mails in msg:
+                                    typ, msg = serv.fetch(str(i), '(FLAGS RFC822)')
+                                    for id in range(0,len(msg)/2):
+                                        mails = msg[id*2]
+                                        flags = msg[(id*2)+1]
                                         if type(mails) == type(('tuple', 'type')):
+                                            if '\Seen' in flags:
+                                                ctx['state'] = 'read' 
                                             mail = email.message_from_string(mails[1])
-                                            if self.save_fullmail(cr, uid, mail, id, mails[0].split()[0]):#If saved succedfully then increment last mail recd
+                                            if self.save_fullmail(cr, uid, mail, id, mails[0].split()[0],ctx):#If saved succedfully then increment last mail recd
                                                 self.write(cr, uid, id, {'last_mail_id':mails[0].split()[0]})
                         serv.close()
                         serv.logout()
@@ -582,11 +591,15 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.") % (id))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status(rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
-                    typ, msg = serv.fetch(str(server_ref), '(RFC822)')
-                    for mails in msg:
+                    typ, msg = serv.fetch(str(server_ref), '(FLAGS RFC822)')
+                    for id in range(0,len(msg)/2):
+                        mails = msg[id*2]
+                        flags = msg[(id*2)+1]
                         if type(mails) == type(('tuple', 'type')):
+                            if '\Seen' in flags:
+                                ctx['state'] = 'read' 
                             mail = email.message_from_string(mails[1])
-                            self.complete_mail(cr, uid, mail, id, server_ref, mailid)
+                            self.complete_mail(cr, uid, mail, id, server_ref, mailid,ctx)
                     serv.close()
                     serv.logout()
                 elif rec.iserver_type == 'pop3':
