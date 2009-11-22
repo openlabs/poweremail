@@ -294,14 +294,28 @@ class poweremail_core_accounts(osv.osv):
         date_as_date = False
         convertor = {'+':1,'-':-1}
         try:
+            time_as_string = time_as_string.replace(',','')
             date_list = time_as_string.split(' ')
             date_temp_str = ' '.join(date_list[1:5])
-            sign = convertor[date_list[5][0]]
-            dt = datetime.datetime.strptime(' '.join(date_list[1:5]),"%d %b %Y %H:%M:%S")
+            if len(date_list)>=6:
+                sign = convertor.get(date_list[5][0],False)
+            else:
+                sign=False
             try:
-                offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
-            except Exception,e2:
-                """Looks like UT or GMT, just forget decoding"""
+                dt = datetime.datetime.strptime(date_temp_str,"%d %b %Y %H:%M:%S")
+            except:
+                try:
+                    dt = datetime.datetime.strptime(date_temp_str,"%d %b %Y %H:%M")
+                except:
+                    return False
+            if sign:
+                try:
+                    offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
+                except Exception,e2:
+                    """Looks like UT or GMT, just forget decoding"""
+                    return False
+            else:
+                offset = datetime.timedelta(hours=0)
             dt = dt + offset
             date_as_date = dt.strftime('%Y-%m-%d %H:%M:%S')
             #print date_as_date
