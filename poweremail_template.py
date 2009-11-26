@@ -309,7 +309,10 @@ class poweremail_templates(osv.osv):
                     message = unicode(message,'UTF-8')
                 object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
                 templ = Template(message,input_encoding='utf-8')
-                reply = templ.render_unicode(object=object,peobject=object)
+                env = {
+                    'user':self.pool.get('res.users').browse(cr,uid,uid),
+                       }
+                reply = templ.render_unicode(object=object,peobject=object,env=env)
                 return reply
             except Exception,e:
                 return ""
@@ -404,12 +407,15 @@ class poweremail_preview(osv.osv_memory):
                 if not type(message) in [unicode]:
                     message = unicode(message,'UTF-8')
                 object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
-                reply = Template(message).render_unicode(object=object,peobject=object)
+                env = {
+                    'user':self.pool.get('res.users').browse(cr,uid,uid),
+                       }
+                reply = Template(message).render_unicode(object=object,peobject=object,env=env)
                 return reply
             except Exception,e:
-                return ""
+                return message
         else:
-            return ""
+            return message
         
     _columns = {
         'ref_template':fields.many2one('poweremail.templates','Template',readonly=True),
