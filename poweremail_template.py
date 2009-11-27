@@ -311,6 +311,7 @@ class poweremail_templates(osv.osv):
                 templ = Template(message,input_encoding='utf-8')
                 env = {
                     'user':self.pool.get('res.users').browse(cr,uid,uid),
+                    'db':cr.dbname
                        }
                 reply = templ.render_unicode(object=object,peobject=object,env=env)
                 return reply
@@ -409,6 +410,7 @@ class poweremail_preview(osv.osv_memory):
                 object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
                 env = {
                     'user':self.pool.get('res.users').browse(cr,uid,uid),
+                    'db':cr.dbname
                        }
                 reply = Template(message).render_unicode(object=object,peobject=object,env=env)
                 return reply
