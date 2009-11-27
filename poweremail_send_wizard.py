@@ -24,6 +24,7 @@
 #########################################################################
 from osv import osv, fields
 from mako.template import Template
+from mako import exceptions
 import netsvc
 import base64
 from tools.translate import _
@@ -75,9 +76,13 @@ class poweremail_send_wizard(osv.osv_memory):
                     message = unicode(message,'UTF-8')
                 object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
                 templ = Template(message,input_encoding='utf-8')
-                reply = templ.render_unicode(object=object,peobject=object)
+                env = {
+                    'user':self.pool.get('res.users').browse(cr,uid,uid),
+                    'db':cr.dbname
+                       }
+                reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
                 return reply
-            except Exception,e:
+            except Exception:
                 return ""
         else:
             return ""

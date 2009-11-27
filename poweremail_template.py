@@ -24,6 +24,7 @@
 #########################################################################
 from osv import osv, fields
 from mako.template import Template
+from mako import exceptions
 import netsvc
 import base64
 import poweremail_engines
@@ -313,12 +314,12 @@ class poweremail_templates(osv.osv):
                     'user':self.pool.get('res.users').browse(cr,uid,uid),
                     'db':cr.dbname
                        }
-                reply = templ.render_unicode(object=object,peobject=object,env=env)
+                reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
                 return reply
-            except Exception,e:
-                return ""
+            except Exception:
+                return u""
         else:
-            return ""
+            return message
         
     def generate_mail(self,cr,uid,id,recids,context={}):
         #Generates an email an saves to outbox given the template id & record ID of a record in template's model
@@ -412,10 +413,10 @@ class poweremail_preview(osv.osv_memory):
                     'user':self.pool.get('res.users').browse(cr,uid,uid),
                     'db':cr.dbname
                        }
-                reply = Template(message).render_unicode(object=object,peobject=object,env=env)
+                reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
                 return reply
-            except Exception,e:
-                return message
+            except Exception:
+                return exceptions.text_error_template().render()
         else:
             return message
         
