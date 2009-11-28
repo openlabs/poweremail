@@ -259,8 +259,8 @@ class poweremail_core_accounts(osv.osv):
                     if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
                         msg.attach(MIMEText(body.get('text', u'No Mail Message'), _charset='UTF-8'))
                     if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
-                        temp_html = body.get('html', u'')
-                        if len(temp_html)==0 or temp_html==u'':
+                        html_body = body.get('html', u'')
+                        if len(html_body)==0 or html_body==u'':
                             html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n','<br/>').replace('\r','<br/>')
                         msg.attach(MIMEText(html_body, _subtype='html', _charset='UTF-8'))
                     #Now add attachments if any
