@@ -674,7 +674,7 @@ class poweremail_core_selfolder(osv.osv_memory):
 
     def makereadable(self, imap_folder):
         if imap_folder:
-            result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")([^\"]*)(?:\")', imap_folder)
+            result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")?([^\"]*)(?:\")?', imap_folder)
             seperator = result.groups()[0]
             folder_readable_name = ""
             splitname = result.groups()[1].split(seperator) #Not readable now
