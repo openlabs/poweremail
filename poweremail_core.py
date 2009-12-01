@@ -265,8 +265,8 @@ class poweremail_core_accounts(osv.osv):
                         html_body = body.get('html', u'')
                         if len(html_body)==0 or html_body==u'':
                             html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n','<br/>').replace('\r','<br/>')
-                        if not type(body_html)==unicode:
-                            body_html = unicode(body_html,"utf-8")
+                        if not type(html_body)==unicode:
+                            html_body = unicode(html_body,"utf-8")
                         msg.attach(MIMEText(html_body.encode("utf-8"), _subtype='html', _charset='UTF-8'))
                     #Now add attachments if any
                     for file in payload.keys():
