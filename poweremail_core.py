@@ -257,12 +257,17 @@ class poweremail_core_accounts(osv.osv):
                     # According to RFC 2046, the last part of a multipart message, in this case
                     # the HTML message, is best and preferred.
                     if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
-                        msg.attach(MIMEText(body.get('text', u'No Mail Message'), _charset='UTF-8'))
+                        body_text = body.get('text', u'No Mail Message')
+                        if not type(body_text)==unicode:
+                            body_text = unicode(body_text,"utf-8")
+                        msg.attach(MIMEText(body_text.encode("utf-8"), _charset='UTF-8'))
                     if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
                         html_body = body.get('html', u'')
                         if len(html_body)==0 or html_body==u'':
                             html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n','<br/>').replace('\r','<br/>')
-                        msg.attach(MIMEText(html_body, _subtype='html', _charset='UTF-8'))
+                        if not type(body_html)==unicode:
+                            body_html = unicode(body_html,"utf-8")
+                        msg.attach(MIMEText(html_body.encode("utf-8"), _subtype='html', _charset='UTF-8'))
                     #Now add attachments if any
                     for file in payload.keys():
                         part = MIMEBase('application', "octet-stream")
@@ -278,7 +283,7 @@ class poweremail_core_accounts(osv.osv):
                     return error
                 try:
                     #print msg['From'],toadds
-                    serv.sendmail(unicode(msg['From']), addresses_l['all'], msg.as_string())
+                    serv.sendmail(msg['From'], addresses_l['all'], msg.as_string())
                 except Exception, error:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Server Send Error\nDescription: %s") % (id, error))
                     return error
