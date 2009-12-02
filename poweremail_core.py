@@ -272,9 +272,6 @@ class poweremail_core_accounts(osv.osv):
                     for file in payload.keys():
                         part = MIMEBase('application', "octet-stream")
                         part.set_payload(base64.decodestring(payload[file]))
-                        f = open(file, "wb")
-                        f.write(base64.decodestring(payload[file]))
-                        f.close()
                         part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
                         Encoders.encode_base64(part)
                         msg.attach(part)
