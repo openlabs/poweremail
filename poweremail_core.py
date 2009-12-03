@@ -57,8 +57,8 @@ class poweremail_core_accounts(osv.osv):
         
         'smtpserver': fields.char('Server', size=120, required=True, readonly=True, states={'draft':[('readonly', False)]}, help="Enter name of outgoing server,eg:smtp.gmail.com "),
         'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly', False)]}, help="Enter port number,eg:SMTP-587 "),
-        'smtpuname': fields.char('User Name', size=120, required=True, readonly=True, states={'draft':[('readonly', False)]}),
-        'smtppass': fields.char('Password', size=120, invisible=True, required=True, readonly=True, states={'draft':[('readonly', False)]}),
+        'smtpuname': fields.char('User Name', size=120, required=False, readonly=True, states={'draft':[('readonly', False)]}),
+        'smtppass': fields.char('Password', size=120, invisible=True, required=False, readonly=True, states={'draft':[('readonly', False)]}),
         'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly', False)]}, readonly=True),
         'send_pref':fields.selection([
                                       ('html', 'HTML otherwise Text'),
@@ -128,17 +128,18 @@ class poweremail_core_accounts(osv.osv):
         #checks SMTP credentials and confirms if outgoing connection works
         rec = self.browse(cr, uid, ids)[0]
         if rec:
-            if rec.smtpserver and rec.smtpport and rec.smtpuname and rec.smtppass:
+            if rec.smtpserver and rec.smtpport: 
                 try:
                     serv = smtplib.SMTP(rec.smtpserver, rec.smtpport)
+                    serv.ehlo()
                     if rec.smtpssl:
-                        serv.ehlo()
                         serv.starttls()
                         serv.ehlo()
                 except Exception, error:
                     raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
                 try:
-                    serv.login(rec.smtpuname, rec.smtppass)
+                    if serv.has_extn('AUTH') or rec.smtpuname or rec.smtppass:
+                        serv.login(rec.smtpuname, rec.smtppass)
                 except Exception, error:
                     raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
                 raise osv.except_osv(_("Information"), _("SMTP Test Connection Was Successful"))
@@ -193,7 +194,7 @@ class poweremail_core_accounts(osv.osv):
         #This function returns a SMTP server object
         logger = netsvc.Logger()
         core_obj = self.browse(cr, uid, id)
-        if core_obj.smtpserver and core_obj.smtpport and core_obj.smtpuname and core_obj.smtppass and core_obj.state == 'approved':
+        if core_obj.smtpserver and core_obj.smtpport and core_obj.state == 'approved':
             try:
                 serv = smtplib.SMTP(core_obj.smtpserver, core_obj.smtpport)
                 if core_obj.smtpssl:
@@ -204,7 +205,8 @@ class poweremail_core_accounts(osv.osv):
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not connect to server\nError: %s") % (id, error))
                 return False
             try:
-                serv.login(core_obj.smtpuname, core_obj.smtppass)
+                if core_obj.smtpuname and core_obj.smtppass:
+                    serv.login(core_obj.smtpuname, core_obj.smtppass)
             except Exception, error:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s") % (id, error))
                 return False
