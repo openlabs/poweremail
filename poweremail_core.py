@@ -371,7 +371,7 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, serv_ref))
 
-    def save_fullmail(self, cr, uid, mail, coreaccountid, serv_ref):
+    def save_fullmail(self, cr, uid, mail, coreaccountid, serv_ref,ctx={}):
         #Internal function for saving of mails to mailbox
         #mail: eMail Object
         #coreaccounti: ID of poeremail core account
