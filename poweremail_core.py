@@ -465,7 +465,7 @@ class poweremail_core_accounts(osv.osv):
                         'name':mail['subject'] + '(' + each[0] + ')',
                         'datas':base64.b64encode(each[2]),
                         'datas_fname':each[1],
-                        'description':mail['subject'] + " [Type:" + each[0] + ", Filename:" + each[1] + "]",
+                        'description':(mail['subject'] or 'No Subject') + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
                         'res_model':'poweremail.mailbox',
                         'res_id':id
                             }
