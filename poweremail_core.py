@@ -530,9 +530,9 @@ class poweremail_core_accounts(osv.osv):
                                 #Download Full RF822 Mails
                                 for i in range(rec.last_mail_id + 1, int(msg_count[0]) + 1):
                                     typ, msg = serv.fetch(str(i), '(FLAGS RFC822)')
-                                    for id in range(0,len(msg)/2):
-                                        mails = msg[id*2]
-                                        flags = msg[(id*2)+1]
+                                    for j in range(0,len(msg)/2):
+                                        mails = msg[j*2]
+                                        flags = msg[(j*2)+1]
                                         if type(mails) == type(('tuple', 'type')):
                                             if '\Seen' in flags:
                                                 ctx['state'] = 'read' 
@@ -613,9 +613,9 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status(rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
                     typ, msg = serv.fetch(str(server_ref), '(FLAGS RFC822)')
-                    for id in range(0,len(msg)/2):
-                        mails = msg[id*2]
-                        flags = msg[(id*2)+1]
+                    for i in range(0,len(msg)/2):
+                        mails = msg[i*2]
+                        flags = msg[(i*2)+1]
                         if type(mails) == type(('tuple', 'type')):
                             if '\Seen' in flags:
                                 ctx['state'] = 'read' 
