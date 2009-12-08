@@ -639,7 +639,7 @@ class poweremail_core_accounts(osv.osv):
                     except Exception, error:
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Login Error Account:%s Error:%s.") % (id, error))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Server Connected & logged in successfully Account:%s.") % (id))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Statistics:%s mails of %s size for Account:%s:%s") % (serv.stat()[0], serv.stat()[1], id))
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Statistics:%s mails of %s size for Account:%s:") % (serv.stat()[0], serv.stat()[1], id))
                     #Download Full RF822 Mails
                     resp, msg, octet = serv.retr(server_ref) #Full Mail
                     mail = email.message_from_string(string.join(msg, "\n"))
