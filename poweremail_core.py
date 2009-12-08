@@ -643,7 +643,7 @@ class poweremail_core_accounts(osv.osv):
                     #Download Full RF822 Mails
                     resp, msg, octet = serv.retr(server_ref) #Full Mail
                     mail = email.message_from_string(string.join(msg, "\n"))
-                    self.complete_mail(cr, uid, mail, id, server_ref)
+                    self.complete_mail(cr, uid, mail, id, server_ref,mailid,ctx)
                 else:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.") % (id))
     
