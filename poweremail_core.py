@@ -40,6 +40,7 @@ import email
 import time,datetime
 import poweremail_engines
 from tools.translate import _
+import tools
 
 class poweremail_core_accounts(osv.osv):
     _name = "poweremail.core_accounts"
@@ -242,7 +243,7 @@ class poweremail_core_accounts(osv.osv):
                     msg = MIMEMultipart()
                     if subject:
                         msg['Subject'] = subject
-                    msg['From'] = unicode(core_obj.name + "<" + core_obj.email_id + ">")
+                    msg['From'] = tools.ustr(core_obj.name + "<" + core_obj.email_id + ">")
                     addresses_l = self.get_ids_from_dict(addresses) 
                     if addresses_l['To']:
                         msg['To'] = u','.join(addresses_l['To'])
@@ -260,15 +261,13 @@ class poweremail_core_accounts(osv.osv):
                     # the HTML message, is best and preferred.
                     if core_obj.send_pref == 'text' or core_obj.send_pref == 'both':
                         body_text = body.get('text', u'No Mail Message')
-                        if not type(body_text)==unicode:
-                            body_text = unicode(body_text,"utf-8")
+                        body_text = tools.ustr(body_text)
                         msg.attach(MIMEText(body_text.encode("utf-8"), _charset='UTF-8'))
                     if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
                         html_body = body.get('html', u'')
                         if len(html_body)==0 or html_body==u'':
                             html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n','<br/>').replace('\r','<br/>')
-                        if not type(html_body)==unicode:
-                            html_body = unicode(html_body,"utf-8")
+                        html_body = tools.ustr(html_body)
                         msg.attach(MIMEText(html_body.encode("utf-8"), _subtype='html', _charset='UTF-8'))
                     #Now add attachments if any
                     for file in payload.keys():
@@ -438,8 +437,8 @@ class poweremail_core_accounts(osv.osv):
             }
         #Identify Mail Type and get payload
         parsed_mail = self.get_payloads(mail)
-        vals['pem_body_text'] = unicode(parsed_mail['text'])
-        vals['pem_body_html'] = unicode(parsed_mail['html'])
+        vals['pem_body_text'] = tools.ustr(parsed_mail['text'])
+        vals['pem_body_html'] = tools.ustr(parsed_mail['html'])
         #Create the mailbox item now
         crid = False
         try:
@@ -662,9 +661,9 @@ class poweremail_core_accounts(osv.osv):
         for part in mail.walk():
             mail_part_type = part.get_content_type()
             if mail_part_type == 'text/plain':
-                parsed_mail['text'] = unicode(part.get_payload())
+                parsed_mail['text'] = tools.ustr(part.get_payload())
             elif mail_part_type == 'text/html':
-                parsed_mail['html'] = unicode(part.get_payload())
+                parsed_mail['html'] = tools.ustr(part.get_payload())
             elif not mail_part_type.startswith('multipart'):
                 parsed_mail['attachments'].append((mail_part_type, part.get_filename(), part.get_payload(decode=True)))
         return parsed_mail

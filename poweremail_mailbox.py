@@ -28,6 +28,7 @@ import time
 import poweremail_engines
 import netsvc
 from tools.translate import _
+import tools
 
 class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"
@@ -110,7 +111,7 @@ class poweremail_mailbox(osv.osv):
     def historise(self,cr,uid,ids,message=''):
         for id in ids:
             history = self.read(cr,uid,id,['history']).get('history','')
-            self.write(cr,uid,id,{'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + unicode(message)})
+            self.write(cr,uid,id,{'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + tools.ustr(message)})
     
     def complete_mail(self,cr,uid,ids,ctx={}):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#

@@ -30,6 +30,7 @@ import base64
 import poweremail_engines
 import random
 from tools.translate import _
+import tools
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
@@ -306,8 +307,7 @@ class poweremail_templates(osv.osv):
         #Returns the computed expression
         if message:
             try:
-                if not type(message) in [unicode]:
-                    message = unicode(message,'UTF-8')
+                message = tools.ustr(message)
                 object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
                 templ = Template(message,input_encoding='utf-8')
                 env = {
@@ -340,7 +340,7 @@ class poweremail_templates(osv.osv):
                 self.engine = self.pool.get("poweremail.engines")
                 
                 vals = {
-                        'pem_from': unicode(from_account['name']) + "<" + unicode(from_account['email_id']) + ">",
+                        'pem_from': tools.ustr(from_account['name']) + "<" + tools.ustr(from_account['email_id']) + ">",
                         'pem_to':self.get_value(cr,uid,recid,template.def_to,template),
                         'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template),
                         'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template),
@@ -370,7 +370,7 @@ class poweremail_templates(osv.osv):
                     new_att_vals={
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
                                     'datas':base64.b64encode(result),
-                                    'datas_fname':unicode(self.get_value(cr,uid,recid,template.file_name,template) or 'Report') + "." + format,
+                                    'datas_fname':tools.ustr(self.get_value(cr,uid,recid,template.file_name,template) or 'Report') + "." + format,
                                     'description':vals['pem_body_text'] or "No Description",
                                     'res_model':'poweremail.mailbox',
                                     'res_id':mail_id
@@ -406,8 +406,7 @@ class poweremail_preview(osv.osv_memory):
         #Returns the computed expression
         if message:
             try:
-                if not type(message) in [unicode]:
-                    message = unicode(message,'UTF-8')
+                message = tools.ustr(message)
                 object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
                 env = {
                     'user':self.pool.get('res.users').browse(cr,uid,uid),

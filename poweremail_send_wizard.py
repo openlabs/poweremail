@@ -28,6 +28,7 @@ from mako import exceptions
 import netsvc
 import base64
 from tools.translate import _
+import tools
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'
@@ -72,8 +73,7 @@ class poweremail_send_wizard(osv.osv_memory):
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
             try:
-                if not type(message) in [unicode]:
-                    message = unicode(message,'UTF-8')
+                message = tools.ustr(message)
                 object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0])
                 templ = Template(message,input_encoding='utf-8')
                 env = {
@@ -144,7 +144,7 @@ class poweremail_send_wizard(osv.osv_memory):
             #print screen_vals
             accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'])
             vals = {
-                'pem_from': unicode(accounts['name']) + "<" + unicode(accounts['email_id']) + ">",
+                'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
                 'pem_to':screen_vals['to'],
                 'pem_cc':screen_vals['cc'],
                 'pem_bcc':screen_vals['bcc'],
@@ -158,9 +158,9 @@ class poweremail_send_wizard(osv.osv_memory):
             if screen_vals['signature']:
                 sign = self.pool.get('res.users').read(cr,uid,uid,['signature'])['signature']
                 if vals['pem_body_text']:
-                    vals['pem_body_text'] = unicode(vals['pem_body_text'],'UTF-8')+sign
+                    vals['pem_body_text'] = tools.ustr(vals['pem_body_text'])+sign
                 if vals['pem_body_html']:
-                    vals['pem_body_html'] = unicode(vals['pem_body_html'],'UTF-8')+sign
+                    vals['pem_body_html'] = tools.ustr(vals['pem_body_html'])+sign
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
             if self.template.report_template:
@@ -174,7 +174,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 new_att_vals={
                                 'name':screen_vals['subject'] + ' (Email Attachment)',
                                 'datas':base64.b64encode(result),
-                                'datas_fname':unicode(screen_vals['report'] or 'Report') + "." + format,
+                                'datas_fname':tools.ustr(screen_vals['report'] or 'Report') + "." + format,
                                 'description':screen_vals['body_text'] or "No Description",
                                 'res_model':'poweremail.mailbox',
                                 'res_id':mail_id
