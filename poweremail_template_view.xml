@@ -106,7 +106,7 @@
 									</page>
 
 								</notebook>
-								<button name="%(wizard_poweremail_preview)d" string="Preview Template" type="action" colspan="4" />
+								<button name="%(wizard_poweremail_preview)d" string="Preview Template" type="action" colspan="4" target="new"/>
 							</group>
 						</page>
 						<page string="Security">
