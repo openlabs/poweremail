@@ -283,7 +283,7 @@
 			<field name="context">{'company':True}</field>
 		</record>
 		<!--8888888888888888888888888888888888 MENUS 8888888888888888888888888888888888888888-->
-		<menuitem name="MailBox" id="menu_poweremail_mailbox_all_main2" parent="poweremail.menu_poweremail_administration_server" />
+		<menuitem name="MailBox" id="menu_poweremail_mailbox_all_main2" parent="menu_poweremail_administration_server" />
 		<menuitem name="Personal" id="menu_poweremail_personal" parent="menu_poweremail_mailbox_all_main2" />
 		<menuitem name="Inbox" id="menu_poweremail_inbox" parent="menu_poweremail_personal" action="action_poweremail_inbox_tree" />
 		<menuitem name="Drafts" id="menu_poweremail_drafts" parent="menu_poweremail_personal" action="action_poweremail_drafts_tree" />
