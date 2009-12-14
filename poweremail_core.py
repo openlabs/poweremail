@@ -505,12 +505,12 @@ class poweremail_core_accounts(osv.osv):
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Server Connected & logged in successfully Account:%s.") % (id))
                         #Select IMAP folder
                         try:
-                            typ, msg_count = serv.select(rec.isfolder)
+                            typ, msg_count = serv.select('"%s"' % rec.isfolder)
                         except imaplib.IMAP4.error, error:
                             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.") % (id, error))
                             raise osv.except_osv(_('Power Email'), _('IMAP Server Folder Selection Error Account:%s Error:%s.\nCheck account settings if you have selected a folder.') % (id, error))
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.") % (id))
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status(rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
+                        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status('"%s"' % rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                         #If there are newer mails than the ones in mailbox
                         #print int(msg_count[0]),rec.last_mail_id
                         if rec.last_mail_id < int(msg_count[0]):
@@ -605,11 +605,11 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Server Connected & logged in successfully Account:%s.") % (id))
                     #Select IMAP folder
                     try:
-                        typ, msg_count = serv.select(rec.isfolder)#typ,msg_count: practically not used here
+                        typ, msg_count = serv.select('"%s"' % rec.isfolder)#typ,msg_count: practically not used here
                     except imaplib.IMAP4.error, error:
                         logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.") % (id, error))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.") % (id))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status(rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
+                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status('"%s"' % rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
                     typ, msg = serv.fetch(str(server_ref), '(FLAGS RFC822)')
                     for i in range(0,len(msg)/2):
