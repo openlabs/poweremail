@@ -405,7 +405,7 @@ class poweremail_core_accounts(osv.osv):
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid))
             #If there are attachments save them as well
             if parsed_mail['attachments']:
-                self.save_attachments(self, cr, uid, mail, crid, parsed_mail, coreaccountid)
+                self.save_attachments(cr, uid, mail, crid, parsed_mail, coreaccountid)
             crid = False
             return True
         else:
@@ -463,7 +463,7 @@ class poweremail_core_accounts(osv.osv):
         for each in parsed_mail['attachments']:#Get each attachment
             new_att_vals = {
                         'name':mail['subject'] + '(' + each[0] + ')',
-                        'datas':base64.b64encode(each[2]),
+                        'datas':base64.b64encode(each[2] or ''),
                         'datas_fname':each[1],
                         'description':(mail['subject'] or 'No Subject') + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
                         'res_model':'poweremail.mailbox',
