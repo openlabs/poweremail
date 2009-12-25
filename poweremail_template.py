@@ -48,11 +48,12 @@ class poweremail_templates(osv.osv):
         'def_to':fields.char('Recepient (To)',size=250,help="The default recepient of email. Placeholders can be used here."),
         'def_cc':fields.char('Default CC',size=250,help="The default CC for the email. Placeholders can be used here."),
         'def_bcc':fields.char('Default BCC',size=250,help="The default BCC for the email. Placeholders can be used here."),
-        'def_subject':fields.char('Default Subject',size=200, help="The default subject of email. Placeholders can be used here."),
-        'def_body_text':fields.text('Standard Body (Text)',help="The text version of the mail"),
-        'def_body_html':fields.text('Body (Text-Web Client Only)',help="The text version of the mail"),
+        'lang':fields.char('Language',size=250,help="The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"),
+        'def_subject':fields.char('Default Subject',size=200, help="The default subject of email. Placeholders can be used here.",translate=True),
+        'def_body_text':fields.text('Standard Body (Text)',help="The text version of the mail",translate=True),
+        'def_body_html':fields.text('Body (Text-Web Client Only)',help="The text version of the mail",translate=True),
         'use_sign':fields.boolean('Use Signature',help="the signature from the User details will be appened to the mail"),
-        'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"),
+        'file_name':fields.char('File Name Pattern',size=200,help="File name pattern can be specified with placeholders. eg. 2009_SO003.pdf",translate=True),
         'report_template':fields.many2one('ir.actions.report.xml','Report to send'),
         #'report_template':fields.reference('Report to send',[('ir.actions.report.xml','Reports')],size=128),
         'allowed_groups':fields.many2many('res.groups','template_group_rel','templ_id','group_id',string="Allowed User Groups",  help="Only users from these groups will be allowed to send mails from this Template"),
@@ -338,7 +339,12 @@ class poweremail_templates(osv.osv):
         for recid in recids:
             try:
                 self.engine = self.pool.get("poweremail.engines")
-                
+                #Search translated template
+                lang = self.get_value(cr,uid,recid,template.lang,template)
+                if lang:
+                    ctx2 = context.copy()
+                    ctx2.update({'lang':lang})
+                    template = self.browse(cr,uid,id,ctx2)
                 vals = {
                         'pem_from': tools.ustr(from_account['name']) + "<" + tools.ustr(from_account['email_id']) + ">",
                         'pem_to':self.get_value(cr,uid,recid,template.def_to,template),
@@ -442,6 +448,12 @@ class poweremail_preview(osv.osv_memory):
             if ctx == {}:
                 ctx = self.context
             template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
+            #Search translated template
+            lang = self.get_value(cr,uid,rel_model_ref,template.lang,template,ctx)
+            if lang:
+                ctx2 = ctx.copy()
+                ctx2.update({'lang':lang})
+                template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx2)
             vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,ctx)
             vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,ctx)
             vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,ctx)

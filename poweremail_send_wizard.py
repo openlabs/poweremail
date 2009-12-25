@@ -44,6 +44,12 @@ class poweremail_send_wizard(osv.osv_memory):
         self.ctx = ctx
         if tmpl_id:
             self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0])
+            #Search translated template
+            lang = self.get_value(cr,uid,ctx,self.template.lang)
+            if lang:
+                ctx2 = ctx.copy()
+                ctx2.update({'lang':lang})
+                self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0],ctx2)
             #print self.template.allowed_groups
             if self.template.enforce_from_account:
                 return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]

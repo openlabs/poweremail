@@ -68,6 +68,7 @@
 								<field name="def_to" colspan="4" required="1" />
 								<field name="def_cc" colspan="4" />
 								<field name="def_bcc" colspan="4" />
+								<field name="lang" colspan="4" />
 							</group>
 							<group col="2" colspan="2">
 								<field name="def_subject" colspan="4" required="1" />
