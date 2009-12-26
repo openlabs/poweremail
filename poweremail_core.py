@@ -32,6 +32,8 @@ from email import Encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.header import decode_header
+import re
 import netsvc
 import poplib
 import imaplib
@@ -337,13 +339,13 @@ class poweremail_core_accounts(osv.osv):
         mail_obj = self.pool.get('poweremail.mailbox')
         
         vals = {
-            'pem_from':mail['From'],
-            'pem_to':mail['To'] or 'no recepient',
-            'pem_cc':mail['cc'],
-            'pem_bcc':mail['bcc'],
+            'pem_from':self.decode_header_text(mail['From']),
+            'pem_to':mail['To'] and self.decode_header_text(mail['To']) or 'no recepient',
+            'pem_cc':self.decode_header_text(mail['cc']),
+            'pem_bcc':self.decode_header_text(mail['bcc']),
             'pem_recd':mail['date'],
             'date_mail':self.extracttime(mail['date']) or time.strftime("%Y-%m-%d %H:%M:%S"),
-            'pem_subject':mail['subject'],
+            'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
             'state':ctx.get('state','unread'),
@@ -378,13 +380,13 @@ class poweremail_core_accounts(osv.osv):
         mail_obj = self.pool.get('poweremail.mailbox')
         #TODO:If multipart save attachments and save ids 
         vals = {
-            'pem_from':mail['From'],
-            'pem_to':mail['To'],
-            'pem_cc':mail['cc'],
-            'pem_bcc':mail['bcc'],
+            'pem_from':self.decode_header_text(mail['From']),
+            'pem_to':self.decode_header_text(mail['To']),
+            'pem_cc':self.decode_header_text(mail['cc']),
+            'pem_bcc':self.decode_header_text(mail['bcc']),
             'pem_recd':mail['date'],
             'date_mail':self.extracttime(mail['date']) or time.strftime("%Y-%m-%d %H:%M:%S"),
-            'pem_subject':mail['subject'],
+            'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
             'state':ctx.get('state','unread'),
@@ -421,13 +423,13 @@ class poweremail_core_accounts(osv.osv):
         mail_obj = self.pool.get('poweremail.mailbox')
         #TODO:If multipart save attachments and save ids
         vals = {
-            'pem_from':mail['From'],
-            'pem_to':mail['To'] or 'no recepient',
-            'pem_cc':mail['cc'],
-            'pem_bcc':mail['bcc'],
+            'pem_from':self.decode_header_text(mail['From']),
+            'pem_to':mail['To'] and self.decode_header_text(mail['To']) or 'no recepient',
+            'pem_cc':self.decode_header_text(mail['cc']),
+            'pem_bcc':self.decode_header_text(mail['bcc']),
             'pem_recd':mail['date'],
             'date_mail':time.strftime("%Y-%m-%d %H:%M:%S"),
-            'pem_subject':mail['subject'],
+            'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
             'state':ctx.get('state','unread'),
@@ -661,12 +663,28 @@ class poweremail_core_accounts(osv.osv):
         for part in mail.walk():
             mail_part_type = part.get_content_type()
             if mail_part_type == 'text/plain':
-                parsed_mail['text'] = tools.ustr(part.get_payload())
+                parsed_mail['text'] = tools.ustr(part.get_payload(decode=True)) # decode=True to decode a MIME message
             elif mail_part_type == 'text/html':
-                parsed_mail['html'] = tools.ustr(part.get_payload())
+                parsed_mail['html'] = tools.ustr(part.get_payload(decode=True)) # Is decode=True needed in html MIME messages?
             elif not mail_part_type.startswith('multipart'):
                 parsed_mail['attachments'].append((mail_part_type, part.get_filename(), part.get_payload(decode=True)))
         return parsed_mail
+
+    def decode_header_text(self, text):
+        """ Decode internationalized headers RFC2822.
+            To, CC, BCC, Subject fields can contain text slices with different encodes, like:
+                =?iso-8859-1?Q?Enric_Mart=ED?= <enricmarti@company.com>, =?Windows-1252?Q?David_G=F3mez?= <david@company.com>
+            Sometimes they include extra " character at the beginning/end of the contact name, like:
+                "=?iso-8859-1?Q?Enric_Mart=ED?=" <enricmarti@company.com>
+            and decode_header() does not work well, so we use regular expressions (?=   ? ?   ?=) to split the text slices
+        """
+        if not text:
+            return text        
+        p = re.compile("(=\?.*?\?.\?.*?\?=)")
+        text2 = ''
+        for t2 in p.split(text):
+            text2 += ''.join([s.decode(t or 'ascii') for (s, t) in decode_header(t2)]).encode('utf-8')
+        return text2
 
 poweremail_core_accounts()
 
