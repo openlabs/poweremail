@@ -1,14 +1,14 @@
 # Translation of OpenERP Server.
 # This file contains the translation of the following modules:
-#	* poweremail
+# 	* poweremail
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 5.0.3\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2009-09-21 06:57:04+0000\n"
-"PO-Revision-Date: 2009-10-15 17:43+0100\n"
-"Last-Translator: Jordi Esteve (Zikzakmedia) <jesteve@zikzakmedia.com>\n"
+"POT-Creation-Date: 2009-12-25 20:58:41+0000\n"
+"PO-Revision-Date: 2009-12-25 22:00+0100\n"
+"Last-Translator: Jordi Esteve <jesteve@zikzakmedia.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -18,7 +18,7 @@ msgstr ""
 #. module: poweremail
 #: help:poweremail.core_accounts,iserver:0
 msgid "Enter name of incoming server,eg:imap.gmail.com "
-msgstr "Introduïu el nom del servidor de correu entrant, per exemple: imap.gmail.com"
+msgstr "Introduïu el nom del servidor de correu d'entrada, per exemple: imap.gmail.com"
 
 #. module: poweremail
 #: view:poweremail.send.wizard:0
@@ -34,6 +34,11 @@ msgstr "Power Email"
 #: model:ir.model,name:poweremail.model_poweremail_core_selfolder
 msgid "Shows a list of IMAP folders"
 msgstr "Mostra la llista de les carpetes IMAP"
+
+#. module: poweremail
+#: help:poweremail.templates,lang:0
+msgid "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+msgstr "L'idioma per defecte del correu electrònic. Es poden usar expressions de camps, per ex. ${object.partner_id.lang}"
 
 #. module: poweremail
 #: field:poweremail.templates,def_bcc:0
@@ -110,9 +115,9 @@ msgid "Standard Body"
 msgstr "Cos del missatge (estàndard)"
 
 #. module: poweremail
-#: view:poweremail.core_accounts:0
-msgid "SMTP Server"
-msgstr "Servidor SMTP"
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_company
+msgid "Company"
+msgstr "Companyia"
 
 #. module: poweremail
 #: view:poweremail.templates:0
@@ -127,7 +132,7 @@ msgstr "Configuració correu electrònic"
 #. module: poweremail
 #: view:poweremail.send.wizard:0
 msgid "Send all mails"
-msgstr "Envia tots els correus electrònics"
+msgstr "Envia tots els correus"
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_per
@@ -173,7 +178,7 @@ msgstr "Codi HTML"
 #. module: poweremail
 #: view:poweremail.core_accounts:0
 msgid "Incoming"
-msgstr "Entrant"
+msgstr "Entrada"
 
 #. module: poweremail
 #: field:poweremail.mailbox,pem_recd:0
@@ -184,6 +189,11 @@ msgstr "Rebut el"
 #: field:poweremail.core_selfolder,name:0
 msgid "Email Account"
 msgstr "Compte de correu electrònic"
+
+#. module: poweremail
+#: field:poweremail.mailbox,conversation_id:0
+msgid "Conversation"
+msgstr "Conversació"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
@@ -204,7 +214,7 @@ msgstr "No aplicable"
 #. module: poweremail
 #: view:poweremail.core_accounts:0
 msgid "Approve Account"
-msgstr "Aprovar el compte"
+msgstr "Aprova el compte"
 
 #. module: poweremail
 #: field:poweremail.core_accounts,email_id:0
@@ -239,7 +249,7 @@ msgstr "Descarrega tot el correu"
 #. module: poweremail
 #: help:poweremail.templates,def_to:0
 msgid "The default recepient of email. Placeholders can be used here."
-msgstr "El destinatari per defecte del correu electrònic. Es poden usar marques de camps."
+msgstr "El destinatari per defecte del correu electrònic. Es poden usar expressions de camps."
 
 #. module: poweremail
 #: view:poweremail.mailbox:0
@@ -247,6 +257,11 @@ msgstr "El destinatari per defecte del correu electrònic. Es poden usar marques
 #: field:poweremail.templates,def_body_text:0
 msgid "Standard Body (Text)"
 msgstr "Cos del missatge (Text)"
+
+#. module: poweremail
+#: field:poweremail.conversation,mails:0
+msgid "Related Emails"
+msgstr "Correus relacionats"
 
 #. module: poweremail
 #: selection:poweremail.core_accounts,send_pref:0
@@ -265,18 +280,19 @@ msgstr "Acció de servidor relacionada"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_follow
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow_company
 msgid "Follow-up"
 msgstr "Seguiment"
 
 #. module: poweremail
-#: field:poweremail.core_accounts,smtpport:0
-msgid "SMTP Port "
-msgstr "Port SMTP"
+#: model:ir.model,name:poweremail.model_poweremail_conversation
+msgid "Conversations are groups of related emails"
+msgstr "Conversacions són grups de correus relacionats"
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_mailbox
 msgid "Power Email Mailbox included all type inbox,outbox,junk.."
-msgstr "PowerMail inclou tot tipus de bústies de correu: entrant, sortint, brossa, ..."
+msgstr "PowerMail inclou tot tipus de bústies de correu: entrada, sortida, brossa, ..."
 
 #. module: poweremail
 #: field:poweremail.core_accounts,isssl:0
@@ -287,18 +303,13 @@ msgstr "Utilitza SSL"
 #. module: poweremail
 #: help:poweremail.core_accounts,smtpserver:0
 msgid "Enter name of outgoing server,eg:smtp.gmail.com "
-msgstr "Escriviu el nom del servidor de correu sortint: exemple: smtp.gmail.com"
+msgstr "Escriviu el nom del servidor de correu de sortida: exemple: smtp.gmail.com"
 
 #. module: poweremail
 #: field:poweremail.preview,subject:0
 #: field:poweremail.send.wizard,subject:0
 msgid "Subject"
 msgstr "Subjecte"
-
-#. module: poweremail
-#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
-msgid "All Account"
-msgstr "Tots els comptes"
 
 #. module: poweremail
 #: field:poweremail.mailbox,pem_from:0
@@ -356,7 +367,7 @@ msgstr "Botó assistent"
 #. module: poweremail
 #: view:ir.actions.server:0
 msgid "All values for the mail can be configured in the template editor itself."
-msgstr "Tots els valors per al correu es poden configurar a l'editor de plantilles."
+msgstr "Tots els valors del correu es poden configurar a l'editor de plantilles."
 
 #. module: poweremail
 #: view:poweremail.mailbox:0
@@ -365,6 +376,7 @@ msgstr "Seguiment PowerEmail"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_sent
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent_company
 msgid "Sent"
 msgstr "Enviats"
 
@@ -386,7 +398,7 @@ msgstr "Per exemple: IMAP: 993, POP3: 995"
 #. module: poweremail
 #: selection:poweremail.mailbox,folder:0
 msgid "Sent Items"
-msgstr "Envia"
+msgstr "Enviats"
 
 #. module: poweremail
 #: view:poweremail.preview:0
@@ -455,6 +467,12 @@ msgstr "Estat del compte"
 #: selection:poweremail.mailbox,mail_type:0
 msgid "HTML Body"
 msgstr "Cos del missatge HTML"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+#, fuzzy
+msgid "security"
+msgstr "Seguretat"
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -584,7 +602,7 @@ msgstr "Configuració"
 #. module: poweremail
 #: field:poweremail.core_accounts,company:0
 msgid "Company Mail A/c"
-msgstr "Correu companyia A/c"
+msgstr "Compte correu de la companyia"
 
 #. module: poweremail
 #: selection:poweremail.core_accounts,company:0
@@ -597,7 +615,13 @@ msgid "Window Action"
 msgstr "Acció finestra"
 
 #. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "SMTP Server"
+msgstr "Servidor SMTP"
+
+#. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Drafts"
 msgstr "Esborranys"
@@ -641,7 +665,7 @@ msgstr "Aplicable només pels elements d'entrada"
 #. module: poweremail
 #: view:poweremail.core_accounts:0
 msgid "Check Incoming Connection"
-msgstr "Comprova la connexió entrant"
+msgstr "Comprova la connexió d'entrada"
 
 #. module: poweremail
 #: field:poweremail.mailbox,state:0
@@ -657,7 +681,7 @@ msgstr "El meu compte"
 #. module: poweremail
 #: view:poweremail.core_accounts:0
 msgid "Outgoing"
-msgstr "Sortint"
+msgstr "Sortida"
 
 #. module: poweremail
 #: selection:poweremail.core_accounts,state:0
@@ -668,6 +692,11 @@ msgstr "Iniciat"
 #: field:poweremail.send.wizard,from:0
 msgid "From Account"
 msgstr "Des del compte"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Intermixed content"
+msgstr "Contingut variat"
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_templates
@@ -697,7 +726,13 @@ msgid "User"
 msgstr "Usuari"
 
 #. module: poweremail
+#: help:poweremail.templates,allowed_groups:0
+msgid "Only users from these groups will be allowed to send mails from this Template"
+msgstr "Només els usuaris d'aquests grups poden enviar correus des d'aquesta plantilla."
+
+#. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Outbox"
 msgstr "Sortida"
@@ -705,12 +740,17 @@ msgstr "Sortida"
 #. module: poweremail
 #: view:poweremail.send.wizard:0
 msgid "Save in Drafts"
-msgstr "Desa en esborranys"
+msgstr "Desa a esborranys"
 
 #. module: poweremail
 #: view:poweremail.templates:0
 msgid "Power Email Templates"
 msgstr "Plantilles de correu electrònic"
+
+#. module: poweremail
+#: field:poweremail.templates,lang:0
+msgid "Language"
+msgstr "Idioma"
 
 #. module: poweremail
 #: field:poweremail.preview,cc:0
@@ -727,42 +767,42 @@ msgstr "Envia correu"
 #: model:ir.module.module,description:poweremail.module_meta_information
 msgid ""
 "\n"
-" Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
-" ============================================================================\n"
-" Features\n"
-" ============================================================================\n"
-" 1. Multiple Email Accounts\n"
-" 2. Company & Personal Email accounts\n"
-" 3. Security (In Progress)\n"
-" 4. Email Folders (Inbox.Outbox.Drafts etc)\n"
-" 5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
-" 6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
-" 7. Simple one point Template designer which automatically updates system. No extra config req.\n"
-" 8. Automatic Email feature on workflow stages\n"
-" ============================================================================\n"
-" NOTE: This is a beta release. Please update bugs at:\n"
-" http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
-" ============================================================================\n"
-" Suggestions & Feedback to: sharoon.thomas@openlabs.co.in\n"
-" ============================================================================\n"
-" "
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"    ============================================================================\n"
+"    Features\n"
+"    ============================================================================\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"    ============================================================================\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"    ============================================================================\n"
+"    Suggestions & Feedback to: sharoon.thomas@openlabs.co.in\n"
+"    ============================================================================\n"
+"    "
 msgstr ""
 "\n"
-" Power Email - estén el més poderós ERP lliure amb característiques de correu electrònic.\n"
+" Power Email - Amplia OpenERP amb característiques de correu electrònic.\n"
 " ============================================================================\n"
 " Característiques\n"
 " ============================================================================\n"
-" 1. Comptes de multi correu electrònic\n"
-" 2. Comptes d'empresa i personal\n"
+" 1. Varis comptes de correu electrònic\n"
+" 2. Comptes de companyia i personal\n"
 " 3. Seguretat (en desenvolupament)\n"
 " 4. Carpetes de correu electrònic (safata entrada, sortida, esborranys, ...)\n"
-" 5. Enviar correu via SMTP (SMTP SSL també suportat)\n"
+" 5. Enviar correu via SMTP (SMTP SSL també està suportat)\n"
 " 6. Recepció de correus (IMAP & POP3) amb SSL i carpetes IMAP.\n"
 " 7. Dissenyador de plantilles senzill amb sistema d'actualització automàtic. No es requereix configuració extra.\n"
 " 8. Correus electrònics automàtics segons estats d'un flux de treball\n"
 " ============================================================================\n"
 " NOTA: És una versió Beta. Per errors:\n"
-" http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+" http://bugs.launchpad.net/poweremail/+filebug (o) https://bugs.launchpad.net/poweremail/+filebug\n"
 " ============================================================================\n"
 " Propostes i Feedback: sharoon.thomas@openlabs.co.in\n"
 " ============================================================================\n"
@@ -770,7 +810,7 @@ msgstr ""
 #. module: poweremail
 #: field:poweremail.templates,file_name:0
 msgid "File Name Pattern"
-msgstr "Patró del nom d'arxiu"
+msgstr "Patró nom de fitxer"
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.act_selfolder_form
@@ -779,8 +819,12 @@ msgstr "Assistent selecció carpeta IMAP"
 
 #. module: poweremail
 #: help:poweremail.templates,auto_email:0
-msgid "Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created."
-msgstr "Si seleccioneu correu electrònic automàtic es crearà una acció de servidor perquè s'enviï el correu després de crear-se un nou registre."
+msgid ""
+"Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\n"
+"Note:Auto email can be enabled only after saving template."
+msgstr ""
+"Si seleccioneu correu electrònic automàtic es crearà una acció de servidor perquè s'enviï el correu després de crear-se/actualitzar-se un registre.\n"
+"Atenció: Es pot activar el correu automàtic només desprès de desar la plantilla."
 
 #. module: poweremail
 #: field:poweremail.send.wizard,report:0
@@ -806,6 +850,12 @@ msgstr "Expressió"
 #: field:poweremail.core_accounts,dont_auto_down_attach:0
 msgid "Dont Download attachments automatically"
 msgstr "No descarrega els adjunts automàticament"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,history:0
+msgid "History"
+msgstr "Historial"
 
 #. module: poweremail
 #: selection:poweremail.mailbox,state:0
@@ -841,7 +891,7 @@ msgstr "Sol.licita reactivació"
 #. module: poweremail
 #: view:poweremail.send.wizard:0
 msgid "Discard Mail"
-msgstr "Descarta correu electrònic"
+msgstr "Cancel·la"
 
 #. module: poweremail
 #: view:poweremail.mailbox:0
@@ -887,14 +937,15 @@ msgstr "Cos del missatge (HTML - Només client web)"
 #. module: poweremail
 #: view:poweremail.send.wizard:0
 msgid "After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve"
-msgstr "Després de fer clic a Envia ara, els correus es posaran a la safata de sortida. El correus s'enviaran en el proper envia/rebre de la vostra safata de sortida."
+msgstr "Després de fer clic a Envia ara, els correus es posaran a la safata de sortida. El correus s'enviaran en el proper Envia/Rebre (manual o automàtic) de la vostra safata de sortida."
 
 #. module: poweremail
-#: help:poweremail.templates,table_sub_object:0
-msgid "This field shows the model you will be using for your table"
-msgstr "Aquest camp mostra el model que s'utilitzarà en la vostra taula"
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
+msgid "Personal"
+msgstr "Personal"
 
 #. module: poweremail
+#: field:poweremail.core_accounts,allowed_groups:0
 #: view:poweremail.templates:0
 #: field:poweremail.templates,allowed_groups:0
 msgid "Allowed User Groups"
@@ -911,9 +962,19 @@ msgid "Email Account Desc"
 msgstr "Descripció compte de correu"
 
 #. module: poweremail
-#: help:poweremail.templates,allowed_groups:0
+#: help:poweremail.core_accounts,allowed_groups:0
 msgid "Only users from these groups will be allowed to send mails from this ID"
-msgstr "Només els usuaris d'aquests grups poden enviar correus des d'aquest ID"
+msgstr "Només els usuaris d'aquests grups poden enviar correus des d'aquest compte."
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Suspended"
+msgstr "Suspès"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Ok"
+msgstr "D'acord"
 
 #. module: poweremail
 #: field:poweremail.core_accounts,isfolder:0
@@ -924,20 +985,27 @@ msgstr "Carpeta"
 #. module: poweremail
 #: help:poweremail.templates,def_bcc:0
 msgid "The default BCC for the email. Placeholders can be used here."
-msgstr "El BCC per defecte del correu electrònic. Es poden usar marques de camps."
+msgstr "El BCC per defecte del correu electrònic. Es poden usar expressions de camps."
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree_company
 msgid "Email Mailbox"
 msgstr "Bústia de correu"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_trash
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Trash"
 msgstr "Paperera"
@@ -963,9 +1031,19 @@ msgid "First Receive headers, then download mail"
 msgstr "Primer es descarreguen les capçaleres, després el correu"
 
 #. module: poweremail
+#: field:poweremail.core_accounts,smtpport:0
+msgid "SMTP Port "
+msgstr "Port SMTP"
+
+#. module: poweremail
 #: help:poweremail.templates,def_cc:0
 msgid "The default CC for the email. Placeholders can be used here."
-msgstr "El CC per defecte del correu electrònic. Es poden usar marques de camps."
+msgstr "El CC per defecte del correu electrònic. Es poden usar expressions de camps."
+
+#. module: poweremail
+#: help:poweremail.templates,table_sub_object:0
+msgid "This field shows the model you will be using for your table"
+msgstr "Aquest camp mostra el model que s'utilitzarà en la vostra taula"
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -1005,7 +1083,7 @@ msgstr "Seguiment"
 #. module: poweremail
 #: help:poweremail.templates,file_name:0
 msgid "File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"
-msgstr "Patró del nom de fitxer. Es pot especificar amb marques de camps. Exemple: 2009_SO003.pdf"
+msgstr "Patró del nom de fitxer. Es pot especificar amb expressions de camps. Exemple: ${object.name}.pdf generaria 2009_SO003.pdf"
 
 #. module: poweremail
 #: field:poweremail.preview,report:0
@@ -1013,9 +1091,9 @@ msgid "Report Name"
 msgstr "Nom informe"
 
 #. module: poweremail
-#: selection:poweremail.core_accounts,state:0
-msgid "Suspended"
-msgstr "Suspesa"
+#: field:poweremail.conversation,name:0
+msgid "Name"
+msgstr "Nom"
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_core_accounts
@@ -1062,7 +1140,7 @@ msgstr "L'acció de servidor corresponent està aquí."
 #. module: poweremail
 #: help:poweremail.templates,def_subject:0
 msgid "The default subject of email. Placeholders can be used here."
-msgstr "El subjecte per defecte del correu electrònic. Es poden usar marques de camps."
+msgstr "El subjecte per defecte del correu electrònic. Es poden usar expressions de camps."
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_send_wizard
@@ -1081,6 +1159,7 @@ msgstr "Motor Power Email"
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
 msgid "All Accounts"
 msgstr "Tots els comptes"
 
@@ -1088,11 +1167,6 @@ msgstr "Tots els comptes"
 #: field:poweremail.templates,def_subject:0
 msgid "Default Subject"
 msgstr "Assumpte per defecte"
-
-#. module: poweremail
-#: field:poweremail.send.wizard,filename:0
-msgid "File Name"
-msgstr "Nom del fitxer"
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -1117,6 +1191,7 @@ msgstr "Darrera descàrrega de correu"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Inbox"
 msgstr "Entrada"
@@ -1145,4 +1220,9 @@ msgstr "Port"
 #: help:poweremail.core_accounts,email_id:0
 msgid " eg:yourname@yourdomain.com "
 msgstr " Exemple: elteunom@elteudomini.com"
+
+#~ msgid "All Account"
+#~ msgstr "Tots els comptes"
+#~ msgid "File Name"
+#~ msgstr "Nom del fitxer"
 

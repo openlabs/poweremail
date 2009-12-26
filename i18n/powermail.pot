@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenERP Server 5.0.3\n"
+"Project-Id-Version: OpenERP Server 5.0.6\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2009-09-21 06:57:04+0000\n"
-"PO-Revision-Date: 2009-09-21 06:57:04+0000\n"
+"POT-Creation-Date: 2009-12-25 20:58:41+0000\n"
+"PO-Revision-Date: 2009-12-25 20:58:41+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -33,6 +33,11 @@ msgstr ""
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_core_selfolder
 msgid "Shows a list of IMAP folders"
+msgstr ""
+
+#. module: poweremail
+#: help:poweremail.templates,lang:0
+msgid "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
 msgstr ""
 
 #. module: poweremail
@@ -103,8 +108,8 @@ msgid "Standard Body"
 msgstr ""
 
 #. module: poweremail
-#: view:poweremail.core_accounts:0
-msgid "SMTP Server"
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_company
+msgid "Company"
 msgstr ""
 
 #. module: poweremail
@@ -179,6 +184,11 @@ msgid "Email Account"
 msgstr ""
 
 #. module: poweremail
+#: field:poweremail.mailbox,conversation_id:0
+msgid "Conversation"
+msgstr ""
+
+#. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_form
 msgid "E-M@IL Templates"
@@ -242,6 +252,11 @@ msgid "Standard Body (Text)"
 msgstr ""
 
 #. module: poweremail
+#: field:poweremail.conversation,mails:0
+msgid "Related Emails"
+msgstr ""
+
+#. module: poweremail
 #: selection:poweremail.core_accounts,send_pref:0
 msgid "Both HTML & Text"
 msgstr ""
@@ -258,12 +273,13 @@ msgstr ""
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_follow
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow_company
 msgid "Follow-up"
 msgstr ""
 
 #. module: poweremail
-#: field:poweremail.core_accounts,smtpport:0
-msgid "SMTP Port "
+#: model:ir.model,name:poweremail.model_poweremail_conversation
+msgid "Conversations are groups of related emails"
 msgstr ""
 
 #. module: poweremail
@@ -286,11 +302,6 @@ msgstr ""
 #: field:poweremail.preview,subject:0
 #: field:poweremail.send.wizard,subject:0
 msgid "Subject"
-msgstr ""
-
-#. module: poweremail
-#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
-msgid "All Account"
 msgstr ""
 
 #. module: poweremail
@@ -358,6 +369,7 @@ msgstr ""
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_sent
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent_company
 msgid "Sent"
 msgstr ""
 
@@ -447,6 +459,11 @@ msgstr ""
 #. module: poweremail
 #: selection:poweremail.mailbox,mail_type:0
 msgid "HTML Body"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "security"
 msgstr ""
 
 #. module: poweremail
@@ -590,7 +607,13 @@ msgid "Window Action"
 msgstr ""
 
 #. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "SMTP Server"
+msgstr ""
+
+#. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Drafts"
 msgstr ""
@@ -663,6 +686,11 @@ msgid "From Account"
 msgstr ""
 
 #. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Intermixed content"
+msgstr ""
+
+#. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_templates
 msgid "Power Email Templates for Models"
 msgstr ""
@@ -690,7 +718,13 @@ msgid "User"
 msgstr ""
 
 #. module: poweremail
+#: help:poweremail.templates,allowed_groups:0
+msgid "Only users from these groups will be allowed to send mails from this Template"
+msgstr ""
+
+#. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Outbox"
 msgstr ""
@@ -703,6 +737,11 @@ msgstr ""
 #. module: poweremail
 #: view:poweremail.templates:0
 msgid "Power Email Templates"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.templates,lang:0
+msgid "Language"
 msgstr ""
 
 #. module: poweremail
@@ -752,7 +791,8 @@ msgstr ""
 
 #. module: poweremail
 #: help:poweremail.templates,auto_email:0
-msgid "Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created."
+msgid "Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\n"
+"Note:Auto email can be enabled only after saving template."
 msgstr ""
 
 #. module: poweremail
@@ -778,6 +818,12 @@ msgstr ""
 #. module: poweremail
 #: field:poweremail.core_accounts,dont_auto_down_attach:0
 msgid "Dont Download attachments automatically"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,history:0
+msgid "History"
 msgstr ""
 
 #. module: poweremail
@@ -863,11 +909,12 @@ msgid "After clicking send all mails, mails will be sent to outbox and cleared i
 msgstr ""
 
 #. module: poweremail
-#: help:poweremail.templates,table_sub_object:0
-msgid "This field shows the model you will be using for your table"
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
+msgid "Personal"
 msgstr ""
 
 #. module: poweremail
+#: field:poweremail.core_accounts,allowed_groups:0
 #: view:poweremail.templates:0
 #: field:poweremail.templates,allowed_groups:0
 msgid "Allowed User Groups"
@@ -884,8 +931,18 @@ msgid "Email Account Desc"
 msgstr ""
 
 #. module: poweremail
-#: help:poweremail.templates,allowed_groups:0
+#: help:poweremail.core_accounts,allowed_groups:0
 msgid "Only users from these groups will be allowed to send mails from this ID"
+msgstr ""
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Suspended"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Ok"
 msgstr ""
 
 #. module: poweremail
@@ -901,16 +958,23 @@ msgstr ""
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree_company
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree_company
 msgid "Email Mailbox"
 msgstr ""
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_trash
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Trash"
 msgstr ""
@@ -936,8 +1000,18 @@ msgid "First Receive headers, then download mail"
 msgstr ""
 
 #. module: poweremail
+#: field:poweremail.core_accounts,smtpport:0
+msgid "SMTP Port "
+msgstr ""
+
+#. module: poweremail
 #: help:poweremail.templates,def_cc:0
 msgid "The default CC for the email. Placeholders can be used here."
+msgstr ""
+
+#. module: poweremail
+#: help:poweremail.templates,table_sub_object:0
+msgid "This field shows the model you will be using for your table"
 msgstr ""
 
 #. module: poweremail
@@ -983,8 +1057,8 @@ msgid "Report Name"
 msgstr ""
 
 #. module: poweremail
-#: selection:poweremail.core_accounts,state:0
-msgid "Suspended"
+#: field:poweremail.conversation,name:0
+msgid "Name"
 msgstr ""
 
 #. module: poweremail
@@ -1051,17 +1125,13 @@ msgstr ""
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
 msgid "All Accounts"
 msgstr ""
 
 #. module: poweremail
 #: field:poweremail.templates,def_subject:0
 msgid "Default Subject"
-msgstr ""
-
-#. module: poweremail
-#: field:poweremail.send.wizard,filename:0
-msgid "File Name"
 msgstr ""
 
 #. module: poweremail
@@ -1087,6 +1157,7 @@ msgstr ""
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox_company
 #: selection:poweremail.mailbox,folder:0
 msgid "Inbox"
 msgstr ""

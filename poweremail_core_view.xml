@@ -12,9 +12,11 @@
 				<form string="Get Mail">
 					<field name="name" select="1" />
 					<field name="folder" select="1" />
-					<group>
+                    <separator string="" colspan="4"/>
+                    <label string="" colspan="2"/>
+                    <group col="2" colspan="2">
 						<button icon="gtk-cancel" special="cancel" string="Cancel" />
-						<button icon="gtk-ok" name="sel_folder" string="" type="object" />
+						<button icon="gtk-ok" name="sel_folder" string="Ok" type="object" />
 					</group>
 				</form>
 			</field>
