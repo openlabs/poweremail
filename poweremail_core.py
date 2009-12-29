@@ -464,10 +464,10 @@ class poweremail_core_accounts(osv.osv):
         att_ids = []
         for each in parsed_mail['attachments']:#Get each attachment
             new_att_vals = {
-                        'name':mail['subject'] + '(' + each[0] + ')',
+                        'name':self.decode_header_text(mail['subject']) + '(' + each[0] + ')',
                         'datas':base64.b64encode(each[2] or ''),
                         'datas_fname':each[1],
-                        'description':(mail['subject'] or 'No Subject') + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
+                        'description':(self.decode_header_text(mail['subject']) or 'No Subject') + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
                         'res_model':'poweremail.mailbox',
                         'res_id':id
                             }
