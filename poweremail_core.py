@@ -682,8 +682,11 @@ class poweremail_core_accounts(osv.osv):
             return text        
         p = re.compile("(=\?.*?\?.\?.*?\?=)")
         text2 = ''
-        for t2 in p.split(text):
-            text2 += ''.join([s.decode(t or 'ascii') for (s, t) in decode_header(t2)]).encode('utf-8')
+        try:
+            for t2 in p.split(text):
+                text2 += ''.join([s.decode(t or 'ascii') for (s, t) in decode_header(t2)]).encode('utf-8')
+        except:
+            return text
         return text2
 
 poweremail_core_accounts()
