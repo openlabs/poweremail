@@ -1,0 +1,1179 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* poweremail
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 5.0.6\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2009-12-30 04:01:50+0000\n"
+"PO-Revision-Date: 2009-12-30 13:07+0800\n"
+"Last-Translator: silence <znnet99@yahoo.com.cn>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,iserver:0
+msgid "Enter name of incoming server,eg:imap.gmail.com "
+msgstr "输入接收服务器的名称,例如:imap.gmail.com"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send mail Wizard"
+msgstr "发送邮件向导"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_administration_server
+msgid "Power Email"
+msgstr "Power Email"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_core_selfolder
+msgid "Shows a list of IMAP folders"
+msgstr "显示IMAP文件夹列表"
+
+#. module: poweremail
+#: field:poweremail.templates,def_bcc:0
+msgid "Default BCC"
+msgstr "默认密送"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Get Mail"
+msgstr "收邮件"
+
+#. module: poweremail
+#: field:poweremail.templates,null_value:0
+msgid "Null Value"
+msgstr "空值"
+
+#. module: poweremail
+#: constraint:ir.actions.act_window:0
+msgid "Invalid model name in the action definition."
+msgstr "在操作定义使用了无效的模块名称。"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Wizard Complete"
+msgstr "向导完成"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Plain Text & HTML with no attachments"
+msgstr "纯文本和HTML没有附件"
+
+#. module: poweremail
+#: help:poweremail.templates,table_model_object_field:0
+msgid ""
+"Select the field from the model you want to use.\n"
+"Only one2many & many2many fields can be used for tables)"
+msgstr ""
+
+#. module: poweremail
+#: help:poweremail.templates,model_object_field:0
+msgid ""
+"Select the field from the model you want to use.\n"
+"If it is a relationship field you will be able to choose the nested values in the box below\n"
+"(Note:If there are no values make sure you have selected the correct model)"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.preview,body_html:0
+#: field:poweremail.preview,body_text:0
+#: field:poweremail.send.wizard,body_html:0
+#: field:poweremail.send.wizard,body_text:0
+msgid "Body"
+msgstr "正文"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send now"
+msgstr "现在发送"
+
+#. module: poweremail
+#: field:poweremail.templates,attached_wkf:0
+msgid "Workflow"
+msgstr "工作流程"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: view:poweremail.templates:0
+msgid "Standard Body"
+msgstr "标准正文"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_company
+msgid "Company"
+msgstr "公司"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Body (HTML - Only web client)"
+msgstr "正文 (HTML - 仅Web客户端)"
+
+#. module: poweremail
+#: view:ir.actions.server:0
+msgid "Email Configuration"
+msgstr "电子邮件设置"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send all mails"
+msgstr "发送所有邮件"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_per
+msgid "Personal Account"
+msgstr "个人帐户"
+
+#. module: poweremail
+#: field:poweremail.mailbox,server_ref:0
+msgid "Server Reference of mail"
+msgstr "邮件服务器参考"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,iserver_type:0
+msgid "Server Type"
+msgstr "服务器类型"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal_my
+msgid "My Accounts"
+msgstr "我的帐户"
+
+#. module: poweremail
+#: field:poweremail.preview,rel_model_ref:0
+#: field:poweremail.send.wizard,rel_model_ref:0
+msgid "Referred Document"
+msgstr "提交文件"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Approved"
+msgstr "批准"
+
+#. module: poweremail
+#: help:poweremail.templates,table_required_fields:0
+msgid "Select the fieldsyou require in the table)"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.templates,table_html:0
+msgid "HTML code"
+msgstr "HTML编码"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Incoming"
+msgstr "接收"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_recd:0
+msgid "Received at"
+msgstr "收到"
+
+#. module: poweremail
+#: field:poweremail.core_selfolder,name:0
+msgid "Email Account"
+msgstr "电子邮件帐户"
+
+#. module: poweremail
+#: field:poweremail.mailbox,conversation_id:0
+msgid "Conversation"
+msgstr "会话"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_form
+msgid "E-M@IL Templates"
+msgstr "E-M@IL模板"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,smtpport:0
+msgid "Enter port number,eg:SMTP-587 "
+msgstr "输入端口号,例如:SMTP-587"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Not Applicable"
+msgstr "不适用"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Approve Account"
+msgstr "审核帐户"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,email_id:0
+msgid "Email ID"
+msgstr "Email ID"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,full_success:0
+msgid "Complete Success"
+msgstr "完全成功"
+
+#. module: poweremail
+#: model:ir.module.module,shortdesc:poweremail.module_meta_information
+msgid "Powerful Email capabilities for Open ERP"
+msgstr "Open ERP强大的电子邮件功能"
+
+#. module: poweremail
+#: view:poweremail.preview:0
+msgid "OK"
+msgstr "确定"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,requested:0
+msgid "No of requested Mails"
+msgstr "没有生成的邮件"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Download Full Mail"
+msgstr "下载完整邮件"
+
+#. module: poweremail
+#: help:poweremail.templates,def_to:0
+msgid "The default recepient of email. Placeholders can be used here."
+msgstr "默认的电子邮件收件人.Placeholders can be used here."
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_body_text:0
+#: field:poweremail.templates,def_body_text:0
+msgid "Standard Body (Text)"
+msgstr "标准正文(文本)"
+
+#. module: poweremail
+#: field:poweremail.conversation,mails:0
+msgid "Related Emails"
+msgstr "相关的电子邮件"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "Both HTML & Text"
+msgstr "Both HTML & Text"
+
+#. module: poweremail
+#: field:poweremail.core_selfolder,folder:0
+msgid "IMAP Folder"
+msgstr "IMAP文件夹"
+
+#. module: poweremail
+#: field:poweremail.templates,server_action:0
+msgid "Related Server Action"
+msgstr "相关服务器操作"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow_company
+msgid "Follow-up"
+msgstr "跟进"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_conversation
+msgid "Conversations are groups of related emails"
+msgstr ""
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_mailbox
+msgid "Power Email Mailbox included all type inbox,outbox,junk.."
+msgstr "Power Email邮箱包括所有类型的收件箱，发件箱，垃圾.."
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isssl:0
+#: field:poweremail.core_accounts,smtpssl:0
+msgid "Use SSL"
+msgstr "使用SSL"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,smtpserver:0
+msgid "Enter name of outgoing server,eg:smtp.gmail.com "
+msgstr "输入发送服务器的名称,例如:smtp.gmail.com"
+
+#. module: poweremail
+#: field:poweremail.preview,subject:0
+#: field:poweremail.send.wizard,subject:0
+msgid "Subject"
+msgstr "主题"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_from:0
+msgid "From"
+msgstr "从"
+
+#. module: poweremail
+#: field:ir.actions.server,poweremail_template:0
+#: field:poweremail.preview,ref_template:0
+#: field:poweremail.send.wizard,ref_template:0
+msgid "Template"
+msgstr "模板"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Insert Simple Field"
+msgstr "插入简单的字段"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Send/Receive"
+msgstr "发送/接收"
+
+#. module: poweremail
+#: field:poweremail.templates,table_sub_object:0
+msgid "Table-model"
+msgstr "表模型"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_mailbox_all_main2
+msgid "MailBox"
+msgstr "邮箱"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.wizard_poweremail_preview
+msgid "Template Preview"
+msgstr "模板预览"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_body_html:0
+#: field:poweremail.templates,def_body_html:0
+msgid "Body (Text-Web Client Only)"
+msgstr "正文 (HTML - 仅Web客户端)"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_preview
+msgid "Power Email Template Preview"
+msgstr "Power Email模板预览"
+
+#. module: poweremail
+#: field:poweremail.templates,ref_ir_value:0
+msgid "Wizard Button"
+msgstr "向导按钮"
+
+#. module: poweremail
+#: view:ir.actions.server:0
+msgid "All values for the mail can be configured in the template editor itself."
+msgstr "所有的邮件可以配置自己的模板编辑器"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Follow Up"
+msgstr "跟进"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent_company
+msgid "Sent"
+msgstr "发送"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,iserver_type:0
+msgid "POP3"
+msgstr "POP3"
+
+#. module: poweremail
+#: field:poweremail.templates,use_sign:0
+msgid "Use Signature"
+msgstr "使用签名"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,isport:0
+msgid "For example IMAP: 993,POP3:995 "
+msgstr "例如IMAP:993,POP3:995 "
+
+#. module: poweremail
+#: selection:poweremail.mailbox,folder:0
+msgid "Sent Items"
+msgstr "发送邮件"
+
+#. module: poweremail
+#: view:poweremail.preview:0
+msgid "Power Email Preview"
+msgstr "Power Email预览"
+
+#. module: poweremail
+#: field:poweremail.templates,name:0
+msgid "Name of Template"
+msgstr "模板名称"
+
+#. module: poweremail
+#: help:poweremail.templates,def_body_html:0
+#: help:poweremail.templates,def_body_text:0
+msgid "The text version of the mail"
+msgstr "该邮件的纯文字版"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_account_id:0
+msgid "User account"
+msgstr "用户帐户"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,signature:0
+msgid "Attach my signature to mail"
+msgstr "附上我的签名邮件"
+
+#. module: poweremail
+#: field:poweremail.templates,table_required_fields:0
+msgid "Required Fields"
+msgstr "必填字段"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_configuration_server
+msgid "Configuration"
+msgstr "设置"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: view:poweremail.templates:0
+msgid "Advanced"
+msgstr "高级"
+
+#. module: poweremail
+#: field:poweremail.preview,to:0
+#: field:poweremail.send.wizard,to:0
+msgid "To"
+msgstr "到"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Expression Builder"
+msgstr ""
+
+#. module: poweremail
+#: constraint:ir.ui.view:0
+msgid "Invalid XML for View Architecture!"
+msgstr "无效的XML视图架构！"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,state:0
+msgid "Account Status"
+msgstr "帐户状态"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "HTML Body"
+msgstr "HTML正文"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "security"
+msgstr "安全"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Suspend Account"
+msgstr "暂停帐户"
+
+#. module: poweremail
+#: help:poweremail.templates,null_value:0
+msgid "This Value is used if the field is empty"
+msgstr "如果该字段为空就使用该值。"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Select Folder"
+msgstr "选择文件夹"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Preview Template"
+msgstr "预览模板"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtpserver:0
+msgid "Server"
+msgstr "SMTP服务器"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_subject:0
+msgid " Subject"
+msgstr "主题"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Cancel"
+msgstr "取消"
+
+#. module: poweremail
+#: help:poweremail.templates,sub_model_object_field:0
+msgid "When you choose relationship fields this field will specify the sub value you can use."
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Generate Table"
+msgstr "生成表格"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,company:0
+msgid "Select if this mail account does not belong to specific user but the organisation as a whole. eg:info@somedomain.com"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Security"
+msgstr "安全"
+
+#. module: poweremail
+#: field:poweremail.templates,sub_object:0
+msgid "Sub-model"
+msgstr "子模型"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,iserver_type:0
+msgid "IMAP"
+msgstr "IMAP"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Body (Plain Text)"
+msgstr "正文 (纯文本)"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Body (Text)"
+msgstr "正文 (文本)"
+
+#. module: poweremail
+#: field:poweremail.mailbox,date_mail:0
+msgid "Rec/Sent Date"
+msgstr "记录/发送日期"
+
+#. module: poweremail
+#: field:poweremail.templates,report_template:0
+msgid "Report to send"
+msgstr "发送记录"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Server Information"
+msgstr "服务器信息"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,generated:0
+msgid "No of generated Mails"
+msgstr "没有生成的邮件"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Mail Details"
+msgstr "邮件详细资料"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Outbox"
+msgstr "Power Email发件箱"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Multiple Mail Wizard Step 1"
+msgstr "多邮件向导步骤1"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "HTML otherwise Text"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.core_accounts,user:0
+msgid "Related User"
+msgstr "相关的用户"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Power Email Configuration"
+msgstr "Power Email配置"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,company:0
+msgid "Company Mail A/c"
+msgstr "企业邮局 A/c"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,company:0
+msgid "Yes"
+msgstr "是"
+
+#. module: poweremail
+#: field:poweremail.templates,ref_ir_act_window:0
+msgid "Window Action"
+msgstr "窗口操作"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "SMTP Server"
+msgstr "SMTP服务器"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Drafts"
+msgstr "草稿箱"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,company:0
+msgid "No"
+msgstr "否"
+
+#. module: poweremail
+#: field:poweremail.mailbox,mail_type:0
+msgid "Mail Contents"
+msgstr "邮件内容"
+
+#. module: poweremail
+#: field:poweremail.preview,bcc:0
+#: field:poweremail.send.wizard,bcc:0
+msgid "BCC"
+msgstr "密送"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Plain Text"
+msgstr "纯文本"
+
+#. module: poweremail
+#: field:poweremail.templates,model_int_name:0
+msgid "Model Internal Name"
+msgstr "内部模块名"
+
+#. module: poweremail
+#: constraint:ir.model:0
+msgid "The Object name must start with x_ and not contain any special character !"
+msgstr "对象名称必须以x_开头并且不包含任何特殊字符！"
+
+#. module: poweremail
+#: help:poweremail.mailbox,server_ref:0
+msgid "Applicable for inward items only"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Check Incoming Connection"
+msgstr "检查接收连接"
+
+#. module: poweremail
+#: field:poweremail.mailbox,state:0
+#: field:poweremail.send.wizard,state:0
+msgid "Status"
+msgstr "状态"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_my
+msgid "My Account"
+msgstr "我的帐户"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Outgoing"
+msgstr "发送"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Initiated"
+msgstr "开始"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,from:0
+msgid "From Account"
+msgstr "从帐户"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Intermixed content"
+msgstr "混合内容"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_templates
+msgid "Power Email Templates for Models"
+msgstr "Power Email模板模块"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_template_form
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_template_tree_all
+msgid "Email Templates"
+msgstr "电子邮件模板"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isuser:0
+#: field:poweremail.core_accounts,smtpuname:0
+msgid "User Name"
+msgstr "用户名"
+
+#. module: poweremail
+#: field:poweremail.templates,sub_model_object_field:0
+msgid "Sub Field"
+msgstr "子字段"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_user:0
+msgid "User"
+msgstr "用户"
+
+#. module: poweremail
+#: help:poweremail.templates,allowed_groups:0
+msgid "Only users from these groups will be allowed to send mails from this Template"
+msgstr ""
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Outbox"
+msgstr "发件箱"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Save in Drafts"
+msgstr "保存草稿"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Power Email Templates"
+msgstr "Power Email模板"
+
+#. module: poweremail
+#: field:poweremail.preview,cc:0
+#: field:poweremail.send.wizard,cc:0
+msgid "CC"
+msgstr "抄送"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Send Mail"
+msgstr "发送邮件"
+
+#. module: poweremail
+#: model:ir.module.module,description:poweremail.module_meta_information
+msgid ""
+"\n"
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"    ============================================================================\n"
+"    Features\n"
+"    ============================================================================\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"    ============================================================================\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"    ============================================================================\n"
+"    Suggestions & Feedback to: sharoon.thomas@openlabs.co.in\n"
+"    ============================================================================\n"
+"    "
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.templates,file_name:0
+msgid "File Name Pattern"
+msgstr "文件名模式"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.act_selfolder_form
+msgid "IMAP Folder Selection Wizard"
+msgstr "IMAP文件夹选择向导"
+
+#. module: poweremail
+#: help:poweremail.templates,auto_email:0
+msgid ""
+"Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\n"
+"Note:Auto email can be enabled only after saving template."
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.send.wizard,report:0
+msgid "Report File Name"
+msgstr "记录文件名"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,iserver:0
+msgid "Incoming Server"
+msgstr "接收服务器"
+
+#. module: poweremail
+#: field:poweremail.templates,table_model_object_field:0
+msgid "Table Field"
+msgstr "表格字段"
+
+#. module: poweremail
+#: field:poweremail.templates,copyvalue:0
+msgid "Expression"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.core_accounts,dont_auto_down_attach:0
+msgid "Dont Download attachments automatically"
+msgstr "不自动下载附件"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,history:0
+msgid "History"
+msgstr "历史"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Un-Read"
+msgstr "未读"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_attachments_ids:0
+msgid "Attachments"
+msgstr "附件"
+
+#. module: poweremail
+#: field:poweremail.templates,auto_email:0
+msgid "Auto Email"
+msgstr "自动发送电子邮件"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_bcc:0
+msgid " BCC"
+msgstr "暗送"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_cc:0
+msgid " CC"
+msgstr "抄送"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Request Re-activation"
+msgstr "要求重新激活"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Discard Mail"
+msgstr "丢弃邮件"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Drafts"
+msgstr "Power Email草稿箱"
+
+#. module: poweremail
+#: help:poweremail.templates,copyvalue:0
+msgid "Copy and paste the value in the location you want to use a system value."
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Close"
+msgstr "关闭"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "Text otherwise HTML"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_to:0
+#: field:poweremail.templates,def_to:0
+msgid "Recepient (To)"
+msgstr "收件人(到)"
+
+#. module: poweremail
+#: help:poweremail.templates,enforce_from_account:0
+msgid "Emails will be sent only from this account."
+msgstr "电子邮件将只有从这个帐户发送."
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Body (HTML-Web Client Only)"
+msgstr "正文 (HTML - 仅Web客户端)"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Body(HTML - Only Web Client)"
+msgstr "正文 (HTML - 仅Web客户端)"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve"
+msgstr ""
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
+msgid "Personal"
+msgstr "个人"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,allowed_groups:0
+#: view:poweremail.templates:0
+#: field:poweremail.templates,allowed_groups:0
+msgid "Allowed User Groups"
+msgstr "允许用户组"
+
+#. module: poweremail
+#: field:poweremail.templates,model_object_field:0
+msgid "Field"
+msgstr "字段"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,name:0
+msgid "Email Account Desc"
+msgstr "电子邮件帐户详细信息"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,allowed_groups:0
+msgid "Only users from these groups will be allowed to send mails from this ID"
+msgstr ""
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Suspended"
+msgstr "暂停"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isfolder:0
+#: field:poweremail.mailbox,folder:0
+msgid "Folder"
+msgstr "文件夹"
+
+#. module: poweremail
+#: help:poweremail.templates,def_bcc:0
+msgid "The default BCC for the email. Placeholders can be used here."
+msgstr "默认的电子邮件密送地址. Placeholders can be used here."
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree_company
+msgid "Email Mailbox"
+msgstr "电子邮件信箱"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Trash"
+msgstr "垃圾箱"
+
+#. module: poweremail
+#: field:poweremail.templates,def_cc:0
+msgid "Default CC"
+msgstr "默认抄送"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Read"
+msgstr "阅读"
+
+#. module: poweremail
+#: help:poweremail.templates,use_sign:0
+msgid "the signature from the User details will be appened to the mail"
+msgstr ""
+
+#. module: poweremail
+#: field:poweremail.core_accounts,rec_headers_den_mail:0
+msgid "First Receive headers, then download mail"
+msgstr "首先接收邮件头，然后下载邮件"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtpport:0
+msgid "SMTP Port "
+msgstr "SMTP端口"
+
+#. module: poweremail
+#: help:poweremail.templates,def_cc:0
+msgid "The default CC for the email. Placeholders can be used here."
+msgstr "默认的电子邮件抄送地址. Placeholders can be used here."
+
+#. module: poweremail
+#: help:poweremail.templates,table_sub_object:0
+msgid "This field shows the model you will be using for your table"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "User Information"
+msgstr "用户信息"
+
+#. module: poweremail
+#: help:poweremail.templates,sub_object:0
+msgid "When a relation field is used this field will show you the type of field you have selected"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Insert Table"
+msgstr "插入表格"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,isfolder:0
+msgid ""
+"Folder to be used for downloading IMAP mails\n"
+"Click on adjacent button to select from a list of folders"
+msgstr "文件夹是用来下载IMAP邮件单击从文件夹列表中选择"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,ispass:0
+#: field:poweremail.core_accounts,smtppass:0
+msgid "Password"
+msgstr "密码"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,folder:0
+msgid "Follow Up"
+msgstr "跟进"
+
+#. module: poweremail
+#: help:poweremail.templates,file_name:0
+msgid "File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"
+msgstr "文件名模式可以指定占位符。例如.2009_SO003.pdf"
+
+#. module: poweremail
+#: field:poweremail.preview,report:0
+msgid "Report Name"
+msgstr "报表名"
+
+#. module: poweremail
+#: field:poweremail.conversation,name:0
+msgid "Name"
+msgstr "姓名"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_core_accounts
+msgid "poweremail.core_accounts"
+msgstr ""
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Trash"
+msgstr "Power Email垃圾箱"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal
+msgid "Personal Accounts"
+msgstr "个人账户"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Sent"
+msgstr "Power Email发送"
+
+#. module: poweremail
+#: help:poweremail.templates,table_html:0
+msgid "Copy this html code to your HTML message body for displaying the info in your mail."
+msgstr "复制HTML代码到您的HTML邮件正文,在您的邮件中显示该信息。"
+
+#. module: poweremail
+#: field:poweremail.templates,attached_activity:0
+msgid "Activity"
+msgstr "激活"
+
+#. module: poweremail
+#: field:poweremail.preview,rel_model:0
+#: field:poweremail.send.wizard,rel_model:0
+#: field:poweremail.templates,object_name:0
+msgid "Model"
+msgstr "模块"
+
+#. module: poweremail
+#: help:poweremail.templates,server_action:0
+msgid "Corresponding server action is here."
+msgstr "通讯服务器的操作在这里"
+
+#. module: poweremail
+#: help:poweremail.templates,def_subject:0
+msgid "The default subject of email. Placeholders can be used here."
+msgstr "默认的电子邮件的主题.Placeholders can be used here."
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_send_wizard
+msgid "This is the wizard for sending mail"
+msgstr "这是发送邮件向导"
+
+#. module: poweremail
+#: field:poweremail.templates,enforce_from_account:0
+msgid "Enforce From Account"
+msgstr "强制从帐户"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_engines
+msgid "Power Email Engine"
+msgstr "Power Email Engine"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
+msgid "All Accounts"
+msgstr "所有帐户"
+
+#. module: poweremail
+#: field:poweremail.templates,def_subject:0
+msgid "Default Subject"
+msgstr "默认主题"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Check Outgoing Connection"
+msgstr "检查发送连接"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,send_pref:0
+msgid "Mail Format"
+msgstr "邮件格式"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_co
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal_co
+msgid "Company Accounts"
+msgstr "公司帐户"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,last_mail_id:0
+msgid "Last Downloaded Mail"
+msgstr "最后下载的邮件"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Inbox"
+msgstr "收件箱"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Simple Mail Wizard Step 1"
+msgstr "简单邮件向导步骤1"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Has Attachments"
+msgstr "有附件"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Inbox"
+msgstr "收件箱"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isport:0
+msgid "Port"
+msgstr "端口"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,email_id:0
+msgid " eg:yourname@yourdomain.com "
+msgstr "例如:yourname@yourdomain.com"
+
