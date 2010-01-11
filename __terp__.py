@@ -27,7 +27,7 @@
     "name" : "Powerful Email capabilities for Open ERP",
     "version" : "0.7 RC",
     "author" : "Sharoon Thomas, Openlabs",
-    "website" : "http://launchpad.net/poweremail",
+    "website" : "http://openlabs.co.in/blog/post/poweremail/",
     "category" : "Added functionality",
     "depends" : ['base'],
     "description": """
