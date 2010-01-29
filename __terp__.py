@@ -32,9 +32,9 @@
     "depends" : ['base'],
     "description": """
     Power Email - extends the most Power ful open source ERP with email which powers the world today.
-    ============================================================================
-    Features
-    ============================================================================
+
+    Features:
+
     1. Multiple Email Accounts
     2. Company & Personal Email accounts
     3. Security (In Progress)
@@ -43,12 +43,10 @@
     6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported
     7. Simple one point Template designer which automatically updates system. No extra config req.
     8. Automatic Email feature on workflow stages
-    ============================================================================
+
     NOTE: This is a beta release. Please update bugs at:
     http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug
-    ============================================================================
-    Suggestions & Feedback to: sharoon.thomas@openlabs.co.in
-    ============================================================================
+
     """,
     "init_xml": ['poweremail_scheduler_data.xml'],
     "update_xml": [
