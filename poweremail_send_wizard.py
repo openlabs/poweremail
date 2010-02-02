@@ -174,7 +174,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,self.template.report_template.id,['report_name'])['report_name']
                 service = netsvc.LocalService(reportname)
                 data = {}
-                data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model']).name
+                data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model']).model
                 (result, format) = service.create(cr, uid, [record_id], data, ctx)
                 att_obj = self.pool.get('ir.attachment')
                 new_att_vals={
