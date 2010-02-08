@@ -75,6 +75,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 #return {'value':{'generated':len(result)}}
             else:
                 raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
+        return True
 
     def get_value(self,cr,uid,ctx={},message={}):
         if message:
