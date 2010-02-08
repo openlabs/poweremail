@@ -698,6 +698,11 @@ class poweremail_core_selfolder(osv.osv_memory):
 
     def makereadable(self, imap_folder):
         if imap_folder:
+	    # We consider imap_folder may be in one of the following formats:
+	    # A string like this: '(\HasChildren) "/" "INBOX"'
+	    # Or a tuple like this: ('(\\HasNoChildren) "/" {18}', 'INBOX/contacts')
+            if isinstance(imap_folder, tuple):
+                return imap_folder[1]
             result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")?([^\"]*)(?:\")?', imap_folder)
             seperator = result.groups()[0]
             folder_readable_name = ""
@@ -736,8 +741,13 @@ class poweremail_core_selfolder(osv.osv_memory):
                 try:
                     for folders in serv.list()[1]:
                         folder_readable_name = self.makereadable(folders)
-                        if folders.find('Noselect') == -1: #If it is a selectable folder
-                            folderlist.append((folder_readable_name, folder_readable_name))
+                        if isinstance(folders, tuple):
+                            data = folders[0] + folders[1]
+                        else:
+                            data = folders
+                        if data.find('Noselect') == -1: #If it is a selectable folder
+			    if folder_readable_name:
+                                folderlist.append((folder_readable_name, folder_readable_name))
                         if folder_readable_name == 'INBOX':
                             self.inboxvalue = folder_readable_name
                 except imaplib.IMAP4.error, error:
