@@ -88,30 +88,30 @@ class poweremail_templates(osv.osv):
         ('name', 'unique (name)', 'The template name must be unique !')
     ]
 
-    def create(self, cr, uid, vals, *args, **kwargs):
-        src_obj = self.pool.get('ir.model').read(cr,uid,vals['object_name'],['model'])['model']
+    def create(self, cr, uid, vals, context=None):
+        src_obj = self.pool.get('ir.model').read(cr,uid,vals['object_name'],['model'],context)['model']
         win_val={
-             'name': vals['name'] + " Mail Form",
+             'name': _("%s Mail Form") % vals['name'],
              'type':'ir.actions.act_window',
              'res_model':'poweremail.send.wizard',
              'src_model': src_obj,
              'view_type': 'form',
              'context': "{'src_model':'" + src_obj + "','template':'" + vals['name'] + "','src_rec_id':active_id,'src_rec_ids':active_ids}",
              'view_mode':'form,tree',
-             'view_id':self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')])[0],
+             'view_id':self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')], context=context)[0],
              'target': 'new',
              'auto_refresh':1
              }
-        vals['ref_ir_act_window']= self.pool.get('ir.actions.act_window').create(cr, uid, win_val)
+        vals['ref_ir_act_window']= self.pool.get('ir.actions.act_window').create(cr, uid, win_val, context)
         value_vals={
-             'name': 'Send Mail(' + vals['name'] + ")",
+             'name': _('Send Mail(%s)') % vals['name'],
              'model': src_obj,
-             'key2': 'client_action_multi',    
+             'key2': 'client_action_multi', 
              'value': "ir.actions.act_window,"+ str(vals['ref_ir_act_window']),
              'object':True,
              }
-        vals['ref_ir_value'] = self.pool.get('ir.values').create(cr, uid, value_vals)
-        return super(poweremail_templates,self).create(cr, uid, vals, *args, **kwargs)   
+        vals['ref_ir_value'] = self.pool.get('ir.values').create(cr, uid, value_vals, context=context)
+        return super(poweremail_templates,self).create(cr, uid, vals, context)   
 
     def write(self,cr,uid,ids,datas={},ctx={}):
         if 'auto_email' in datas.keys():#Has the auto email button toggled?
@@ -201,108 +201,109 @@ class poweremail_templates(osv.osv):
         return copy_val 
             
     def _onchange_model_object_field(self,cr,uid,ids,model_object_field):
-        if model_object_field:
-            result={}
-            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
-            #Check if field is relational
-            if field_obj.ttype in ['many2one','one2many','many2many']:
-                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-                #print res_ids[0]
-                if res_ids:
-                    result['sub_object'] = res_ids[0]
-                    result['copyvalue'] = self.compute_pl(False,False,False)
-                    result['sub_model_object_field'] = False
-                    result['null_value'] = False
-                    return {'value':result}
-            else:
-                #Its a simple field... just compute placeholder
-                    result['sub_object'] = False
-                    result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
-                    result['sub_model_object_field'] = False
-                    result['null_value'] = False
-                    return {'value':result}
-            
+        if not model_object_field:
+            return {}
+        result={}
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        #Check if field is relational
+        if field_obj.ttype in ['many2one','one2many','many2many']:
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            if res_ids:
+                result['sub_object'] = res_ids[0]
+                result['copyvalue'] = self.compute_pl(False,False,False)
+                result['sub_model_object_field'] = False
+                result['null_value'] = False
+        else:
+            #Its a simple field... just compute placeholder
+            result['sub_object'] = False
+            result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
+            result['sub_model_object_field'] = False
+            result['null_value'] = False
+        return {'value':result}
+
+
+
+        
     def _onchange_sub_model_object_field(self,cr,uid,ids,model_object_field,sub_model_object_field):
-        if model_object_field and sub_model_object_field:
-            result={}
-            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
-            if field_obj.ttype in ['many2one','one2many','many2many']:
-                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-                sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
-                #print res_ids[0]
-                if res_ids:
-                    result['sub_object'] = res_ids[0]
-                    result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,False)
-                    result['sub_model_object_field'] = sub_model_object_field
-                    result['null_value'] = False
-                    return {'value':result}
-            else:
-                #Its a simple field... just compute placeholder
-                    result['sub_object'] = False
-                    result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
-                    result['sub_model_object_field'] = False
-                    result['null_value'] = False
-                    return {'value':result}
+        if not model_object_field or not sub_model_object_field:
+            return {}
+        result={}
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        if field_obj.ttype in ['many2one','one2many','many2many']:
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+            if res_ids:
+                result['sub_object'] = res_ids[0]
+                result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,False)
+                result['sub_model_object_field'] = sub_model_object_field
+                result['null_value'] = False
+        else:
+            #Its a simple field... just compute placeholder
+            result['sub_object'] = False
+            result['copyvalue'] = self.compute_pl(field_obj.name,False,False)
+            result['sub_model_object_field'] = False
+            result['null_value'] = False
+        return {'value':result}
 
     def _onchange_null_value(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value):
-        if model_object_field and null_value:
-            result={}
-            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
-            if field_obj.ttype in ['many2one','one2many','many2many']:
-                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-                sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
-                #print res_ids[0]
-                if res_ids:
-                    result['sub_object'] = res_ids[0]
-                    result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,null_value)
-                    result['sub_model_object_field'] = sub_model_object_field
-                    result['null_value'] = null_value
-                    return {'value':result}
-            else:
-                #Its a simple field... just compute placeholder
-                    result['sub_object'] = False
-                    result['copyvalue'] = self.compute_pl(field_obj.name,False,null_value)
-                    result['sub_model_object_field'] = False
-                    result['null_value'] = null_value
-                    return {'value':result}
-                   
+        if not model_object_field and not null_value:
+            return {}
+        result={}
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        if field_obj.ttype in ['many2one','one2many','many2many']:
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+            if res_ids:
+                result['sub_object'] = res_ids[0]
+                result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,null_value)
+                result['sub_model_object_field'] = sub_model_object_field
+                result['null_value'] = null_value
+        else:
+            #Its a simple field... just compute placeholder
+            result['sub_object'] = False
+            result['copyvalue'] = self.compute_pl(field_obj.name,False,null_value)
+            result['sub_model_object_field'] = False
+            result['null_value'] = null_value
+        return {'value':result}
+               
     def _onchange_table_model_object_field(self,cr,uid,ids,model_object_field):
-        if model_object_field:
-            result={}
-            field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
-            if field_obj.ttype in ['many2one','one2many','many2many']:
-                res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-                if res_ids:
-                    result['table_sub_object'] = res_ids[0]
-                    return {'value':result}
-            else:
-                #Its a simple field... just compute placeholder
-                    result['sub_object'] = False
-                    return {'value':result}
-    
+        if not model_object_field:
+            return {}
+        result={}
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        if field_obj.ttype in ['many2one','one2many','many2many']:
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            if res_ids:
+                result['table_sub_object'] = res_ids[0]
+        else:
+            #Its a simple field... just compute placeholder
+            result['sub_object'] = False
+        return {'value':result}
+
     def _onchange_table_required_fields(self,cr,uid,ids,table_model_object_field,table_required_fields):
         print table_model_object_field,table_required_fields
-        if table_model_object_field and table_required_fields:
-            result=''
-            table_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,table_model_object_field)
-            field_obj = self.pool.get('ir.model.fields')         
-            #Generate Html Header
-            result +="<p>\n<table>\n<tr>"
-            for each_rec in table_required_fields[0][2]:
-                result += "\n<td>"
-                record = field_obj.browse(cr,uid,each_rec)
-                result += record.field_description
-                result += "</td>"
-            result +="\n</tr>\n"
-            #Table header is defined,  now mako for table
-            result += "%for o in object." + table_field_obj.name + ":\n<tr>"
-            for each_rec in table_required_fields[0][2]:
-                result += "\n<td>${o."
-                record = field_obj.browse(cr,uid,each_rec)
-                result += record.name
-                result += "}</td>"
-            result +="\n</tr>\n%endfor\n</table>\n</p>"
-            return {'value':{'table_html':result}}
+        if not table_model_object_field or not table_required_fields:
+            return {}
+        result=''
+        table_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,table_model_object_field)
+        field_obj = self.pool.get('ir.model.fields')         
+        #Generate Html Header
+        result +="<p>\n<table>\n<tr>"
+        for each_rec in table_required_fields[0][2]:
+            result += "\n<td>"
+            record = field_obj.browse(cr,uid,each_rec)
+            result += record.field_description
+            result += "</td>"
+        result +="\n</tr>\n"
+        #Table header is defined,  now mako for table
+        result += "%for o in object." + table_field_obj.name + ":\n<tr>"
+        for each_rec in table_required_fields[0][2]:
+            result += "\n<td>${o."
+            record = field_obj.browse(cr,uid,each_rec)
+            result += record.name
+            result += "}</td>"
+        result +="\n</tr>\n%endfor\n</table>\n</p>"
+        return {'value':{'table_html':result}}
 
     def get_value(self,cr,uid,recid,message={},template=None):
         #Returns the computed expression
@@ -443,26 +444,27 @@ class poweremail_preview(osv.osv_memory):
     }
 
     def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
-        if rel_model_ref:
-            vals={}
-            if ctx == {}:
-                ctx = self.context
-            template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
-            #Search translated template
-            lang = self.get_value(cr,uid,rel_model_ref,template.lang,template,ctx)
-            if lang:
-                ctx2 = ctx.copy()
-                ctx2.update({'lang':lang})
-                template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx2)
-            vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,ctx)
-            vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,ctx)
-            vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
-            vals['subject']= self.get_value(cr,uid,rel_model_ref,template.def_subject,template,ctx)
-            vals['body_text']=self.get_value(cr,uid,rel_model_ref,template.def_body_text,template,ctx)
-            vals['body_html']=self.get_value(cr,uid,rel_model_ref,template.def_body_html,template,ctx)
-            vals['report']= self.get_value(cr,uid,rel_model_ref,template.file_name,template,ctx)
-            #print "Vals>>>>>",vals
-            return {'value':vals}
+        if not rel_model_ref:
+            return {}
+        vals={}
+        if ctx == {}:
+            ctx = self.context
+        template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
+        #Search translated template
+        lang = self.get_value(cr,uid,rel_model_ref,template.lang,template,ctx)
+        if lang:
+            ctx2 = ctx.copy()
+            ctx2.update({'lang':lang})
+            template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx2)
+        vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,ctx)
+        vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,ctx)
+        vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
+        vals['subject']= self.get_value(cr,uid,rel_model_ref,template.def_subject,template,ctx)
+        vals['body_text']=self.get_value(cr,uid,rel_model_ref,template.def_body_text,template,ctx)
+        vals['body_html']=self.get_value(cr,uid,rel_model_ref,template.def_body_html,template,ctx)
+        vals['report']= self.get_value(cr,uid,rel_model_ref,template.file_name,template,ctx)
+        #print "Vals>>>>>",vals
+        return {'value':vals}
         
 poweremail_preview()
 
