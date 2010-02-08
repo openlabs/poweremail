@@ -119,7 +119,7 @@ class poweremail_core_accounts(osv.osv):
     #The constraint is finally necessary. This also makes sure that you dont give personal users two accounts with same ID
     #However this constraint exempts company accounts. Any no of co accounts with same ID is allowed
     _constraints = [
-        (_constraint_unique, _('Error: You are not allowed to have more than 1 account.'), [])
+        (_constraint_unique, 'Error: You are not allowed to have more than 1 account.', [])
     ]
     
     def on_change_emailid(self, cr, uid, ids, name=None, email_id=None, context=None):
