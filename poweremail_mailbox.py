@@ -33,7 +33,7 @@ import tools
 class poweremail_mailbox(osv.osv):
     _name="poweremail.mailbox"
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
-    _rec_name="subject"
+    _rec_name="pem_subject"
     _order = "date_mail desc"
     def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
         try:
@@ -78,6 +78,7 @@ class poweremail_mailbox(osv.osv):
         #send mails one by one
         for id in ids:
             self.send_this_mail(cr, uid, [id], ctx)
+        return True
     
     def send_this_mail(self,cr,uid,ids=[],ctx={}):
         #8888888888888 SENDS THIS MAIL IN OUTBOX 8888888888888888888#
@@ -107,6 +108,7 @@ class poweremail_mailbox(osv.osv):
                 logger = netsvc.Logger()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
                 self.historise(cr, uid, [id], error)
+        return True
     
     def historise(self,cr,uid,ids,message=''):
         for id in ids:
