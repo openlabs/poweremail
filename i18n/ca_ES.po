@@ -1223,7 +1223,7 @@ msgstr "Cos del missatge (HTML - Només client web)"
 #: code:addons/poweremail/poweremail_send_wizard.py:0
 #, fuzzy, python-format
 msgid "%s (Email Attachment)"
-msgstr "Té adjunts"
+msgstr "%s (adjunt de correu electrònic)"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
