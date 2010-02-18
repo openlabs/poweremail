@@ -114,7 +114,7 @@ class poweremail_send_wizard(osv.osv_memory):
         'rel_model':fields.many2one('ir.model','Model',readonly=True),
         'rel_model_ref':fields.integer('Referred Document',readonly=True),
         'from':fields.selection(_get_accounts,'From Account',select=True),
-        'to':fields.char('To',size=250,readonly=True),
+        'to':fields.char('To',size=250,required=True),
         'cc':fields.char('CC',size=250,),
         'bcc':fields.char('BCC',size=250,),
         'subject':fields.char('Subject',size=200),
@@ -162,7 +162,6 @@ class poweremail_send_wizard(osv.osv_memory):
     def save_to_mailbox(self,cr,uid,ids,context=None):
         for id in ids:
             screen_vals = self.read(cr,uid,id,[], context)[0]
-            #print screen_vals
             accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'], context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
