@@ -45,7 +45,9 @@ class poweremail_mailbox(osv.osv):
         except Exception,e:
             print "Err in sending mail",e
         
-    def get_all_mail(self,cr,uid,context={}):
+    def get_all_mail(self,cr,uid,context=None):
+        if context is None:
+            context = {}
         #8888888888888 FETCHES MAILS 8888888888888888888#
         #email_account: THe ID of poweremil core account
         #Context should also have the last downloaded mail for an account
@@ -55,10 +57,12 @@ class poweremail_mailbox(osv.osv):
             #Get mails from that ID only
             core_obj.get_mails(cr,uid,[context['email_account']])
         else:
-            accounts = core_obj.search(cr,uid,[('state','=','approved')])
+            accounts = core_obj.search(cr,uid,[('state','=','approved')], context=context)
             core_obj.get_mails(cr,uid,accounts)
 
-    def get_fullmail(self,cr,uid,context={}):
+    def get_fullmail(self,cr,uid,context=None):
+        if context is None:
+            context = {}
         #8888888888888 FETCHES MAILS 8888888888888888888#
         core_obj = self.pool.get('poweremail.core_accounts')
         if 'mailboxref' in context.keys():
@@ -67,60 +71,66 @@ class poweremail_mailbox(osv.osv):
         else:
             raise osv.except_osv(_("Mail fetch exception"),_("No information on which mail should be fetched fully"))
         
-    def send_all_mail(self,cr,uid,ids=[],ctx={}):
+    def send_all_mail(self,cr,uid,ids=None,context=None):
+        if ids is None:
+            ids = []
+        if context is None:
+            context = {}
         #8888888888888 SENDS MAILS IN OUTBOX 8888888888888888888#
         #get ids of mails in outbox
         filters = [('folder','=','outbox')]
-        if 'filters' in ctx.keys():
-            for each_filter in ctx['filters']:
+        if 'filters' in context.keys():
+            for each_filter in context['filters']:
                 filters.append(each_filter)
-        ids = self.search(cr,uid,filters)
+        ids = self.search(cr,uid,filters, context=context)
         #send mails one by one
         for id in ids:
-            self.send_this_mail(cr, uid, [id], ctx)
+            self.send_this_mail(cr, uid, [id], context)
         return True
     
-    def send_this_mail(self,cr,uid,ids=[],ctx={}):
+    def send_this_mail(self,cr,uid,ids=None,context=None):
+        if ids is None:
+            ids = []
         #8888888888888 SENDS THIS MAIL IN OUTBOX 8888888888888888888#
         #send mails one by one
         for id in ids:
             try:
                 core_obj=self.pool.get('poweremail.core_accounts')
-                values =  self.read(cr,uid,id,[]) #Values will be a dictionary of all entries in the record ref by id
+                values =  self.read(cr,uid,id,[], context) #Values will be a dictionary of all entries in the record ref by id
                 payload={}
                 if values['pem_attachments_ids']:
                     #Get filenames & binary of attachments
                     for attid in values['pem_attachments_ids']:
-                        attachment = self.pool.get('ir.attachment').browse(cr,uid,attid)#,['datas_fname','datas'])
+                        attachment = self.pool.get('ir.attachment').browse(cr,uid,attid,context)#,['datas_fname','datas'])
                         payload[attachment.datas_fname] = attachment.datas
                 result = core_obj.send_mail(cr,uid,
                                   [values['pem_account_id'][0]],
                                   {'To':values.get('pem_to',u'') or u'','CC':values.get('pem_cc',u'') or u'','BCC':values.get('pem_bcc',u'') or u''},
                                   values['pem_subject'] or u'',
                                   {'text':values.get('pem_body_text',u'') or u'','html':values.get('pem_body_html',u'') or u''},
-                                  payload=payload)
+                                  payload=payload, context=context)
                 if result == True:
-                    self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")})
-                    self.historise(cr, uid, [id], "Email sent successfully")
+                    self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")}, context)
+                    self.historise(cr, uid, [id], "Email sent successfully", context)
                 else:
-                    self.historise(cr,uid,[id],result)
+                    self.historise(cr,uid,[id],result, context)
             except Exception,error:
                 logger = netsvc.Logger()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
-                self.historise(cr, uid, [id], error)
+                self.historise(cr, uid, [id], error, context)
         return True
     
-    def historise(self,cr,uid,ids,message=''):
+    def historise(self,cr,uid,ids,message='', context=None):
         for id in ids:
-            history = self.read(cr,uid,id,['history']).get('history','')
-            self.write(cr,uid,id,{'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + tools.ustr(message)})
+            history = self.read(cr,uid,id,['history'], context).get('history','')
+            self.write(cr,uid,id,{'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + tools.ustr(message)}, context)
     
-    def complete_mail(self,cr,uid,ids,ctx={}):
+    def complete_mail(self,cr,uid,ids,context=None):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
         #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,
         for id in ids:
-            self.pool.get('poweremail.core_accounts').get_fullmail(cr,uid,id,ctx)
-            self.historise(cr, uid, [id], "Full email downloaded")
+            self.pool.get('poweremail.core_accounts').get_fullmail(cr,uid,id,context)
+            self.historise(cr, uid, [id], "Full email downloaded", context)
     
     _columns = {
             'pem_from':fields.char('From', size=64),
@@ -163,13 +173,15 @@ class poweremail_mailbox(osv.osv):
 
     } 
 
-    def search(self, cr, uid, args, offset=0, limit=None, order=None, context={}, count=False):
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+        if context is None:
+            context = {}
         if context.get('company',False):
-            users_groups = self.pool.get('res.users').browse(cr,uid,uid).groups_id
+            users_groups = self.pool.get('res.users').browse(cr,uid,uid, context).groups_id
             group_acc_rel = {}
             #get all accounts and get a table of {group1:[account1,account2],group2:[account1]}
-            for each_account_id in self.pool.get('poweremail.core_accounts').search(cr,uid,[('state','=','approved'),('company','=','yes')]):
-                account = self.pool.get('poweremail.core_accounts').browse(cr,uid,each_account_id)
+            for each_account_id in self.pool.get('poweremail.core_accounts').search(cr,uid,[('state','=','approved'),('company','=','yes')], context=context):
+                account = self.pool.get('poweremail.core_accounts').browse(cr,uid,each_account_id, context)
                 for each_group in account.allowed_groups:
                     if not account.id in group_acc_rel.get(each_group,[]):
                         groups = group_acc_rel.get(each_group,[])
@@ -203,3 +215,5 @@ class poweremail_mailbox(osv.osv):
         'conversation_id':fields.many2one('poweremail.conversation','Conversation')
                 }
 poweremail_mailbox()
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

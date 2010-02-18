@@ -48,8 +48,10 @@ class actions_server(osv.osv):
         'poweremail_template':fields.many2one('poweremail.templates','Template',)#In view customize such that domain('object_name','=',model_id)
     }
 
-    def run(self, cr, uid, ids, context={}):
+    def run(self, cr, uid, ids, context=None):
         print cr,uid,ids,context
+        if context is None:
+            context = {}
         logger = netsvc.Logger()
         logger.notifyChannel('Server Action', netsvc.LOG_INFO, 'Started Server Action with Power Email update')
 
@@ -64,3 +66,6 @@ class actions_server(osv.osv):
             else:
                 return super(actions_server,self).run(cr, uid, ids, context)
 actions_server()
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+

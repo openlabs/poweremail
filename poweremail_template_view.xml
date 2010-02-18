@@ -18,7 +18,7 @@
 				<form string="Power Email Preview">
 					<field name="rel_model" />
 					<newline />
-					<field name="rel_model_ref" on_change="_on_change_ref(rel_model_ref)" />
+					<field name="rel_model_ref" on_change="_on_change_ref(rel_model_ref, context)" />
 					<newline />
 					<field name="to" />
 					<newline />
@@ -92,17 +92,16 @@
 								<notebook>
 									<page string="Insert Simple Field">
 
-										<field name="model_object_field" domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_model_object_field(model_object_field)" colspan="4" />
+										<field name="model_object_field" domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_model_object_field(model_object_field, context)" colspan="4" />
 										<field name="sub_object" readonly="1" colspan="4" />
-										<field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" colspan="4" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="_onchange_sub_model_object_field(model_object_field,sub_model_object_field)" />
-										<field name="null_value" colspan="4" on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value)" />
+										<field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" colspan="4" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="_onchange_sub_model_object_field(model_object_field,sub_model_object_field,context)" />
+										<field name="null_value" colspan="4" on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value,context)" />
 										<field name="copyvalue" colspan="4" />
 									</page>
 									<page string="Insert Table">
-										<field name="table_model_object_field" domain="[('model_id','=',object_name),('ttype','in',['one2many','many2many'])]" colspan="2" on_change="_onchange_table_model_object_field(table_model_object_field)"/>
+										<field name="table_model_object_field" domain="[('model_id','=',object_name),('ttype','in',['one2many','many2many'])]" colspan="2" on_change="_onchange_table_model_object_field(table_model_object_field,context)"/>
 										<field name="table_sub_object" readonly="1" colspan="2"/>
-										<field name="table_required_fields" colspan="4" nolabel="1" domain="[('model_id','=',table_sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_table_required_fields(table_model_object_field,table_required_fields)"/>
-										<button name="generate_table(table_model_object_field,table_required_fields)" string="Generate Table" colspan="4" type="object"/>
+										<field name="table_required_fields" colspan="4" nolabel="1" domain="[('model_id','=',table_sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_table_required_fields(table_model_object_field,table_required_fields,context)"/>
 										<field name="table_html" colspan="4"/>
 									</page>
 

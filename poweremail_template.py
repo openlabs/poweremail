@@ -36,10 +36,12 @@ class poweremail_templates(osv.osv):
     _name="poweremail.templates"
     _description = 'Power Email Templates for Models'
 
-    def change_model(self,cr,uid,ids,object_name,ctx={}):
-       mod_name = self.pool.get('ir.model').read(cr,uid,object_name,['model'])['model']
-       return {'value':{'model_int_name':mod_name}}
-       
+    def change_model(self,cr,uid,ids,object_name,context=None):
+        if object_name:
+            mod_name = self.pool.get('ir.model').read(cr,uid, object_name, ['model'], context)['model']
+        else:
+            mod_name = False
+        return {'value':{'model_int_name':mod_name}}
 
     _columns = {
         'name' : fields.char('Name of Template',size=100,required=True),
@@ -113,67 +115,66 @@ class poweremail_templates(osv.osv):
         vals['ref_ir_value'] = self.pool.get('ir.values').create(cr, uid, value_vals, context=context)
         return super(poweremail_templates,self).create(cr, uid, vals, context)   
 
-    def write(self,cr,uid,ids,datas={},ctx={}):
-        if 'auto_email' in datas.keys():#Has the auto email button toggled?
-            if datas['auto_email']: #If auto email was enabled
+    def write(self,cr,uid,ids,vals,context=None):
+        if 'auto_email' in vals.keys():#Has the auto email button toggled?
+            if vals['auto_email']: #If auto email was enabled
                 #Create Server Action
                 vals = {
                         'state':'poweremail',
                         'poweremail_template':ids[0],
-                        'name':self.pool.get('poweremail.templates').read(cr,uid,ids[0],['name'])['name'],
+                        'name':self.pool.get('poweremail.templates').read(cr,uid,ids[0],['name'],context)['name'],
                         'condition':'True',
-                        'model_id':self.read(cr,uid,ids[0],['object_name'])['object_name'][0]
+                        'model_id':self.read(cr,uid,ids[0],['object_name'],context)['object_name'][0]
                     }
-                datas['server_action'] = self.pool.get('ir.actions.server').create(cr,uid,vals)
+                vals['server_action'] = self.pool.get('ir.actions.server').create(cr,uid,vals,context)
                 #Attach Workflow to server action
                 #Check if workflow activity also changed
-                if 'attached_activity' in datas.keys():
+                if 'attached_activity' in vals.keys():
                     #The workflow has changed, so cancel the previous one
-                    ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
+                    ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'],context)['attached_activity']
                     if ref_wf_act:          #Delete existing reference
-                        self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+                        self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False},context)
                     #Now attach the server action to newly selected workflow activity
-                    self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':datas['server_action']})
+                    self.pool.get('workflow.activity').write(cr,uid,vals['attached_activity'],{'action_id':vals['server_action']},context)
             else: #Auto email got disabled, so delete all workflow attachments and prev server action
-                ref_sr_act = self.read(cr, uid, ids[0], ['server_action'])['server_action']
-                ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
+                ref_sr_act = self.read(cr, uid, ids[0], ['server_action'], context)['server_action']
+                ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'], context)['attached_activity']
                 if ref_sr_act:          #Delete server action
-                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0])
+                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0], context)
                 if ref_wf_act:          #Delete Server action reference in workflow
-                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False}, context)
 
         #If only attached workflow stage changed?
-        elif 'attached_activity' in datas.keys():
+        elif 'attached_activity' in vals.keys():
             #The workflow only has changed, so cancel the previous one and add server action to new one
-            ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'])['attached_activity']
+            ref_wf_act = self.read(cr, uid, ids[0], ['attached_activity'], context)['attached_activity']
             if ref_wf_act:          #Delete existing reference
-                self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
+                self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False}, context)
             #Now attach the server action to newly selected workflow activity
-            ref_sr_act = self.read(cr, uid, ids[0], ['server_action'])['server_action']
-            self.pool.get('workflow.activity').write(cr,uid,datas['attached_activity'],{'action_id':ref_sr_act[0]})
+            ref_sr_act = self.read(cr, uid, ids[0], ['server_action'], context)['server_action']
+            self.pool.get('workflow.activity').write(cr,uid,vals['attached_activity'],{'action_id':ref_sr_act[0]}, context)
 
-        return super(poweremail_templates,self).write(cr, uid,ids, datas, ctx)
+        return super(poweremail_templates,self).write(cr, uid,ids, vals, context)
 
-    def unlink(self, cr, uid, ids, ctx={}):
+    def unlink(self, cr, uid, ids, context=None):
         for id in ids:
             try:
-                ref_ir_act_window = self.read(cr, uid, id, ['ref_ir_act_window'])['ref_ir_act_window']
-                ref_ir_value = self.read(cr, uid, id, ['ref_ir_value'])['ref_ir_value']
-                ref_sr_act = self.read(cr, uid, id, ['server_action'])['server_action']
-                ref_wf_act = self.read(cr, uid, id, ['attached_activity'])['attached_activity']
+                ref_ir_act_window = self.read(cr, uid, id, ['ref_ir_act_window'], context)['ref_ir_act_window']
+                ref_ir_value = self.read(cr, uid, id, ['ref_ir_value'], context)['ref_ir_value']
+                ref_sr_act = self.read(cr, uid, id, ['server_action'], context)['server_action']
+                ref_wf_act = self.read(cr, uid, id, ['attached_activity'], context)['attached_activity']
                 print ref_ir_act_window,ref_ir_value
-                if ref_ir_act_window:   #Delete Wizard buttin
-                    self.pool.get('ir.actions.act_window').unlink(cr,uid,ref_ir_act_window[0])
+                if ref_ir_act_window:   #Delete Wizard button
+                    self.pool.get('ir.actions.act_window').unlink(cr,uid,ref_ir_act_window[0], context)
                 if ref_ir_value:
-                    self.pool.get('ir.values').unlink(cr,uid,ref_ir_value[0])
+                    self.pool.get('ir.values').unlink(cr,uid,ref_ir_value[0], context)
                 if ref_sr_act:          #Delete server action
-                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0])
+                    self.pool.get('ir.actions.server').unlink(cr,uid,ref_sr_act[0], context)
                 if ref_wf_act:          #Delete Server action reference in workflow
-                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False})
-                super(poweremail_templates,self).unlink(cr,uid,id)
+                    self.pool.get('workflow.activity').write(cr,uid,ref_wf_act[0],{'action_id':False}, context)
+                super(poweremail_templates,self).unlink(cr,uid,id, context)
             except:
                 raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))
-                return False
         return True
     
     def copy(self, cr, uid, id, default=None, context=None):
@@ -181,7 +182,7 @@ class poweremail_templates(osv.osv):
             default = {}
         default = default.copy()
         new_name = "Copy of template " + default.get('name','No Name')
-        check = self.search(cr,uid,[('name','=',new_name)])
+        check = self.search(cr,uid,[('name','=',new_name)], context=context)
         if check:
             new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
         default.update({'name':new_name,})
@@ -200,14 +201,14 @@ class poweremail_templates(osv.osv):
             copy_val += "}"
         return copy_val 
             
-    def _onchange_model_object_field(self,cr,uid,ids,model_object_field):
+    def _onchange_model_object_field(self,cr,uid,ids,model_object_field, context=None):
         if not model_object_field:
             return {}
         result={}
-        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field, context)
         #Check if field is relational
         if field_obj.ttype in ['many2one','one2many','many2many']:
-            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)], context=context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
                 result['copyvalue'] = self.compute_pl(False,False,False)
@@ -224,14 +225,14 @@ class poweremail_templates(osv.osv):
 
 
         
-    def _onchange_sub_model_object_field(self,cr,uid,ids,model_object_field,sub_model_object_field):
+    def _onchange_sub_model_object_field(self,cr,uid,ids,model_object_field,sub_model_object_field, context=None):
         if not model_object_field or not sub_model_object_field:
             return {}
         result={}
-        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field, context)
         if field_obj.ttype in ['many2one','one2many','many2many']:
-            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)], context=context)
+            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field, context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
                 result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,False)
@@ -245,14 +246,14 @@ class poweremail_templates(osv.osv):
             result['null_value'] = False
         return {'value':result}
 
-    def _onchange_null_value(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value):
+    def _onchange_null_value(self,cr,uid,ids,model_object_field,sub_model_object_field,null_value, context=None):
         if not model_object_field and not null_value:
             return {}
         result={}
-        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field, context)
         if field_obj.ttype in ['many2one','one2many','many2many']:
-            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
-            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field)
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)], context=context)
+            sub_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,sub_model_object_field, context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
                 result['copyvalue'] = self.compute_pl(field_obj.name,sub_field_obj.name,null_value)
@@ -266,13 +267,13 @@ class poweremail_templates(osv.osv):
             result['null_value'] = null_value
         return {'value':result}
                
-    def _onchange_table_model_object_field(self,cr,uid,ids,model_object_field):
+    def _onchange_table_model_object_field(self,cr,uid,ids,model_object_field, context=None):
         if not model_object_field:
             return {}
         result={}
-        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field)
+        field_obj = self.pool.get('ir.model.fields').browse(cr,uid,model_object_field, context)
         if field_obj.ttype in ['many2one','one2many','many2many']:
-            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)])
+            res_ids=self.pool.get('ir.model').search(cr,uid,[('model','=',field_obj.relation)], context=context)
             if res_ids:
                 result['table_sub_object'] = res_ids[0]
         else:
@@ -280,18 +281,18 @@ class poweremail_templates(osv.osv):
             result['sub_object'] = False
         return {'value':result}
 
-    def _onchange_table_required_fields(self,cr,uid,ids,table_model_object_field,table_required_fields):
+    def _onchange_table_required_fields(self,cr,uid,ids,table_model_object_field,table_required_fields, context=None):
         print table_model_object_field,table_required_fields
         if not table_model_object_field or not table_required_fields:
-            return {}
+            return {'value':{'table_html': False}}
         result=''
-        table_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,table_model_object_field)
+        table_field_obj = self.pool.get('ir.model.fields').browse(cr,uid,table_model_object_field, context)
         field_obj = self.pool.get('ir.model.fields')         
         #Generate Html Header
         result +="<p>\n<table>\n<tr>"
         for each_rec in table_required_fields[0][2]:
             result += "\n<td>"
-            record = field_obj.browse(cr,uid,each_rec)
+            record = field_obj.browse(cr,uid,each_rec,context)
             result += record.field_description
             result += "</td>"
         result +="\n</tr>\n"
@@ -299,21 +300,23 @@ class poweremail_templates(osv.osv):
         result += "%for o in object." + table_field_obj.name + ":\n<tr>"
         for each_rec in table_required_fields[0][2]:
             result += "\n<td>${o."
-            record = field_obj.browse(cr,uid,each_rec)
+            record = field_obj.browse(cr,uid,each_rec,context)
             result += record.name
             result += "}</td>"
         result +="\n</tr>\n%endfor\n</table>\n</p>"
         return {'value':{'table_html':result}}
 
-    def get_value(self,cr,uid,recid,message={},template=None):
+    def get_value(self,cr,uid,recid,message=None,template=None, context=None):
+        if message is None:
+            message = {}
         #Returns the computed expression
         if message:
             try:
                 message = tools.ustr(message)
-                object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+                object = self.pool.get(template.model_int_name).browse(cr,uid,recid, context)
                 templ = Template(message,input_encoding='utf-8')
                 env = {
-                    'user':self.pool.get('res.users').browse(cr,uid,uid),
+                    'user':self.pool.get('res.users').browse(cr,uid,uid, context),
                     'db':cr.dbname
                        }
                 reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
@@ -323,52 +326,54 @@ class poweremail_templates(osv.osv):
         else:
             return message
         
-    def generate_mail(self,cr,uid,id,recids,context={}):
+    def generate_mail(self,cr,uid,id,recids,context=None):
         #Generates an email an saves to outbox given the template id & record ID of a record in template's model
         #id: ID of template to be used
         #recid: record id for the mail
         #Context: 'account_id':The id of account to send from
+        if context is None:
+            context = {}
         logger = netsvc.Logger()
         sent_recs = []
         from_account = False
-        template = self.browse(cr,uid,id)
+        template = self.browse(cr,uid,id, context)
         #If account to send from is in context select it, else use enforced account 
         if 'account_id' in context.keys():
-            from_account = self.pool.get('poweremail.core_accounts').read(cr,uid,context['account_id'],['name','email_id'])
+            from_account = self.pool.get('poweremail.core_accounts').read(cr,uid,context['account_id'],['name','email_id'], context)
         else:
             from_account = {'id':template.enforce_from_account.id, 'name':template.enforce_from_account.name, 'email_id':template.enforce_from_account.email_id}
         for recid in recids:
             try:
                 self.engine = self.pool.get("poweremail.engines")
                 #Search translated template
-                lang = self.get_value(cr,uid,recid,template.lang,template)
+                lang = self.get_value(cr,uid,recid,template.lang,template, context)
                 if lang:
-                    ctx2 = context.copy()
-                    ctx2.update({'lang':lang})
-                    template = self.browse(cr,uid,id,ctx2)
+                    ctx = context.copy()
+                    ctx.update({'lang':lang})
+                    template = self.browse(cr,uid,id,ctx)
                 vals = {
                         'pem_from': tools.ustr(from_account['name']) + "<" + tools.ustr(from_account['email_id']) + ">",
-                        'pem_to':self.get_value(cr,uid,recid,template.def_to,template),
-                        'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template),
-                        'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template),
-                        'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template),
-                        'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template),
-                        'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template),
+                        'pem_to':self.get_value(cr,uid,recid,template.def_to,template, context),
+                        'pem_cc':self.get_value(cr,uid,recid,template.def_cc,template, context),
+                        'pem_bcc':self.get_value(cr,uid,recid,template.def_bcc,template, context),
+                        'pem_subject':self.get_value(cr,uid,recid,template.def_subject,template, context),
+                        'pem_body_text':self.get_value(cr,uid,recid,template.def_body_text,template, context),
+                        'pem_body_html':self.get_value(cr,uid,recid,template.def_body_html,template, context),
                         'pem_account_id' :from_account['id'],#This is a mandatory field when automatic emails are sent
                         'state':'na',
                         'folder':'outbox',
                         'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
                     }
                 if template.use_sign:
-                    sign = self.pool.get('res.users').read(cr,uid,uid,['signature'])['signature']
+                    sign = self.pool.get('res.users').read(cr,uid,uid,['signature'], context)['signature']
                     if vals['pem_body_text']:
                         vals['pem_body_text']+=sign
                     if vals['pem_body_html']:
                         vals['pem_body_html']+=sign
                 #Create partly the mail and later update attachments
-                mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals)
+                mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals, context)
                 if template.report_template:
-                    reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'])['report_name']
+                    reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'], context)['report_name']
                     service = netsvc.LocalService(reportname)
                     data = {}
                     data['model'] = template.model_int_name
@@ -377,14 +382,14 @@ class poweremail_templates(osv.osv):
                     new_att_vals={
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
                                     'datas':base64.b64encode(result),
-                                    'datas_fname':tools.ustr(self.get_value(cr,uid,recid,template.file_name,template) or 'Report') + "." + format,
+                                    'datas_fname':tools.ustr(self.get_value(cr,uid,recid,template.file_name,template, context) or 'Report') + "." + format,
                                     'description':vals['pem_body_text'] or "No Description",
                                     'res_model':'poweremail.mailbox',
                                     'res_id':mail_id
                                         }
-                    attid = att_obj.create(cr,uid,new_att_vals)
+                    attid = att_obj.create(cr,uid,new_att_vals, context)
                     if attid:
-                        self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'})
+                        self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'}, context)
                 sent_recs.append(recid)
             except Exception,error:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Email Generation failed, Reason:%s")% (error))
@@ -398,25 +403,29 @@ class poweremail_preview(osv.osv_memory):
     _name = "poweremail.preview"
     _description = "Power Email Template Preview"
     
-    def _get_model_recs(self,cr,uid,ctx={}):
+    def _get_model_recs(self,cr,uid,context=None):
+        if context is None:
+            context = {}
         #Fills up the selection box which allows records from the selected object to be displayed
-        self.context = ctx
-        if 'active_id' in ctx.keys():
-            ref_obj_id = self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
-            ref_obj_name = self.pool.get('ir.model').read(cr,uid,ref_obj_id[0],['model'])['model']
-            ref_obj_ids = self.pool.get(ref_obj_name).search(cr,uid,[])
-            ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr,uid,ref_obj_ids)
+        self.context = context
+        if 'active_id' in context.keys():
+            ref_obj_id = self.pool.get('poweremail.templates').read(cr,uid,context['active_id'],['object_name'],context)['object_name']
+            ref_obj_name = self.pool.get('ir.model').read(cr,uid,ref_obj_id[0],['model'],context)['model']
+            ref_obj_ids = self.pool.get(ref_obj_name).search(cr,uid,[], context=context)
+            ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr,uid,ref_obj_ids, context)
             #print ref_obj_recs
             return ref_obj_recs
     
-    def get_value(self,cr,uid,recid,message={},template=None,ctx={}):
+    def get_value(self,cr,uid,recid,message=None,template=None,context=None):
+        if message is None:
+            message = {}
         #Returns the computed expression
         if message:
             try:
                 message = tools.ustr(message)
-                object = self.pool.get(template.model_int_name).browse(cr,uid,recid)
+                object = self.pool.get(template.model_int_name).browse(cr,uid,recid, context)
                 env = {
-                    'user':self.pool.get('res.users').browse(cr,uid,uid),
+                    'user':self.pool.get('res.users').browse(cr,uid,uid, context),
                     'db':cr.dbname
                        }
                 reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
@@ -440,29 +449,31 @@ class poweremail_preview(osv.osv_memory):
     }
     _defaults = {
         'ref_template': lambda self,cr,uid,ctx:ctx['active_id'],
-        'rel_model': lambda self,cr,uid,ctx:self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'])['object_name']
+        'rel_model': lambda self,cr,uid,ctx:self.pool.get('poweremail.templates').read(cr,uid,ctx['active_id'],['object_name'], ctx)['object_name']
     }
 
-    def _on_change_ref(self,cr,uid,ids,rel_model_ref,ctx={}):
+    def _on_change_ref(self,cr,uid,ids,rel_model_ref, context=None):
+        if context is None:
+            context = {}
         if not rel_model_ref:
             return {}
         vals={}
-        if ctx == {}:
-            ctx = self.context
-        template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx)
+        if context == {}:
+            context = self.context
+        template = self.pool.get('poweremail.templates').browse(cr,uid,context['active_id'],context)
         #Search translated template
-        lang = self.get_value(cr,uid,rel_model_ref,template.lang,template,ctx)
+        lang = self.get_value(cr,uid,rel_model_ref,template.lang,template,context)
         if lang:
-            ctx2 = ctx.copy()
-            ctx2.update({'lang':lang})
-            template = self.pool.get('poweremail.templates').browse(cr,uid,ctx['active_id'],ctx2)
-        vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,ctx)
-        vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,ctx)
-        vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,ctx)
-        vals['subject']= self.get_value(cr,uid,rel_model_ref,template.def_subject,template,ctx)
-        vals['body_text']=self.get_value(cr,uid,rel_model_ref,template.def_body_text,template,ctx)
-        vals['body_html']=self.get_value(cr,uid,rel_model_ref,template.def_body_html,template,ctx)
-        vals['report']= self.get_value(cr,uid,rel_model_ref,template.file_name,template,ctx)
+            ctx = context.copy()
+            ctx.update({'lang':lang})
+            template = self.pool.get('poweremail.templates').browse(cr,uid,context['active_id'],ctx)
+        vals['to']= self.get_value(cr,uid,rel_model_ref,template.def_to,template,context)
+        vals['cc']= self.get_value(cr,uid,rel_model_ref,template.def_cc,template,context)
+        vals['bcc']= self.get_value(cr,uid,rel_model_ref,template.def_bcc,template,context)
+        vals['subject']= self.get_value(cr,uid,rel_model_ref,template.def_subject,template,context)
+        vals['body_text']=self.get_value(cr,uid,rel_model_ref,template.def_body_text,template,context)
+        vals['body_html']=self.get_value(cr,uid,rel_model_ref,template.def_body_html,template,context)
+        vals['report']= self.get_value(cr,uid,rel_model_ref,template.file_name,template,context)
         #print "Vals>>>>>",vals
         return {'value':vals}
         
@@ -473,3 +484,5 @@ class res_groups(osv.osv):
     _description = "User Groups"
     _columns = {}
 res_groups()
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
