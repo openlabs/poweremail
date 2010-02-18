@@ -38,31 +38,29 @@ class poweremail_send_wizard(osv.osv_memory):
     def _get_accounts(self,cr,uid,context=None):
         if context is None:
             context = {}
+
+        template = self._get_template(cr, uid, context)
+        if not template:
+            return []
+
         logger = netsvc.Logger()
-        tmpl_id = False
-        if 'template' in context.keys():
-            self.model_ref = context['src_rec_ids'][0]
-            tmpl_id = self.pool.get('poweremail.templates').search(cr,uid,[('name','=',context['template'])], context=context)
-        self.ctx = context
-        if tmpl_id:
-            self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0], context)
-            #Search translated template
-            lang = self.get_value(cr,uid,context,self.template.lang)
-            if lang:
-                ctx = context.copy()
-                ctx.update({'lang':lang})
-                self.template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0],ctx)
-            #print self.template.allowed_groups
-            if self.template.enforce_from_account:
-                return [(self.template.enforce_from_account.id,self.template.enforce_from_account.name + " (" + self.template.enforce_from_account.email_id + ")")]
+
+        #Search translated template
+        lang = self.get_value(cr,uid,context,template.lang)
+        if lang:
+            ctx = context.copy()
+            ctx.update({'lang':lang})
+            template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0],ctx)
+        if template.enforce_from_account:
+            return [(template.enforce_from_account.id, '%s (%s)' % (template.enforce_from_account.name, template.enforce_from_account.email_id))]
+        else:
+            accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','no'),('user','=',uid)], context=context)
+            if accounts_id:
+                accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id, context)
+                return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
             else:
-                accounts_id = self.pool.get('poweremail.core_accounts').search(cr,uid,[('company','=','no'),('user','=',uid)], context=context)
-                if accounts_id:
-                    accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id, context)
-                    return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
-                else:
-                   logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
-                   raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+               logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+               raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
     def _get_generated(self,cr,uid,ids=None,context=None):
         if ids is None:
@@ -72,13 +70,16 @@ class poweremail_send_wizard(osv.osv_memory):
         logger = netsvc.Logger()
         screen_vals = self.read(cr,uid,ids[0],[], context)
         context['account_id'] = screen_vals[0]['from']
-        if self.ctx['src_rec_ids'] and len(self.ctx['src_rec_ids'])>1 and self.template.id:
+        template = self._get_template(cr, uid, context)
+        if context['src_rec_ids'] and len(context['src_rec_ids'])>1 and template:
             #Means there are multiple items selected for email. Just send them no need preview
-            result =self.pool.get('poweremail.templates').generate_mail(cr,uid,self.template.id,self.ctx['src_rec_ids'],context) 
+            result = self.pool.get('poweremail.templates').generate_mail(cr,uid,template.id,context['src_rec_ids'],context) 
             if result:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
-                self.write(cr,uid,ids,{'generated':len(result),'state':'done'}, context)
-                #return {'value':{'generated':len(result)}}
+                self.write(cr,uid,ids,{
+                    'generated':len(result),
+                    'state':'done'
+                }, context)
             else:
                 raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
         return True
@@ -91,18 +92,37 @@ class poweremail_send_wizard(osv.osv_memory):
         if message:
             try:
                 message = tools.ustr(message)
-                object = self.pool.get(self.template.model_int_name).browse(cr,uid,ctx['src_rec_ids'][0],context)
+                template = self._get_template(cr, uid, context)
+                object = self.pool.get(template.model_int_name).browse(cr,uid,context['src_rec_ids'][0],context)
                 templ = Template(message,input_encoding='utf-8')
                 env = {
                     'user':self.pool.get('res.users').browse(cr,uid,uid, context),
                     'db':cr.dbname
-                       }
+                }
                 reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
                 return reply
-            except Exception:
+            except Exception, e:
                 return ""
         else:
             return ""
+
+    def _get_template(self, cr, uid, context=None):
+        if context is None:
+            context = {}
+        if not 'template' in context:
+            return None
+        if 'template' in context.keys():
+            template_ids = self.pool.get('poweremail.templates').search(cr, uid, [('name','=',context['template'])], context=context)
+        if not template_ids:
+            return None
+
+        return self.pool.get('poweremail.templates').browse(cr, uid, template_ids[0], context)
+
+    def _get_template_value(self, cr, uid, field, context=None):
+        template = self._get_template(cr, uid, context)
+        if not template:
+            return False
+        return self.get_value( cr, uid, context, getattr(template, field) )
 
     _columns = {
         'state':fields.selection([
@@ -126,23 +146,23 @@ class poweremail_send_wizard(osv.osv_memory):
         'requested':fields.integer('No of requested Mails',readonly=True),
         'generated':fields.integer('No of generated Mails',readonly=True), 
         'full_success':fields.boolean('Complete Success',readonly=True)
-                }
+    }
 
     _defaults = {
         'state': lambda self,cr,uid,ctx: len(ctx['src_rec_ids']) > 1 and 'multi' or 'single',
         'rel_model': lambda self,cr,uid,ctx:self.pool.get('ir.model').search(cr,uid,[('model','=',ctx['src_model'])],context=ctx)[0],
         'rel_model_ref': lambda self,cr,uid,ctx:ctx['active_id'],
-        'to': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_to),
-        'cc': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_cc),
-        'bcc': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_bcc),
-        'subject':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_subject),
-        'body_text':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_text),
-        'body_html':lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.def_body_html),
-        'report': lambda self,cr,uid,ctx: self.get_value(cr,uid,ctx,self.template.file_name),
-        'signature': lambda self,cr,uid,ctx: self.template.use_sign,
-        'ref_template':lambda self,cr,uid,ctx: self.template.id,
+        'to': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_to', ctx),
+        'cc': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_cc', ctx),
+        'bcc': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_bcc', ctx),
+        'subject':lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_subject', ctx),
+        'body_text':lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_body_text', ctx),
+        'body_html':lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_body_html', ctx),
+        'report': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'file_name', ctx),
+        'signature': lambda self,cr,uid,ctx: self._get_template(cr, uid, ctx).use_sign,
+        'ref_template':lambda self,cr,uid,ctx: self._get_template(cr, uid, ctx).id,
         'requested':lambda self,cr,uid,ctx: len(ctx['src_rec_ids']),
-        'full_success': lambda *a:False
+        'full_success': lambda *a: False
     }
 
     def sav_to_drafts(self,cr,uid,ids,context=None):
@@ -181,9 +201,10 @@ class poweremail_send_wizard(osv.osv_memory):
                 vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals, context)
-            if self.template.report_template:
+            template = self._get_template(cr, uid, context)
+            if template.report_template:
                 record_id = screen_vals['rel_model_ref']
-                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,self.template.report_template.id,['report_name'], context)['report_name']
+                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'], context)['report_name']
                 service = netsvc.LocalService(reportname)
                 data = {}
                 data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model'], context).model
