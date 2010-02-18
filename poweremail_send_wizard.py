@@ -161,8 +161,8 @@ class poweremail_send_wizard(osv.osv_memory):
         
     def save_to_mailbox(self,cr,uid,ids,context=None):
         for id in ids:
-            screen_vals = self.read(cr,uid,id,[], context)[0]
-            accounts = self.pool.get('poweremail.core_accounts').read(cr,uid,screen_vals['from'], context)
+            screen_vals = self.read(cr,uid,id,[],context)[0]
+            accounts = self.pool.get('poweremail.core_accounts').read(cr, uid, screen_vals['from'], context=context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
                 'pem_to':screen_vals['to'],
@@ -192,13 +192,13 @@ class poweremail_send_wizard(osv.osv_memory):
                 (result, format) = service.create(cr, uid, [record_id], data, context)
                 att_obj = self.pool.get('ir.attachment')
                 new_att_vals={
-                                'name': _('%s (Email Attachment)') % screen_vals['subject'],
-                                'datas':base64.b64encode(result),
-                                'datas_fname':tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
-                                'description':screen_vals['body_text'] or _("No Description"),
-                                'res_model':'poweremail.mailbox',
-                                'res_id':mail_id
-                                    }
+                    'name': _('%s (Email Attachment)') % screen_vals['subject'],
+                    'datas':base64.b64encode(result),
+                    'datas_fname':tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
+                    'description':screen_vals['body_text'] or _("No Description"),
+                    'res_model':'poweremail.mailbox',
+                    'res_id':mail_id
+                }
                 attid = att_obj.create(cr,uid,new_att_vals, context)
                 if attid:
                     self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'}, context)
