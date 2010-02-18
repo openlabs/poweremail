@@ -48,7 +48,7 @@
 					<button special="cancel" string="Close" colspan="4" states="done" />
 					<field name="state" />
 					<newline />
-					<label string="After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve" />
+					<label string="After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve" colspan="4"/>
 				</form>
 			</field>
 		</record>
