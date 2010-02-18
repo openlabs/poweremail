@@ -176,11 +176,9 @@ class poweremail_send_wizard(osv.osv_memory):
                 'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
             }
             if screen_vals['signature']:
-                sign = self.pool.get('res.users').read(cr,uid,uid,['signature'], context)['signature']
-                if vals['pem_body_text']:
-                    vals['pem_body_text'] = tools.ustr(vals['pem_body_text'])+sign
-                if vals['pem_body_html']:
-                    vals['pem_body_html'] = tools.ustr(vals['pem_body_html'])+sign
+                signature = self.pool.get('res.users').read(cr,uid,uid,['signature'], context)['signature']
+                vals['pem_body_text'] = tools.ustr(vals['pem_body_text'] or '') + signature
+                vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals, context)
             if self.template.report_template:
