@@ -67,8 +67,8 @@ class poweremail_templates(osv.osv):
         'attached_activity':fields.many2one('workflow.activity','Activity'),
         #Referred Stuff - Delete these if template are deleted or they will crash the system
         'server_action':fields.many2one('ir.actions.server','Related Server Action',help="Corresponding server action is here."),
-        'ref_ir_act_window':fields.many2one('ir.actions.act_window','Window Action',readonly=True,ondelete="cascade"),
-        'ref_ir_value':fields.many2one('ir.values','Wizard Button',readonly=True,ondelete="cascade"),
+        'ref_ir_act_window':fields.many2one('ir.actions.act_window','Window Action',readonly=True),
+        'ref_ir_value':fields.many2one('ir.values','Wizard Button',readonly=True),
         #Expression Builder fields
         #Simple Fields
         'model_object_field':fields.many2one('ir.model.fields',string="Field",help="Select the field from the model you want to use.\nIf it is a relationship field you will be able to choose the nested values in the box below\n(Note:If there are no values make sure you have selected the correct model)",store=False),
