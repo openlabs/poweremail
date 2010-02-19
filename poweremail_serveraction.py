@@ -45,7 +45,7 @@ class actions_server(osv.osv):
             ('object_write','Write Object'),
             ('other','Multi Actions'),
         ], 'Action Type', required=True, size=32, help="Type of the Action that is to be executed"),
-        'poweremail_template':fields.many2one('poweremail.templates','Template',)#In view customize such that domain('object_name','=',model_id)
+        'poweremail_template':fields.many2one('poweremail.templates','Template',ondelete='cascade')#In view customize such that domain('object_name','=',model_id)
     }
 
     def run(self, cr, uid, ids, context=None):

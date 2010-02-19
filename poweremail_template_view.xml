@@ -115,7 +115,7 @@
 						</page>
 						<page string="Advanced">
 							<field name="enforce_from_account" attrs="{'required':[('auto_email','=',True)]}" />
-							<field name="auto_email" attrs="{'readonly':[('ref_ir_act_window','=',False)]}"/>
+							<field name="auto_email"/>
 							<field name="attached_wkf" domain="[('osv','=',model_int_name)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
 							<field name="attached_activity" domain="[('wkf_id', '=', attached_wkf)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
 							<field name="server_action" readonly="1" />
