@@ -201,22 +201,29 @@ class poweremail_send_wizard(osv.osv_memory):
             if template.report_template:
                 record_id = screen_vals['rel_model_ref']
                 reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'], context)['report_name']
-                service = netsvc.LocalService(reportname)
                 data = {}
                 data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model'], context).model
-                (result, format) = service.create(cr, uid, [record_id], data, context)
-                att_obj = self.pool.get('ir.attachment')
-                new_att_vals={
+
+                # Ensure report is rendered using template's language
+                ctx = context.copy()
+                if template.lang:
+                    ctx['lang'] = self.get_value( cr, uid, template, template.lang, context )
+                service = netsvc.LocalService(reportname)
+                (result, format) = service.create(cr, uid, [record_id], data, ctx)
+
+                attachment_id = self.pool.get('ir.attachment').create(cr, uid, {
                     'name': _('%s (Email Attachment)') % screen_vals['subject'],
-                    'datas':base64.b64encode(result),
-                    'datas_fname':tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
-                    'description':screen_vals['body_text'] or _("No Description"),
-                    'res_model':'poweremail.mailbox',
-                    'res_id':mail_id
-                }
-                attid = att_obj.create(cr,uid,new_att_vals, context)
-                if attid:
-                    self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'}, context)
+                    'datas': base64.b64encode(result),
+                    'datas_fname': tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
+                    'description': screen_vals['body_text'] or _("No Description"),
+                    'res_model': 'poweremail.mailbox',
+                    'res_id': mail_id
+                }, context)
+                if attachment_id:
+                    self.pool.get('poweremail.mailbox').write(cr, uid, mail_id, {
+                        'pem_attachments_ids': [[6, 0, [attachment_id]]],
+                        'mail_type':'multipart/mixed'
+                    }, context)
             return mail_id
 poweremail_send_wizard()
 
