@@ -45,12 +45,6 @@ class poweremail_send_wizard(osv.osv_memory):
 
         logger = netsvc.Logger()
 
-        #Search translated template
-        lang = self.get_value(cr,uid,context,template.lang)
-        if lang:
-            ctx = context.copy()
-            ctx.update({'lang':lang})
-            template = self.pool.get('poweremail.templates').browse(cr,uid,tmpl_id[0],ctx)
         if template.enforce_from_account:
             return [(template.enforce_from_account.id, '%s (%s)' % (template.enforce_from_account.name, template.enforce_from_account.email_id))]
         else:
@@ -84,26 +78,20 @@ class poweremail_send_wizard(osv.osv_memory):
                 raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
         return True
 
-    def get_value(self,cr,uid,context=None,message=None):
-        if context is None:
-            context = {}
-        if message is None:
-            message = {}
-        if message:
-            try:
-                message = tools.ustr(message)
-                template = self._get_template(cr, uid, context)
-                object = self.pool.get(template.model_int_name).browse(cr,uid,context['src_rec_ids'][0],context)
-                templ = Template(message,input_encoding='utf-8')
-                env = {
-                    'user':self.pool.get('res.users').browse(cr,uid,uid, context),
-                    'db':cr.dbname
-                }
-                reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
-                return reply
-            except Exception, e:
-                return ""
-        else:
+    def get_value(self,cr,uid, template, message, context=None):
+        if not message:
+            return ''
+        try:
+            message = tools.ustr(message)
+            object = self.pool.get(template.model_int_name).browse(cr,uid,context['src_rec_ids'][0],context)
+            templ = Template(message,input_encoding='utf-8')
+            env = {
+                'user':self.pool.get('res.users').browse(cr,uid,uid, context),
+                'db':cr.dbname
+            }
+            reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
+            return reply
+        except Exception, e:
             return ""
 
     def _get_template(self, cr, uid, context=None):
@@ -116,13 +104,21 @@ class poweremail_send_wizard(osv.osv_memory):
         if not template_ids:
             return None
 
-        return self.pool.get('poweremail.templates').browse(cr, uid, template_ids[0], context)
+        template = self.pool.get('poweremail.templates').browse(cr, uid, template_ids[0], context)
+
+        lang = self.get_value( cr, uid, template, template.lang, context )
+        if lang:
+            # Use translated template if necessary
+            ctx = context.copy()
+            ctx['lang'] = lang
+            template = self.pool.get('poweremail.templates').browse(cr, uid, template.id, ctx)
+        return template
 
     def _get_template_value(self, cr, uid, field, context=None):
         template = self._get_template(cr, uid, context)
         if not template:
             return False
-        return self.get_value( cr, uid, context, getattr(template, field) )
+        return self.get_value( cr, uid, template, getattr(template, field), context )
 
     _columns = {
         'state':fields.selection([
