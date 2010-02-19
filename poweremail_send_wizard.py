@@ -141,7 +141,8 @@ class poweremail_send_wizard(osv.osv_memory):
         #'filename':fields.text('File Name'),
         'requested':fields.integer('No of requested Mails',readonly=True),
         'generated':fields.integer('No of generated Mails',readonly=True), 
-        'full_success':fields.boolean('Complete Success',readonly=True)
+        'full_success':fields.boolean('Complete Success',readonly=True),
+        'attachment_ids': fields.many2many('ir.attachment','send_wizard_attachment_rel', 'wizard_id', 'attachment_id', 'Attachments'),
     }
 
     _defaults = {
@@ -160,6 +161,12 @@ class poweremail_send_wizard(osv.osv_memory):
         'requested':lambda self,cr,uid,ctx: len(ctx['src_rec_ids']),
         'full_success': lambda *a: False
     }
+
+    def fields_get(self, cr, uid, fields=None, context=None, read_access=True):
+        result = super(poweremail_send_wizard, self).fields_get(cr, uid, fields, context, read_access)
+        if 'attachment_ids' in result:
+            result['attachment_ids']['domain'] = [('res_model','=',context['src_model']),('res_id','=',context['active_id'])]
+        return result
 
     def sav_to_drafts(self,cr,uid,ids,context=None):
         if context is None:
@@ -195,6 +202,9 @@ class poweremail_send_wizard(osv.osv_memory):
                 signature = self.pool.get('res.users').read(cr,uid,uid,['signature'], context)['signature']
                 vals['pem_body_text'] = tools.ustr(vals['pem_body_text'] or '') + signature
                 vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
+
+            attachment_ids = []
+
             #Create partly the mail and later update attachments
             mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals, context)
             template = self._get_template(cr, uid, context)
@@ -219,11 +229,21 @@ class poweremail_send_wizard(osv.osv_memory):
                     'res_model': 'poweremail.mailbox',
                     'res_id': mail_id
                 }, context)
-                if attachment_id:
-                    self.pool.get('poweremail.mailbox').write(cr, uid, mail_id, {
-                        'pem_attachments_ids': [[6, 0, [attachment_id]]],
-                        'mail_type':'multipart/mixed'
-                    }, context)
+                attachment_ids.append( attachment_id )
+
+            # Add document attachments
+            for attachment_id in screen_vals.get('attachment_ids',[]):
+                new_id = self.pool.get('ir.attachment').copy(cr, uid, attachment_id, {
+                    'res_model': 'poweremail.mailbox',
+                    'res_id': mail_id,
+                }, context)
+                attachment_ids.append( new_id )
+
+            if attachment_ids:
+                self.pool.get('poweremail.mailbox').write(cr, uid, mail_id, {
+                    'pem_attachments_ids': [[6, 0, attachment_ids]],
+                    'mail_type': 'multipart/mixed'
+                }, context)
             return mail_id
 poweremail_send_wizard()
 
