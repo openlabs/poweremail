@@ -61,7 +61,7 @@ class actions_server(osv.osv):
                     raise osv.except_osv(_('Error'), _("Please specify an template to use for auto email in poweremail !"))
                 templ_id = action.poweremail_template.id
                 
-                self.pool.get('poweremail.templates').generate_mail(cr,uid,templ_id,[context['active_id']])
+                self.pool.get('poweremail.templates').generate_mail(cr, uid, templ_id, [context['active_id']], context)
                 return False
             else:
                 return super(actions_server,self).run(cr, uid, ids, context)

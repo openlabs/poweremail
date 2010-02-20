@@ -31,6 +31,76 @@ import poweremail_engines
 import random
 from tools.translate import _
 import tools
+import types
+import report
+import pooler
+
+def send_on_create(self, cr, uid, vals, context=None):
+    id = self.old_create(cr, uid, vals, context)
+    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
+    # Ensure it's still configured to send on create
+    if template.send_on_create:
+        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, [id], context)
+    return id
+
+def send_on_write(self, cr, uid, ids, vals, context=None):
+    result = self.old_write(cr, uid, ids, vals, context)
+    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
+    # Ensure it's still configured to send on write
+    if template.send_on_write:
+        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, ids, context)
+    return result
+    
+
+# This is an ugly hack to ensure that send_on_create and send_on_write are
+# initialized when the server is started. Note there's a small time window
+# between when the pool is available and when this function is called which 
+# may mean allow creating/writing objects without an e-mail being sent.
+
+old_register_all = report.interface.register_all
+def new_register_all(db):
+    value = old_register_all(db)
+
+    cr = db.cursor()
+    pool = pooler.get_pool( cr.dbname )
+    cr.execute("""
+        SELECT 
+            pt.id,
+            im.model,
+            pt.send_on_create,
+            pt.send_on_write
+        FROM
+            poweremail_templates pt,
+            ir_model im
+        WHERE
+            pt.object_name = im.id
+    """ )
+    for record in cr.fetchall():
+        id = record[0]
+        model = record[1]
+        soc = record[2]
+        sow = record[3]
+        obj = pool.get(model)
+        if hasattr(obj, 'old_create'):
+            obj.create = obj.old_create
+            del obj.old_create
+        if hasattr(obj, 'old_write'):
+            obj.write = obj.old_write
+            del obj.old_write
+        if soc:
+            obj.template_id = id
+            obj.old_create = obj.create
+            obj.create = types.MethodType( send_on_create, obj, osv.osv )
+        if sow:
+            obj.template_id = id
+            obj.old_write = obj.write
+            obj.write = types.MethodType( send_on_write, obj, osv.osv )
+
+    return value
+
+report.interface.register_all = new_register_all
+
+
 
 class poweremail_templates(osv.osv):
     _name="poweremail.templates"
@@ -80,7 +150,9 @@ class poweremail_templates(osv.osv):
         'table_model_object_field':fields.many2one('ir.model.fields',string="Table Field",help="Select the field from the model you want to use.\nOnly one2many & many2many fields can be used for tables)",store=False),
         'table_sub_object':fields.many2one('ir.model','Table-model',help='This field shows the model you will be using for your table',store=False),
         'table_required_fields':fields.many2many('ir.model.fields','fields_table_rel','field_id','table_id',string="Required Fields",help="Select the fieldsyou require in the table)",store=False),
-        'table_html':fields.text('HTML code',help="Copy this html code to your HTML message body for displaying the info in your mail.",store=False)
+        'table_html':fields.text('HTML code',help="Copy this html code to your HTML message body for displaying the info in your mail.",store=False),
+        'send_on_create': fields.boolean('Send on Create', help='Sends an e-mail when a new document is created.'),
+        'send_on_write': fields.boolean('Send on Update', help='Sends an e-mail when a document is modified.'),
     }
 
     _defaults = {
@@ -122,6 +194,25 @@ class poweremail_templates(osv.osv):
             elif template.server_action:
                     self.pool.get('ir.actions.server').unlink(cr, uid, template.server_action.id, context)
 
+
+    def update_send_on_store(self, cr, uid, ids, context):
+        for template in self.browse(cr, uid, ids, context):
+            obj = self.pool.get(template.object_name.model)
+            if hasattr(obj, 'old_create'):
+                obj.create = obj.old_create
+                del obj.old_create
+            if hasattr(obj, 'old_write'):
+                obj.write = obj.old_write
+                del obj.old_write
+            if template.send_on_create:
+                obj.template_id = template.id
+                obj.old_create = obj.create
+                obj.create = types.MethodType( send_on_create, obj, osv.osv )
+            if template.send_on_write:
+                obj.template_id = template.id
+                obj.old_write = obj.write
+                obj.write = types.MethodType( send_on_write, obj, osv.osv )
+
     def create(self, cr, uid, vals, context=None):
         src_obj = self.pool.get('ir.model').read(cr, uid, vals['object_name'], ['model'], context)['model']
         vals['ref_ir_act_window']= self.pool.get('ir.actions.act_window').create(cr, uid, {
@@ -144,18 +235,29 @@ class poweremail_templates(osv.osv):
              'object': True,
          }, context)
         id = super(poweremail_templates,self).create(cr, uid, vals, context)   
-        if vals.get('auto_email'): 
+        if vals.get('auto_email'):
             self.update_auto_email(cr, uid, [id], context)
+        if vals.get('send_on_create') or vals.get('send_on_write'): 
+            self.update_send_on_store(cr, uid, [id], context)
         return id
 
     def write(self,cr,uid,ids,vals,context=None):
         result = super(poweremail_templates,self).write(cr, uid, ids, vals, context)
         if 'auto_email' in vals or 'attached_activity' in vals:
             self.update_auto_email(cr, uid, ids, context)
+        if 'send_on_create' in vals or 'send_on_write' in vals:
+            self.update_send_on_store(cr, uid, ids, context)
         return result
 
     def unlink(self, cr, uid, ids, context=None):
         for template in self.browse(cr, uid, ids, context):
+            obj = self.pool.get(template.object_name.model)
+            if hasattr(obj, 'old_create'):
+                obj.create = obj.old_create
+                del obj.old_create
+            if hasattr(obj, 'old_write'):
+                obj.write = obj.old_write
+                del obj.old_write
             try:
                 if template.ref_ir_act_window:
                     self.pool.get('ir.actions.act_window').unlink(cr, uid, template.ref_ir_act_window.id, context)
@@ -326,7 +428,10 @@ class poweremail_templates(osv.osv):
         logger = netsvc.Logger()
         sent_recs = []
         from_account = False
-        template = self.browse(cr,uid,id, context)
+        template = self.browse(cr, uid, id, context)
+        if not template:
+            return
+
         #If account to send from is in context select it, else use enforced account 
         if 'account_id' in context.keys():
             from_account = self.pool.get('poweremail.core_accounts').read(cr,uid,context['account_id'],['name','email_id'], context)

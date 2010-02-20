@@ -118,6 +118,8 @@
 							<field name="auto_email"/>
 							<field name="attached_wkf" domain="[('osv','=',model_int_name)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
 							<field name="attached_activity" domain="[('wkf_id', '=', attached_wkf)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
+							<field name="send_on_create"/>
+							<field name="send_on_write"/>
 							<field name="server_action" readonly="1" />
 							<field name="ref_ir_act_window" />
 							<field name="ref_ir_value" />
