@@ -214,6 +214,7 @@ class poweremail_templates(osv.osv):
                 obj.write = types.MethodType( send_on_write, obj, osv.osv )
 
     def create(self, cr, uid, vals, context=None):
+        id = super(poweremail_templates,self).create(cr, uid, vals, context)   
         src_obj = self.pool.get('ir.model').read(cr, uid, vals['object_name'], ['model'], context)['model']
         vals['ref_ir_act_window']= self.pool.get('ir.actions.act_window').create(cr, uid, {
              'name': _("%s Mail Form") % vals['name'],
@@ -221,7 +222,7 @@ class poweremail_templates(osv.osv):
              'res_model': 'poweremail.send.wizard',
              'src_model': src_obj,
              'view_type': 'form',
-             'context': "{'src_model':'" + src_obj + "','template':'" + vals['name'] + "','src_rec_id':active_id,'src_rec_ids':active_ids}",
+             'context': "{'src_model':'%s','template_id':'%d','src_rec_id':active_id,'src_rec_ids':active_ids}" % ( src_obj, id ),
              'view_mode':'form,tree',
              'view_id': self.pool.get('ir.ui.view').search(cr,uid,[('name','=','poweremail.send.wizard.form')], context=context)[0],
              'target': 'new',
@@ -234,7 +235,6 @@ class poweremail_templates(osv.osv):
              'value': "ir.actions.act_window,"+ str(vals['ref_ir_act_window']),
              'object': True,
          }, context)
-        id = super(poweremail_templates,self).create(cr, uid, vals, context)   
         if vals.get('auto_email'):
             self.update_auto_email(cr, uid, [id], context)
         if vals.get('send_on_create') or vals.get('send_on_write'): 

@@ -97,9 +97,14 @@ class poweremail_send_wizard(osv.osv_memory):
     def _get_template(self, cr, uid, context=None):
         if context is None:
             context = {}
-        if not 'template' in context:
+        if not 'template' in context and not 'template_id' in context:
             return None
-        if 'template' in context.keys():
+        if 'template_id' in context.keys():
+            template_ids = self.pool.get('poweremail.templates').search(cr, uid, [('id','=',context['template_id'])], context=context)
+        elif 'template' in context.keys():
+            # Old versions of poweremail used the name of the template. This caused
+            # problems when the user changed the name of the template, but we keep the code
+            # for compatibility with those versions.
             template_ids = self.pool.get('poweremail.templates').search(cr, uid, [('name','=',context['template'])], context=context)
         if not template_ids:
             return None
