@@ -96,6 +96,7 @@ def new_register_all(db):
             obj.old_write = obj.write
             obj.write = types.MethodType( send_on_write, obj, osv.osv )
 
+    cr.close()
     return value
 
 report.interface.register_all = new_register_all
