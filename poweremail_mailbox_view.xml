@@ -16,13 +16,13 @@
 			<field name="arch" type="xml">
 				<form string="Power Email Inbox">
 					<group col="4" colspan="2">
-						<field name="pem_from" colspan="2" select="1"/>
+						<field name="pem_from" colspan="4" select="1"/>
 						<field name="pem_cc" colspan="4" select="1"/>
 						<field name="date_mail" colspan="4" select="2"/>
 						<field name="pem_recd" colspan="2" select="1"/>
 					</group>
 					<group col="4" colspan="2">
-						<field name="pem_to" colspan="2" required="1" select="1" />
+						<field name="pem_to" colspan="4" required="1" select="1" />
 						<field name="pem_bcc" colspan="4" select="2"/>
 						<field name="pem_subject" colspan="4" select="1"/>
 					</group>
@@ -35,6 +35,7 @@
 								</page>
 								<page string="Body (HTML-Web Client Only)">
 									<field name="pem_body_html" nolabel="1" colspan="4" widget="text_html" />
+									<label string="Note: HTML body can't be edited with GTK desktop client." colspan="4"/>
 								</page>
 
 							</notebook>

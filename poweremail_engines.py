@@ -53,9 +53,9 @@ class poweremail_engines(osv.osv):
         if message:
             logger = netsvc.Logger()
             def merge(match):
-                template = self.pool.get("poweremail.templates").browse(cr,uid,templateid)
+                template = self.pool.get("poweremail.templates").browse(cr,uid,templateid,context)
                 obj_pool = self.pool.get(template.object_name.model)
-                obj = obj_pool.browse(cr, uid, id)
+                obj = obj_pool.browse(cr, uid, id, context)
                 exp = str(match.group()[2:-2]).strip()
                 #print "level 1:",exp
                 exp_spl = exp.split('/')

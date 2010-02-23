@@ -25,14 +25,18 @@
 							<field name="report" colspan="4" />
 						</group>
 						<separator string="" colspan="4" />
-						<notebook>
+						<notebook colspan="4">
 							<page string="Body (Plain Text)">
 								<field name="body_text" select="2" colspan="4" nolabel="1" />
 							</page>
-							<page string="Body(HTML - Only Web Client)">
+							<page string="Body (HTML)">
 								<field name="body_html" select="2" colspan="4" nolabel="1" widget="text_html" />
+								<label string="Note: HTML body can't be edited with GTK desktop client." colspan="4"/>
 							</page>
-
+							<page string="Attachments">
+								<label string="Add here all attachments of the current document you want to include in the e-mail." colspan="4"/>
+								<field name="attachment_ids" colspan="4" nolabel="1"/>
+							</page>
 						</notebook>
 						<field name="signature" colspan="4" />
 						<button name="sav_to_drafts" string="Save in Drafts" type="object" />
@@ -48,7 +52,7 @@
 					<button special="cancel" string="Close" colspan="4" states="done" />
 					<field name="state" />
 					<newline />
-					<label string="After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve" />
+					<label string="After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve" colspan="4"/>
 				</form>
 			</field>
 		</record>
