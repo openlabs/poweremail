@@ -227,7 +227,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 (result, format) = service.create(cr, uid, [record_id], data, ctx)
 
                 attachment_id = self.pool.get('ir.attachment').create(cr, uid, {
-                    'name': _('%s (Email Attachment)') % screen_vals['subject'],
+                    'name': _('%s (Email Attachment)').encode("utf-8") % screen_vals['subject'],
                     'datas': base64.b64encode(result),
                     'datas_fname': tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
                     'description': screen_vals['body_text'] or _("No Description"),

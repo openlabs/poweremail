@@ -78,11 +78,13 @@ class poweremail_mailbox(osv.osv):
             context = {}
         #8888888888888 SENDS MAILS IN OUTBOX 8888888888888888888#
         #get ids of mails in outbox
-        filters = [('folder','=','outbox')]
+        filters = [('folder','=','outbox'),('state','!=','sending')]
         if 'filters' in context.keys():
             for each_filter in context['filters']:
                 filters.append(each_filter)
         ids = self.search(cr,uid,filters, context=context)
+        # To prevent resend the same emails in several send_all_mail() calls
+        self.write(cr, uid, ids, {'state':'sending'}, context)
         #send mails one by one
         for id in ids:
             self.send_this_mail(cr, uid, [id], context)
@@ -118,6 +120,7 @@ class poweremail_mailbox(osv.osv):
                 logger = netsvc.Logger()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
                 self.historise(cr, uid, [id], error, context)
+            self.write(cr, uid, id, {'state':'na'}, context)
         return True
     
     def historise(self,cr,uid,ids,message='', context=None):
@@ -164,6 +167,7 @@ class poweremail_mailbox(osv.osv):
                                     ('read','Read'),
                                     ('unread','Un-Read'),
                                     ('na','Not Applicable'),
+                                    ('sending','Sending'),
                                     ],'Status'),
             'date_mail':fields.datetime('Rec/Sent Date'),
             'history':fields.text('History',readonly=True,store=True)
