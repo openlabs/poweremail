@@ -63,6 +63,12 @@ def new_register_all(db):
 
     cr = db.cursor()
     pool = pooler.get_pool( cr.dbname )
+
+    # If poweremail.templates has not yet been initialized, do not try to
+    # SELECT its table yet
+    if not 'poweremail.templates' in pool.obj_list():
+        return value
+
     cr.execute("""
         SELECT 
             pt.id,
