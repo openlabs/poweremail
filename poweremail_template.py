@@ -29,6 +29,7 @@ import netsvc
 import base64
 import poweremail_engines
 import random
+import time
 from tools.translate import _
 import tools
 import types
@@ -160,13 +161,17 @@ class poweremail_templates(osv.osv):
         'table_html':fields.text('HTML code',help="Copy this html code to your HTML message body for displaying the info in your mail.",store=False),
         'send_on_create': fields.boolean('Send on Create', help='Sends an e-mail when a new document is created.'),
         'send_on_write': fields.boolean('Send on Update', help='Sends an e-mail when a document is modified.'),
+        'partner_event': fields.char('Partner ID to log Events', size=250, help="Partner ID who to log and email event. Placeholders can be used here. eg. ${object.partner_id.id}"),
+        'partner_event_type_id':fields.many2one('res.partner.event.type', 'Partner Event Type', readonly=True),
+        'canal_id': fields.many2one('res.partner.canal', 'Channel'),
+        'partner_type': fields.selection([('customer','Customer'),('retailer','Retailer'),('prospect','Commercial Prospect')], 'Partner Relation'),
     }
 
     _defaults = {
 
     }
     _sql_constraints = [
-        ('name', 'unique (name)', 'The template name must be unique !')
+        ('name', 'unique (name)', _('The template name must be unique !'))
     ]
 
     def update_auto_email(self, cr, uid, ids, context=None):
@@ -201,7 +206,6 @@ class poweremail_templates(osv.osv):
             elif template.server_action:
                     self.pool.get('ir.actions.server').unlink(cr, uid, template.server_action.id, context)
 
-
     def update_send_on_store(self, cr, uid, ids, context):
         for template in self.browse(cr, uid, ids, context):
             obj = self.pool.get(template.object_name.model)
@@ -219,6 +223,21 @@ class poweremail_templates(osv.osv):
                 obj.template_id = template.id
                 obj.old_write = obj.write
                 obj.write = types.MethodType( send_on_write, obj, osv.osv )
+
+    def update_partner_event(self, cr, uid, ids, context):
+        for template in self.browse(cr, uid, ids, context):
+            if template.partner_event:
+                if not template.partner_event_type_id:
+                    # Create partner event type if necessary
+                    partner_event_type_id = self.pool.get('res.partner.event.type').create(cr, uid, {
+                        'name': _('EMAIL: ')+template.name,
+                        'key': 'email_'+template.name.lower().replace(' ','_'),
+                    }, context)
+                    self.write(cr, uid, template.id, {
+                        'partner_event_type_id': partner_event_type_id,
+                    }, context)
+            elif template.partner_event_type_id:
+                self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
 
     def create(self, cr, uid, vals, context=None):
         id = super(poweremail_templates,self).create(cr, uid, vals, context)   
@@ -246,6 +265,8 @@ class poweremail_templates(osv.osv):
             self.update_auto_email(cr, uid, [id], context)
         if vals.get('send_on_create') or vals.get('send_on_write'): 
             self.update_send_on_store(cr, uid, [id], context)
+        if vals.get('partner_event'): 
+            self.update_partner_event(cr, uid, [id], context)
         return id
 
     def write(self,cr,uid,ids,vals,context=None):
@@ -254,6 +275,8 @@ class poweremail_templates(osv.osv):
             self.update_auto_email(cr, uid, ids, context)
         if 'send_on_create' in vals or 'send_on_write' in vals:
             self.update_send_on_store(cr, uid, ids, context)
+        if 'partner_event' in vals: 
+            self.update_partner_event(cr, uid, ids, context)
         return result
 
     def unlink(self, cr, uid, ids, context=None):
@@ -272,6 +295,8 @@ class poweremail_templates(osv.osv):
                     self.pool.get('ir.values').unlink(cr, uid, template.ref_ir_value.id, context)
                 if template.server_action:
                     self.pool.get('ir.actions.server').unlink(cr, uid, template.server_action.id, context)
+                if template.partner_event_type_id:
+                    self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
             except:
                 raise osv.except_osv(_("Warning"),_("Deletion of Record failed"))
         return super(poweremail_templates,self).unlink(cr,uid, ids, context)
@@ -493,6 +518,28 @@ class poweremail_templates(osv.osv):
                     if attid:
                         self.pool.get('poweremail.mailbox').write(cr,uid,mail_id,{'pem_attachments_ids':[[6, 0, [attid]]],'mail_type':'multipart/mixed'}, context)
                 sent_recs.append(recid)
+                # Create a partner event
+                if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self.get_value(cr, uid, recid, template.partner_event, template, context):
+                    name = vals['pem_subject']
+                    if isinstance(name, str):
+                        name = unicode(name, 'utf-8')
+                    if len(name) > 64:
+                        name = name[:61] + '...'
+                    document = False
+                    if self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
+                        document = data['model']+',%i' % recid
+                    elif attid and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
+                        document = 'ir.attachment,%i' % attid
+                    self.pool.get('res.partner.event').create(cr, uid, {
+                        'name': name,
+                        'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
+                        'partner_id': self.get_value(cr, uid, recid, template.partner_event, template, context),
+                        'date': time.strftime('%Y-%m-%d %H:%M:%S'),
+                        'canal_id': template.canal_id and template.canal_id.id or False,
+                        'partner_type': template.partner_type,
+                        'user_id': uid,
+                        'document': document,
+                    })
             except Exception,error:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Email Generation failed, Reason:%s")% (error))
                 return sent_recs

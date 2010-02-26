@@ -115,15 +115,22 @@
 							<field name="allowed_groups" string="Allowed User Groups" nolabel="1" />
 						</page>
 						<page string="Advanced">
+							<separator string="Automatic Email" colspan="4"/>
 							<field name="enforce_from_account" attrs="{'required':[('auto_email','=',True)]}" />
 							<field name="auto_email"/>
 							<field name="attached_wkf" domain="[('osv','=',model_int_name)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
 							<field name="attached_activity" domain="[('wkf_id', '=', attached_wkf)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
 							<field name="send_on_create"/>
 							<field name="send_on_write"/>
+							<separator string="Email action and wizard" colspan="4"/>
 							<field name="server_action" readonly="1" />
 							<field name="ref_ir_act_window" />
 							<field name="ref_ir_value" />
+							<separator string="Log partner events" colspan="4"/>
+							<field name="partner_event" />
+							<field name="partner_event_type_id"/>
+							<field name="canal_id" attrs="{'required':[('partner_event','!=',False)]}"/>
+							<field name="partner_type" attrs="{'required':[('partner_event','!=',False)]}"/>
 						</page>
 					</notebook>
 				</form>

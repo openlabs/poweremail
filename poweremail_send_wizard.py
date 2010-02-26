@@ -27,6 +27,7 @@ from mako.template import Template
 from mako import exceptions
 import netsvc
 import base64
+import time
 from tools.translate import _
 import tools
 
@@ -193,13 +194,13 @@ class poweremail_send_wizard(osv.osv_memory):
             accounts = self.pool.get('poweremail.core_accounts').read(cr, uid, screen_vals['from'], context=context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
-                'pem_to':screen_vals['to'],
-                'pem_cc':screen_vals['cc'],
-                'pem_bcc':screen_vals['bcc'],
-                'pem_subject':screen_vals['subject'],
-                'pem_body_text':screen_vals['body_text'],
-                'pem_body_html':screen_vals['body_html'],
-                'pem_account_id' :screen_vals['from'],
+                'pem_to': screen_vals['to'],
+                'pem_cc': screen_vals['cc'],
+                'pem_bcc': screen_vals['bcc'],
+                'pem_subject': screen_vals['subject'],
+                'pem_body_text': screen_vals['body_text'],
+                'pem_body_html': screen_vals['body_html'],
+                'pem_account_id': screen_vals['from'],
                 'state':'na',
                 'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
             }
@@ -249,6 +250,30 @@ class poweremail_send_wizard(osv.osv_memory):
                     'pem_attachments_ids': [[6, 0, attachment_ids]],
                     'mail_type': 'multipart/mixed'
                 }, context)
+
+            # Create a partner event
+            if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', ctx):
+                name = vals['pem_subject']
+                if isinstance(name, str):
+                    name = unicode(name, 'utf-8')
+                if len(name) > 64:
+                    name = name[:61] + '...'
+                document = False
+                if self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
+                    document = data['model']+',%i' % record_id
+                elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
+                    document = 'ir.attachment,%i' % attachment_ids[0]
+                self.pool.get('res.partner.event').create(cr, uid, {
+                    'name': name,
+                    'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
+                    'partner_id': self._get_template_value(cr, uid, 'partner_event', ctx),
+                    'date': time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'canal_id': template.canal_id and template.canal_id.id or False,
+                    'partner_type': template.partner_type,
+                    'user_id': uid,
+                    'document': document,
+                })
+
             return mail_id
 poweremail_send_wizard()
 
