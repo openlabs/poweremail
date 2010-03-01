@@ -39,12 +39,15 @@ import poplib
 import imaplib
 import string
 import email
-import time,datetime
+import time, datetime
 import poweremail_engines
 from tools.translate import _
 import tools
 
 class poweremail_core_accounts(osv.osv):
+    """
+    Object to store email account settings
+    """
     _name = "poweremail.core_accounts"
     _known_content_types = ['multipart/mixed',
                             'multipart/alternative',
@@ -53,46 +56,94 @@ class poweremail_core_accounts(osv.osv):
                             'text/html'
                             ]
     _columns = {
-        'name': fields.char('Email Account Desc', size=64, required=True, readonly=True, select=True, states={'draft':[('readonly', False)]}),
-        'user':fields.many2one('res.users', 'Related User', required=True, readonly=True, states={'draft':[('readonly', False)]}),
-        
-        'email_id': fields.char('Email ID', size=120, required=True, readonly=True, states={'draft':[('readonly', False)]} , help=" eg:yourname@yourdomain.com "),
-        
-        'smtpserver': fields.char('Server', size=120, required=True, readonly=True, states={'draft':[('readonly', False)]}, help="Enter name of outgoing server,eg:smtp.gmail.com "),
-        'smtpport': fields.integer('SMTP Port ', size=64, required=True, readonly=True, states={'draft':[('readonly', False)]}, help="Enter port number,eg:SMTP-587 "),
-        'smtpuname': fields.char('User Name', size=120, required=False, readonly=True, states={'draft':[('readonly', False)]}),
-        'smtppass': fields.char('Password', size=120, invisible=True, required=False, readonly=True, states={'draft':[('readonly', False)]}),
-        'smtpssl':fields.boolean('Use SSL', states={'draft':[('readonly', False)]}, readonly=True),
+        'name': fields.char('Email Account Desc',
+                            size=64, required=True,
+                            readonly=True, select=True,
+                            states={'draft':[('readonly', False)]}),
+        'user':fields.many2one('res.users',
+                               'Related User', required=True,
+                               readonly=True, states={'draft':[('readonly', False)]}),
+        'email_id': fields.char('Email ID',
+                                size=120, required=True,
+                                readonly=True, states={'draft':[('readonly', False)]} ,
+                                help=" eg:yourname@yourdomain.com "),
+        'smtpserver': fields.char('Server',
+                                  size=120, required=True,
+                                  readonly=True, states={'draft':[('readonly', False)]},
+                                  help="Enter name of outgoing server,eg:smtp.gmail.com "),
+        'smtpport': fields.integer('SMTP Port ',
+                                   size=64, required=True,
+                                   readonly=True, states={'draft':[('readonly', False)]},
+                                   help="Enter port number,eg:SMTP-587 "),
+        'smtpuname': fields.char('User Name',
+                                 size=120, required=False,
+                                 readonly=True, states={'draft':[('readonly', False)]}),
+        'smtppass': fields.char('Password',
+                                size=120, invisible=True,
+                                required=False, readonly=True,
+                                states={'draft':[('readonly', False)]}),
+        'smtpssl':fields.boolean('Use SSL',
+                                 states={'draft':[('readonly', False)]}, readonly=True),
         'send_pref':fields.selection([
                                       ('html', 'HTML otherwise Text'),
                                       ('text', 'Text otherwise HTML'),
                                       ('both', 'Both HTML & Text')
                                       ], 'Mail Format', required=True),
-        'iserver':fields.char('Incoming Server', size=100, readonly=True, states={'draft':[('readonly', False)]}, help="Enter name of incoming server,eg:imap.gmail.com "),
-        'isport': fields.integer('Port', readonly=True, states={'draft':[('readonly', False)]}, help="For example IMAP: 993,POP3:995 "),
-        'isuser':fields.char('User Name', size=100, readonly=True, states={'draft':[('readonly', False)]}),
-        'ispass':fields.char('Password', size=100, readonly=True, states={'draft':[('readonly', False)]}),
-        'iserver_type': fields.selection([('imap', 'IMAP'), ('pop3', 'POP3')], 'Server Type', readonly=True, states={'draft':[('readonly', False)]}),
-        'isssl':fields.boolean('Use SSL', readonly=True, states={'draft':[('readonly', False)]}),
-        'isfolder':fields.char('Folder', readonly=True, size=100, help="Folder to be used for downloading IMAP mails\nClick on adjacent button to select from a list of folders"),
+        'iserver':fields.char('Incoming Server',
+                              size=100, readonly=True,
+                              states={'draft':[('readonly', False)]},
+                              help="Enter name of incoming server,eg:imap.gmail.com "),
+        'isport': fields.integer('Port',
+                                 readonly=True, states={'draft':[('readonly', False)]},
+                                 help="For example IMAP: 993,POP3:995 "),
+        'isuser':fields.char('User Name',
+                             size=100, readonly=True,
+                             states={'draft':[('readonly', False)]}),
+        'ispass':fields.char('Password',
+                             size=100, readonly=True,
+                             states={'draft':[('readonly', False)]}),
+        'iserver_type': fields.selection([
+                                          ('imap', 'IMAP'),
+                                          ('pop3', 'POP3')
+                                          ], 'Server Type', readonly=True,
+                                          states={'draft':[('readonly', False)]}),
+        'isssl':fields.boolean('Use SSL',
+                               readonly=True, states={'draft':[('readonly', False)]}),
+        'isfolder':fields.char('Folder',
+                               readonly=True, size=100,
+                               help="Folder to be used for downloading IMAP mails\n" \
+                               "Click on adjacent button to select from a list of folders"),
         'last_mail_id':fields.integer('Last Downloaded Mail', readonly=True),
         'rec_headers_den_mail':fields.boolean('First Receive headers, then download mail'),
         'dont_auto_down_attach':fields.boolean('Dont Download attachments automatically'),
-        'allowed_groups':fields.many2many('res.groups', 'account_group_rel', 'templ_id', 'group_id', string="Allowed User Groups", help="Only users from these groups will be allowed to send mails from this ID"),
+        'allowed_groups':fields.many2many('res.groups',
+                                          'account_group_rel', 'templ_id', 'group_id',
+                                          string="Allowed User Groups",
+                                          help="Only users from these groups will be" \
+                                          "allowed to send mails from this ID"),
         'company':fields.selection([
                                     ('yes', 'Yes'),
                                     ('no', 'No')
-                                    ], 'Company Mail A/c', readonly=True, help="Select if this mail account does not belong to specific user but the organisation as a whole. eg:info@somedomain.com", required=True, states={'draft':[('readonly', False)]}),
+                                    ], 'Company Mail A/c',
+                                    readonly=True,
+                                    help="Select if this mail account does not belong" \
+                                    "to specific user but the organisation as a whole." \
+                                    "eg:info@somedomain.com",
+                                    required=True, states={'draft':[('readonly', False)]}),
 
         'state':fields.selection([
                                   ('draft', 'Initiated'),
                                   ('suspended', 'Suspended'),
                                   ('approved', 'Approved')
                                   ], 'Account Status', required=True, readonly=True),
-                }
+    }
 
     _defaults = {
-         'name':lambda self, cr, uid, ctx:self.pool.get('res.users').read(cr, uid, uid, ['name'], ctx)['name'],
+         'name':lambda self, cr, uid, ctx:self.pool.get('res.users').read(cr,
+                                                                          uid,
+                                                                          uid,
+                                                                          ['name'],
+                                                                          ctx)['name'],
          'smtpssl':lambda * a:True,
          'state':lambda * a:'draft',
          'user':lambda self, cr, uid, ctx:uid,
@@ -102,34 +153,65 @@ class poweremail_core_accounts(osv.osv):
          'rec_headers_den_mail':lambda * a:True,
          'dont_auto_down_attach':lambda * a:True,
          'send_pref':lambda * a: 'html',
-                 }
-                 
+     }
+    
     _sql_constraints = [
-        ('email_uniq', 'unique (email_id)', 'Another setting already exists with this email ID !')
+        ('email_uniq',
+         'unique (email_id)',
+         'Another setting already exists with this email ID !')
     ]
-    def _constraint_unique(self, cr, uid, ids):
-        if self.read(cr, uid, ids, ['company'])[0]['company'] == 'no':
-            accounts = self.search(cr, uid, [('user', '=', uid), ('company', '=', 'no')])
+    
+    def _constraint_unique(self, cursor, user, ids):
+        """
+        This makes sure that you dont give personal 
+        users two accounts with same ID (Validated in sql constaints)
+        However this constraint exempts company accounts. 
+        Any no of co accounts for a user is allowed
+        """
+        if self.read(cursor, user, ids, ['company'])[0]['company'] == 'no':
+            accounts = self.search(cursor, uid, [
+                                                 ('user', '=', user),
+                                                 ('company', '=', 'no')
+                                                 ])
             if len(accounts) > 1 :
                 return False
             else :
                 return True
         else:
             return True
-    #The constraint is finally necessary. This also makes sure that you dont give personal users two accounts with same ID
-    #However this constraint exempts company accounts. Any no of co accounts with same ID is allowed
+        
     _constraints = [
-        (_constraint_unique, 'Error: You are not allowed to have more than 1 account.', [])
+        (_constraint_unique,
+         'Error: You are not allowed to have more than 1 account.',
+         [])
     ]
     
-    def on_change_emailid(self, cr, uid, ids, name=None, email_id=None, context=None):
-        self.write(cr, uid, ids, {'state':'draft'}, context=context)
-        return {'value': {'state': 'draft', 'smtpuname':email_id, 'isuser':email_id}}
+    def on_change_emailid(self, cursor, user, ids, name=None, email_id=None, context=None):
+        """
+        Called when the email ID field changes.
+        
+        UI enhancement
+        Writes the same email value to the smtpusername
+        and incoming username
+        """
+        #TODO: Check and remove the write. Is it needed?
+        self.write(cursor, user, ids, {'state':'draft'}, context=context)
+        return {
+                'value': {
+                          'state': 'draft',
+                          'smtpuname':email_id,
+                          'isuser':email_id
+                          }
+                }
     
     
-    def out_connection(self, cr, uid, ids, context=None):
-        #checks SMTP credentials and confirms if outgoing connection works
-        rec = self.browse(cr, uid, ids, context)[0]
+    def out_connection(self, cursor, user, ids, context=None):
+        """
+        checks SMTP credentials and confirms if outgoing connection works
+        (Attached to button)
+        """
+        #TODO:Reuse smtp_connection and remove duplicate code
+        rec = self.browse(cursor, user, ids, context)[0]
         if rec:
             if rec.smtpserver and rec.smtpport: 
                 try:
@@ -139,33 +221,44 @@ class poweremail_core_accounts(osv.osv):
                         serv.starttls()
                         serv.ehlo()
                 except Exception, error:
-                    raise osv.except_osv(_("SMTP Server Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("SMTP Server Error"),
+                                         _("An error occurred : %s ") % error)
                 try:
                     if serv.has_extn('AUTH') or rec.smtpuname or rec.smtppass:
                         serv.login(rec.smtpuname, rec.smtppass)
                 except Exception, error:
-                    raise osv.except_osv(_("SMTP Server Login Error"), _("An error occurred : %s ") % error)
-                raise osv.except_osv(_("Information"), _("SMTP Test Connection Was Successful"))
+                    raise osv.except_osv(_("SMTP Server Login Error"),
+                                         _("An error occurred : %s ") % error)
+                raise osv.except_osv(_("Information"),
+                                     _("SMTP Test Connection Was Successful"))
 
-    def in_connection(self, cr, uid, ids, context={}):
-        #Checks IMAP or POP3 credentials and returns if credentials are right
-        rec = self.browse(cr, uid, ids, context)[0]
+    def in_connection(self, cursor, user, ids, context={}):
+        """
+        Checks IMAP or POP3 credentials and returns if credentials are right
+        """
+        #TODO:Re Use a common in_connection which other methods could use
+        rec = self.browse(cursor, user, ids, context)[0]
         if rec:
             if rec.iserver and rec.isport and rec.isuser and rec.ispass:
                 if rec.iserver_type == 'imap':
+                    #Extract IMAP connection into separate private method
                     try:
                         if rec.isssl:
                             serv = imaplib.IMAP4_SSL(rec.iserver, rec.isport)
                         else:
                             serv = imaplib.IMAP4(rec.iserver, rec.isport)
                     except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                        raise osv.except_osv(_("IMAP Server Error"), 
+                                             _("An error occurred : %s ") % error)
                     try:
                         serv.login(rec.isuser, rec.ispass)
                     except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
-                    raise osv.except_osv(_("Information"), _("IMAP Test Connection Was Successful"))
+                        raise osv.except_osv(_("IMAP Server Login Error"), 
+                                             _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("Information"), 
+                                         _("IMAP Test Connection Was Successful"))
                 else:
+                    #Extract POP3 connection into separate private method
                     try:
                         if rec.isssl:
                             serv = poplib.POP3_SSL(rec.iserver, rec.isport)
@@ -180,6 +273,7 @@ class poweremail_core_accounts(osv.osv):
                         raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
                     raise osv.except_osv(_("Information"), _("POP3 Test Connection Was Successful"))
 
+    #Use 
     def do_approval(self, cr, uid, ids, context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'approved'}, context=context)
@@ -273,8 +367,8 @@ class poweremail_core_accounts(osv.osv):
                         msg.attach(MIMEText(body_text.encode("utf-8"), _charset='UTF-8'))
                     if core_obj.send_pref == 'html' or core_obj.send_pref == 'both':
                         html_body = body.get('html', u'')
-                        if len(html_body)==0 or html_body==u'':
-                            html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n','<br/>').replace('\r','<br/>')
+                        if len(html_body) == 0 or html_body == u'':
+                            html_body = body.get('text', u'<p>No Mail Message</p>').replace('\n', '<br/>').replace('\r', '<br/>')
                         html_body = tools.ustr(html_body)
                         msg.attach(MIMEText(html_body.encode("utf-8"), _subtype='html', _charset='UTF-8'))
                     #Now add attachments if any
@@ -300,32 +394,32 @@ class poweremail_core_accounts(osv.osv):
             else:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved") % id)
                                 
-    def extracttime(self,time_as_string):
+    def extracttime(self, time_as_string):
         logger = netsvc.Logger()
         #The standard email dates are of format similar to:
         #Thu, 8 Oct 2009 09:35:42 +0200
         #print time_as_string
         date_as_date = False
-        convertor = {'+':1,'-':-1}
+        convertor = {'+':1, '-':-1}
         try:
-            time_as_string = time_as_string.replace(',','')
+            time_as_string = time_as_string.replace(',', '')
             date_list = time_as_string.split(' ')
             date_temp_str = ' '.join(date_list[1:5])
-            if len(date_list)>=6:
-                sign = convertor.get(date_list[5][0],False)
+            if len(date_list) >= 6:
+                sign = convertor.get(date_list[5][0], False)
             else:
-                sign=False
+                sign = False
             try:
-                dt = datetime.datetime.strptime(date_temp_str,"%d %b %Y %H:%M:%S")
+                dt = datetime.datetime.strptime(date_temp_str, "%d %b %Y %H:%M:%S")
             except:
                 try:
-                    dt = datetime.datetime.strptime(date_temp_str,"%d %b %Y %H:%M")
+                    dt = datetime.datetime.strptime(date_temp_str, "%d %b %Y %H:%M")
                 except:
                     return False
             if sign:
                 try:
-                    offset = datetime.timedelta(hours=sign*int(date_list[5][1:3]),minutes=sign*int(date_list[5][3:5]))
-                except Exception,e2:
+                    offset = datetime.timedelta(hours=sign * int(date_list[5][1:3]), minutes=sign * int(date_list[5][3:5]))
+                except Exception, e2:
                     """Looks like UT or GMT, just forget decoding"""
                     return False
             else:
@@ -333,8 +427,8 @@ class poweremail_core_accounts(osv.osv):
             dt = dt + offset
             date_as_date = dt.strftime('%Y-%m-%d %H:%M:%S')
             #print date_as_date
-        except Exception,e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Datetime Extraction failed.Date:%s\tError:%s") % (time_as_string,e))
+        except Exception, e:
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Datetime Extraction failed.Date:%s\tError:%s") % (time_as_string, e))
         return date_as_date
         
     def save_header(self, cr, uid, mail, coreaccountid, serv_ref, context=None):
@@ -356,7 +450,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':context.get('state','unread'),
+            'state':context.get('state', 'unread'),
             'pem_body_text':'Mail not downloaded...',
             'pem_body_html':'Mail not downloaded...',
             'pem_account_id':coreaccountid
@@ -380,7 +474,7 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, serv_ref))
 
-    def save_fullmail(self, cr, uid, mail, coreaccountid, serv_ref,context=None):
+    def save_fullmail(self, cr, uid, mail, coreaccountid, serv_ref, context=None):
         if context is None:
             context = {}
         #Internal function for saving of mails to mailbox
@@ -399,7 +493,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':context.get('state','unread'),
+            'state':context.get('state', 'unread'),
             'pem_body_text':'Mail not downloaded...', #TODO:Replace with mail text
             'pem_body_html':'Mail not downloaded...', #TODO:Replace
             'pem_account_id':coreaccountid
@@ -444,7 +538,7 @@ class poweremail_core_accounts(osv.osv):
             'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
-            'state':context.get('state','unread'),
+            'state':context.get('state', 'unread'),
             'pem_body_text':'Mail not downloaded...', #TODO:Replace with mail text
             'pem_body_html':'Mail not downloaded...', #TODO:Replace
             'pem_account_id':coreaccountid
@@ -546,9 +640,9 @@ class poweremail_core_accounts(osv.osv):
                                 #Download Full RF822 Mails
                                 for i in range(rec.last_mail_id + 1, int(msg_count[0]) + 1):
                                     typ, msg = serv.fetch(str(i), '(FLAGS RFC822)')
-                                    for j in range(0,len(msg)/2):
-                                        mails = msg[j*2]
-                                        flags = msg[(j*2)+1]
+                                    for j in range(0, len(msg) / 2):
+                                        mails = msg[j * 2]
+                                        flags = msg[(j * 2) + 1]
                                         if type(mails) == type(('tuple', 'type')):
                                             ctx = context.copy()
                                             if '\Seen' in flags:
@@ -630,9 +724,9 @@ class poweremail_core_accounts(osv.osv):
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status('"%s"' % rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
                     #If there are newer mails than the ones in mailbox
                     typ, msg = serv.fetch(str(server_ref), '(FLAGS RFC822)')
-                    for i in range(0,len(msg)/2):
-                        mails = msg[i*2]
-                        flags = msg[(i*2)+1]
+                    for i in range(0, len(msg) / 2):
+                        mails = msg[i * 2]
+                        flags = msg[(i * 2) + 1]
                         if type(mails) == type(('tuple', 'type')):
                             if '\Seen' in flags:
                                 context['state'] = 'read' 
@@ -660,7 +754,7 @@ class poweremail_core_accounts(osv.osv):
                     #Download Full RF822 Mails
                     resp, msg, octet = serv.retr(server_ref) #Full Mail
                     mail = email.message_from_string(string.join(msg, "\n"))
-                    self.complete_mail(cr, uid, mail, id, server_ref,mailid, context)
+                    self.complete_mail(cr, uid, mail, id, server_ref, mailid, context)
                 else:
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.") % (id))
     
@@ -735,10 +829,8 @@ class poweremail_core_selfolder(osv.osv_memory):
         return False
     
     def _get_folders(self, cr, uid, context=None):
-        #print cr, uid, ctx
         if 'active_ids' in context.keys():
             record = self.pool.get('poweremail.core_accounts').browse(cr, uid, context['active_ids'][0], context)
-            #print record.email_id
             if record:
                 folderlist = []
                 try:
