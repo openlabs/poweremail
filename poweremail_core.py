@@ -272,6 +272,7 @@ class poweremail_core_accounts(osv.osv):
                     except Exception, error:
                         raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
                     raise osv.except_osv(_("Information"), _("POP3 Test Connection Was Successful"))
+        return True
 
     def do_approval(self, cr, uid, ids, context={}):
         #TODO: Check if user has rights
@@ -755,6 +756,7 @@ class poweremail_core_accounts(osv.osv):
             ctx = context.copy()
             ctx['filters'] = [('pem_account_id', '=', id)]
             self.pool.get('poweremail.mailbox').send_all_mail(cr, uid, [], context=ctx)
+        return True
  
     def get_payloads(self, mail):
         #This function will go through the mail and identify the payloads and return them
