@@ -297,7 +297,7 @@ class poweremail_core_accounts(osv.osv):
                 if core_obj.smtpuname and core_obj.smtppass:
                     serv.login(core_obj.smtpuname, core_obj.smtppass)
             except Exception, error:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not login to server\nError: %s") % (id, error))
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed on login. Probable Reason:Could not login to server\nError: %s") % (id, error))
                 return False
             #Everything is complete, now return the connection
             return serv
@@ -453,11 +453,12 @@ class poweremail_core_accounts(osv.osv):
         else:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload (%s) Account:%s.") % (mail.get_content_type(), coreaccountid))
         #Create mailbox entry in Mail
+        crid = False
         try:
         #print vals
             crid = mail_obj.create(cr, uid, vals, context)
         except Exception, e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, serv_ref))
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s,Error:%s") % (coreaccountid, serv_ref, str(e)))
         #Check if a create was success
         if crid:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid))
@@ -494,10 +495,11 @@ class poweremail_core_accounts(osv.osv):
         vals['pem_body_text'] = parsed_mail['text']
         vals['pem_body_html'] = parsed_mail['html']
         #Create the mailbox item now
+        crid = False
         try:
             crid = mail_obj.create(cr, uid, vals, context)
         except Exception, e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, serv_ref))
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s,Error:%s") % (coreaccountid, serv_ref, str(e)))
         #Check if a create was success
         if crid:
             logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid))
