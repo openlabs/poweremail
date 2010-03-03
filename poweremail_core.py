@@ -169,7 +169,7 @@ class poweremail_core_accounts(osv.osv):
         Any no of co accounts for a user is allowed
         """
         if self.read(cursor, user, ids, ['company'])[0]['company'] == 'no':
-            accounts = self.search(cursor, uid, [
+            accounts = self.search(cursor, user, [
                                                  ('user', '=', user),
                                                  ('company', '=', 'no')
                                                  ])
@@ -273,7 +273,6 @@ class poweremail_core_accounts(osv.osv):
                         raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
                     raise osv.except_osv(_("Information"), _("POP3 Test Connection Was Successful"))
 
-    #Use 
     def do_approval(self, cr, uid, ids, context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'approved'}, context=context)
