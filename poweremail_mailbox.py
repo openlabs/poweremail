@@ -87,8 +87,7 @@ class poweremail_mailbox(osv.osv):
         # To prevent resend the same emails in several send_all_mail() calls
         self.write(cr, uid, ids, {'state':'sending'}, context)
         #send mails one by one
-        for id in ids:
-            self.send_this_mail(cr, uid, [id], context)
+        self.send_this_mail(cr, uid, ids, context)
         return True
     
     def send_this_mail(self,cr,uid,ids=None,context=None):
@@ -116,7 +115,7 @@ class poweremail_mailbox(osv.osv):
                     self.write(cr,uid,id,{'folder':'sent','state':'na','date_mail':time.strftime("%Y-%m-%d %H:%M:%S")}, context)
                     self.historise(cr, uid, [id], "Email sent successfully", context)
                 else:
-                    self.historise(cr,uid,[id],result, context)
+                    self.historise(cr, uid, [id], result, context)
             except Exception,error:
                 logger = netsvc.Logger()
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s")% (id,error))
@@ -145,7 +144,7 @@ class poweremail_mailbox(osv.osv):
             'pem_body_text':fields.text('Standard Body (Text)'),
             'pem_body_html':fields.text('Body (Text-Web Client Only)'),
             'pem_attachments_ids':fields.many2many('ir.attachment', 'mail_attachments_rel', 'mail_id', 'att_id', 'Attachments'),
-            'pem_account_id' :fields.many2one('poweremail.core_accounts', 'User account'),
+            'pem_account_id' :fields.many2one('poweremail.core_accounts', 'User account', required=True),
             'pem_user':fields.related('pem_account_id','user',type="many2one",relation="res.users",string="User"),
             'server_ref':fields.integer('Server Reference of mail',help="Applicable for inward items only"),
             'pem_recd':fields.char('Received at',size=50),
@@ -163,19 +162,20 @@ class poweremail_mailbox(osv.osv):
                                     ('trash','Trash'),
                                     ('followup','Follow Up'),
                                     ('sent','Sent Items'),
-                                    ],'Folder'),
+                                    ], 'Folder', required=True),
             'state':fields.selection([
                                     ('read','Read'),
                                     ('unread','Un-Read'),
                                     ('na','Not Applicable'),
                                     ('sending','Sending'),
-                                    ],'Status'),
+                                    ],'Status', required=True),
             'date_mail':fields.datetime('Rec/Sent Date'),
             'history':fields.text('History',readonly=True,store=True)
         }
 
     _defaults = {
-
+        'state': lambda *a: 'na',
+        'folder': lambda *a: 'outbox',
     } 
 
     def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
