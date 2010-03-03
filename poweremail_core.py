@@ -279,14 +279,6 @@ class poweremail_core_accounts(osv.osv):
         self.write(cr, uid, ids, {'state':'approved'}, context=context)
 #        wf_service = netsvc.LocalService("workflow")
 
-    def get_reapprove(self, cr, uid, ids, context={}):
-        #TODO: Check if user has rights
-        self.write(cr, uid, ids, {'state':'draft'}, context=context)
-
-    def do_suspend(self, cr, uid, ids, context={}):
-        #TODO: Check if user has rights
-        self.write(cr, uid, ids, {'state':'suspended'}, context=context)    
-
     def smtp_connection(self, cr, uid, id, context=None):
         #This function returns a SMTP server object
         logger = netsvc.Logger()
@@ -573,7 +565,7 @@ class poweremail_core_accounts(osv.osv):
                         'name':self.decode_header_text(mail['subject']) + '(' + each[0] + ')',
                         'datas':base64.b64encode(each[2] or ''),
                         'datas_fname':each[1],
-                        'description':(self.decode_header_text(mail['subject']) or 'No Subject') + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
+                        'description':(self.decode_header_text(mail['subject']) or _('No Subject')) + " [Type:" + (each[0] or 'Unknown') + ", Filename:" + (each[1] or 'No Name') + "]",
                         'res_model':'poweremail.mailbox',
                         'res_id':id
                             }
