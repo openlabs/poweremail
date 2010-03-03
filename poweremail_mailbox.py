@@ -35,16 +35,17 @@ class poweremail_mailbox(osv.osv):
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
     _rec_name="pem_subject"
     _order = "date_mail desc"
-    def run_mail_scheduler(self, cr, uid, use_new_cursor=False, context=None):
+    def run_mail_scheduler(self, cr, uid, context=None):
+        logger = netsvc.Logger()
         try:
             self.get_all_mail(cr,uid,context={'all_accounts':True})
         except Exception,e:
-            print "Err in receiving mail",e
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, "Error receiving mail: %s" % str(e))
         try:
             self.send_all_mail(cr,uid,context)
         except Exception,e:
-            print "Err in sending mail",e
-        
+            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, "Error sending mail: %s" % str(e))
+ 
     def get_all_mail(self,cr,uid,context=None):
         if context is None:
             context = {}

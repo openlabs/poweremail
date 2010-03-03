@@ -10,8 +10,7 @@
             <field eval="False" name="doall"/>
             <field eval="'poweremail.mailbox'" name="model"/>
             <field eval="'run_mail_scheduler'" name="function"/>
-            <field eval="'(False,)'" name="args"/>
+            <field eval="'()'" name="args"/>
         </record>
-        
     </data>
 </openerp>
