@@ -252,21 +252,21 @@ class poweremail_send_wizard(osv.osv_memory):
                 }, context)
 
             # Create a partner event
-            if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', ctx):
+            if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', context):
                 name = vals['pem_subject']
                 if isinstance(name, str):
                     name = unicode(name, 'utf-8')
                 if len(name) > 64:
                     name = name[:61] + '...'
                 document = False
-                if self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
+                if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
                     document = data['model']+',%i' % record_id
                 elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
                     document = 'ir.attachment,%i' % attachment_ids[0]
                 self.pool.get('res.partner.event').create(cr, uid, {
                     'name': name,
                     'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
-                    'partner_id': self._get_template_value(cr, uid, 'partner_event', ctx),
+                    'partner_id': self._get_template_value(cr, uid, 'partner_event', context),
                     'date': time.strftime('%Y-%m-%d %H:%M:%S'),
                     'canal_id': template.canal_id and template.canal_id.id or False,
                     'partner_type': template.partner_type,

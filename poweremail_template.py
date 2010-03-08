@@ -526,7 +526,7 @@ class poweremail_templates(osv.osv):
                     if len(name) > 64:
                         name = name[:61] + '...'
                     document = False
-                    if self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
+                    if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
                         document = data['model']+',%i' % recid
                     elif attid and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
                         document = 'ir.attachment,%i' % attid
