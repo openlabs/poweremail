@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Document   : poweremail_template_view.xml
-    Created on : 22 July, 2009, 10:08 AM
-    Author     : Sharoon Thomas
-    Description: View file for templates
-
--->
+	<!--
+		Document : poweremail_template_view.xml Created on : 22 July, 2009,
+		10:08 AM Author : Sharoon Thomas Description: View file for templates
+	-->
 <openerp>
 	<data>
 		<!-- Power Email Template PReview -->
@@ -30,7 +27,7 @@
 					<newline />
 					<field name="body_text" />
 					<newline />
-					<field name="body_html" widget="text_html"/>
+					<field name="body_html" widget="text_html" />
 					<newline />
 					<field name="report" />
 					<group>
@@ -60,7 +57,8 @@
 			<field name="arch" type="xml">
 				<form string="Power Email Templates">
 					<field name="name" />
-					<field name="object_name" required="1" on_change="change_model(object_name)" />
+					<field name="object_name" required="1"
+						on_change="change_model(object_name)" />
 					<field name="model_int_name" invisible="1" />
 					<notebook colspan="4">
 						<page string="Mail Details">
@@ -68,13 +66,11 @@
 								<field name="def_to" colspan="4" required="1" />
 								<field name="def_cc" colspan="4" />
 								<field name="def_bcc" colspan="4" />
-								<field name="lang" colspan="4" />
 							</group>
 							<group col="2" colspan="2">
 								<field name="def_subject" colspan="4" required="1" />
 								<field name="use_sign" colspan="4" />
-								<field name="file_name" colspan="4" />
-								<field name="report_template" colspan="4" domain="[('model','=',model_int_name)]" />
+								<field name="lang" colspan="4" />
 							</group>
 							<separator colspan="3" string="Standard Body" />
 							<separator colspan="1" string="Expression Builder" />
@@ -83,54 +79,89 @@
 								<page string="Body (Text)">
 									<field name="def_body_text" colspan="4" nolabel="1" />
 								</page>
-								<page string="Body (HTML)">
-									<field name="def_body_html" colspan="4" nolabel="1" widget="text_html"/>
-									<label string="Note: HTML body can't be edited with GTK desktop client." colspan="4"/>
-									<!--html widget is not required as GTK does not support, if using only web use this widget="text_html"-->
+								<page string="Body (Raw HTML)">
+									<field name="def_body_html" colspan="4" nolabel="1" />
+									<label string="Note: This is Raw HTML." colspan="4" />
+									<!--We should support markdown instead of expecting user to use html-->
 								</page>
+								<!--
+									I dont advice using the html widget because tinymce is
+									interfering too much with the html generated
+								-->
+								<!--
+									<page string="Body (HTML)"> <field name="def_body_html"
+									colspan="4" nolabel="1" widget="text_html"/> <label
+									string="Note: HTML body can't be edited with GTK desktop
+									client." colspan="4"/> html widget is not required as GTK does
+									not support, if using only web use this widget="text_html"
+									</page>
+								-->
 							</notebook>
 							<group col="4">
+								<field name="template_language"
+									on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value,template_language,context)" />
 								<notebook>
 									<page string="Insert Simple Field">
 
-										<field name="model_object_field" domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_model_object_field(model_object_field, context)" colspan="4" />
+										<field name="model_object_field"
+											domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]"
+											on_change="_onchange_model_object_field(model_object_field, template_language,context)"
+											colspan="4" />
 										<field name="sub_object" readonly="1" colspan="4" />
-										<field name="sub_model_object_field" domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" colspan="4" attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}" on_change="_onchange_sub_model_object_field(model_object_field,sub_model_object_field,context)" />
-										<field name="null_value" colspan="4" on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value,context)" />
+										<field name="sub_model_object_field"
+											domain="[('model_id','=',sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]"
+											colspan="4"
+											attrs="{'readonly':[('sub_object','=',False)],'required':[('sub_object','!=',False)]}"
+											on_change="_onchange_sub_model_object_field(model_object_field,sub_model_object_field,template_language,context)" />
+										<field name="null_value" colspan="4"
+											on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value,template_language,context)" />
 										<field name="copyvalue" colspan="4" />
 									</page>
 									<page string="Insert Table">
-										<field name="table_model_object_field" domain="[('model_id','=',object_name),('ttype','in',['one2many','many2many'])]" colspan="2" on_change="_onchange_table_model_object_field(table_model_object_field,context)"/>
-										<field name="table_sub_object" readonly="1" colspan="2"/>
-										<field name="table_required_fields" colspan="4" nolabel="1" domain="[('model_id','=',table_sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]" on_change="_onchange_table_required_fields(table_model_object_field,table_required_fields,context)"/>
-										<field name="table_html" colspan="4"/>
+										<field name="table_model_object_field"
+											domain="[('model_id','=',object_name),('ttype','in',['one2many','many2many'])]"
+											colspan="2"
+											on_change="_onchange_table_model_object_field(table_model_object_field,template_language,context)" />
+										<field name="table_sub_object" readonly="1" colspan="2" />
+										<field name="table_required_fields" colspan="4" nolabel="1"
+											domain="[('model_id','=',table_sub_object),('ttype','!=','one2many'),('ttype','!=','many2many')]"
+											on_change="_onchange_table_required_fields(table_model_object_field,table_required_fields,context)" />
+										<field name="table_html" colspan="4" />
 									</page>
 
 								</notebook>
-								<button name="%(wizard_poweremail_preview)d" string="Preview Template" type="action" colspan="4" target="new"/>
+								<button name="%(wizard_poweremail_preview)d" string="Preview Template"
+									type="action" colspan="4" target="new" />
 							</group>
 						</page>
 						<page string="Security">
 							<separator colspan="4" string="Allowed User Groups" />
-							<field name="allowed_groups" string="Allowed User Groups" nolabel="1" />
+							<field name="allowed_groups" string="Allowed User Groups"
+								nolabel="1" />
 						</page>
 						<page string="Advanced">
-							<separator string="Automatic Email" colspan="4"/>
+							<separator string="Automatic Email" colspan="4" />
 							<field name="enforce_from_account" attrs="{'required':[('auto_email','=',True)]}" />
-							<field name="auto_email"/>
-							<field name="attached_wkf" domain="[('osv','=',model_int_name)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
-							<field name="attached_activity" domain="[('wkf_id', '=', attached_wkf)]" attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
-							<field name="send_on_create"/>
-							<field name="send_on_write"/>
-							<separator string="Email action and wizard" colspan="4"/>
+							<field name="auto_email" />
+							<field name="attached_wkf" domain="[('osv','=',model_int_name)]"
+								attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
+							<field name="attached_activity" domain="[('wkf_id', '=', attached_wkf)]"
+								attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
+							<field name="send_on_create" />
+							<field name="send_on_write" />
+							<separator string="Email action and wizard" colspan="4" />
 							<field name="server_action" readonly="1" />
 							<field name="ref_ir_act_window" />
 							<field name="ref_ir_value" />
-							<separator string="Log partner events" colspan="4"/>
+							<separator string="Attachments (Report to attach)" colspan="4"/>
+							<field name="file_name" colspan="2" />
+							<field name="report_template" colspan="2"
+									domain="[('model','=',model_int_name)]" />
+							<separator string="Log partner events" colspan="4" />
 							<field name="partner_event" />
-							<field name="partner_event_type_id"/>
-							<field name="canal_id" attrs="{'required':[('partner_event','!=',False)]}"/>
-							<field name="partner_type" attrs="{'required':[('partner_event','!=',False)]}"/>
+							<field name="partner_event_type_id" />
+							<field name="canal_id" attrs="{'required':[('partner_event','!=',False)]}" />
+							<field name="partner_type" attrs="{'required':[('partner_event','!=',False)]}" />
 						</page>
 					</notebook>
 				</form>
@@ -143,13 +174,13 @@
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
 				<tree string="Power Email Templates">
-					<field name="name" select="1"/>
-					<field name="object_name" required="1" select="1"/>
-					<field name="def_to" colspan="4" select="2"/>
-					<field name="def_cc" colspan="4" select="2"/>
-					<field name="def_bcc" colspan="4" select="2"/>
-					<field name="def_subject" colspan="4" select="2"/>
-					<field name="use_sign" colspan="4" select="2"/>
+					<field name="name" select="1" />
+					<field name="object_name" required="1" select="1" />
+					<field name="def_to" colspan="4" select="2" />
+					<field name="def_cc" colspan="4" select="2" />
+					<field name="def_bcc" colspan="4" select="2" />
+					<field name="def_subject" colspan="4" select="2" />
+					<field name="use_sign" colspan="4" select="2" />
 					<field name="file_name" colspan="4" />
 					<field name="enforce_from_account" />
 				</tree>
@@ -174,9 +205,12 @@
 		</record>
 
 
-		<menuitem name="E-M@IL Templates" id="menu_poweremail_templates_all" parent="menu_poweremail_administration_server" action="action_poweremail_template_tree_all" />
+		<menuitem name="E-M@IL Templates" id="menu_poweremail_templates_all"
+			parent="menu_poweremail_administration_server" action="action_poweremail_template_tree_all" />
 
-		<menuitem name="E-M@IL Templates" id="menu_poweremail_templates_form" parent="menu_poweremail_administration_server" action="action_poweremail_template_form" sequence="10" />
+		<menuitem name="E-M@IL Templates" id="menu_poweremail_templates_form"
+			parent="menu_poweremail_administration_server" action="action_poweremail_template_form"
+			sequence="10" />
 	</data>
 </openerp>
 
