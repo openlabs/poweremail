@@ -160,173 +160,179 @@ class poweremail_templates(osv.osv):
         'object_name':fields.many2one('ir.model', 'Model'),
         'model_int_name':fields.char('Model Internal Name', size=200,),
         'def_to':fields.char(
-                 'Recepient (To)', 
-                 size=250, 
+                 'Recepient (To)',
+                 size=250,
                  help="The default recepient of email." 
                  "Placeholders can be used here."),
         'def_cc':fields.char(
-                 'Default CC', 
-                 size=250, 
+                 'Default CC',
+                 size=250,
                  help="The default CC for the email."
                  " Placeholders can be used here."),
         'def_bcc':fields.char(
-                  'Default BCC', 
-                  size=250, 
+                  'Default BCC',
+                  size=250,
                   help="The default BCC for the email."
                   " Placeholders can be used here."),
         'lang':fields.char(
-                   'Language', 
-                   size=250, 
+                   'Language',
+                   size=250,
                    help="The default language for the email."
                    " Placeholders can be used here. "
                    "eg. ${object.partner_id.lang}"),
         'def_subject':fields.char(
-                  'Default Subject', 
-                  size=200, 
+                  'Default Subject',
+                  size=200,
                   help="The default subject of email."
-                  " Placeholders can be used here.", 
+                  " Placeholders can be used here.",
                   translate=True),
         'def_body_text':fields.text(
-                    'Standard Body (Text)', 
-                    help="The text version of the mail", 
+                    'Standard Body (Text)',
+                    help="The text version of the mail",
                     translate=True),
         'def_body_html':fields.text(
-                    'Body (Text-Web Client Only)', 
-                    help="The text version of the mail", 
+                    'Body (Text-Web Client Only)',
+                    help="The text version of the mail",
                     translate=True),
         'use_sign':fields.boolean(
-                  'Use Signature', 
+                  'Use Signature',
                   help="the signature from the User details" 
                   "will be appened to the mail"),
         'file_name':fields.char(
-                'File Name Pattern', 
-                size=200, 
+                'File Name Pattern',
+                size=200,
                 help="File name pattern can be specified with placeholders." 
-                "eg. 2009_SO003.pdf", 
+                "eg. 2009_SO003.pdf",
                 translate=True),
         'report_template':fields.many2one(
-                  'ir.actions.report.xml', 
+                  'ir.actions.report.xml',
                   'Report to send'),
         #'report_template':fields.reference('Report to send',[('ir.actions.report.xml','Reports')],size=128),
         'allowed_groups':fields.many2many(
-                  'res.groups', 
-                  'template_group_rel', 
-                  'templ_id', 'group_id', 
-                  string="Allowed User Groups", 
+                  'res.groups',
+                  'template_group_rel',
+                  'templ_id', 'group_id',
+                  string="Allowed User Groups",
                   help="Only users from these groups will be"
                   " allowed to send mails from this Template"),
         'enforce_from_account':fields.many2one(
-                   'poweremail.core_accounts', 
-                   string="Enforce From Account", 
-                   help="Emails will be sent only from this account.", 
+                   'poweremail.core_accounts',
+                   string="Enforce From Account",
+                   help="Emails will be sent only from this account.",
                    domain="[('company','=','yes')]"),
 
-        'auto_email':fields.boolean('Auto Email', 
+        'auto_email':fields.boolean('Auto Email',
                     help="Selecting Auto Email will create a server"
                     " action for you which automatically sends mail after a"
                     " new record is created.\nNote:Auto email can be enabled"
                     " only after saving template."),
         #Referred Stuff - Dont delete even if template is deleted
         'attached_wkf':fields.many2one(
-                   'workflow', 
+                   'workflow',
                    'Workflow'),
         'attached_activity':fields.many2one(
-                    'workflow.activity', 
+                    'workflow.activity',
                     'Activity'),
         #Referred Stuff - Delete these if template are deleted or they will crash the system
         'server_action':fields.many2one(
-                    'ir.actions.server', 
-                    'Related Server Action', 
+                    'ir.actions.server',
+                    'Related Server Action',
                     help="Corresponding server action is here."),
         'ref_ir_act_window':fields.many2one(
-                    'ir.actions.act_window', 
-                    'Window Action', 
+                    'ir.actions.act_window',
+                    'Window Action',
                     readonly=True),
         'ref_ir_value':fields.many2one(
-                   'ir.values', 
-                   'Wizard Button', 
+                   'ir.values',
+                   'Wizard Button',
                    readonly=True),
         #Expression Builder fields
         #Simple Fields
         'model_object_field':fields.many2one(
-                 'ir.model.fields', 
-                 string="Field", 
+                 'ir.model.fields',
+                 string="Field",
                  help="Select the field from the model you want to use."
                  "\nIf it is a relationship field you will be able to "
                  "choose the nested values in the box below\n(Note:If "
                  "there are no values make sure you have selected the"
-                 " correct model)", 
+                 " correct model)",
                  store=False),
         'sub_object':fields.many2one(
-                 'ir.model', 
-                 'Sub-model', 
+                 'ir.model',
+                 'Sub-model',
                  help='When a relation field is used this field'
-                 ' will show you the type of field you have selected', 
+                 ' will show you the type of field you have selected',
                  store=False),
         'sub_model_object_field':fields.many2one(
-                 'ir.model.fields', 
-                 'Sub Field', 
+                 'ir.model.fields',
+                 'Sub Field',
                  help="When you choose relationship fields "
-                 "this field will specify the sub value you can use.", 
+                 "this field will specify the sub value you can use.",
                  store=False),
         'null_value':fields.char(
-                 'Null Value', 
-                 help="This Value is used if the field is empty", 
+                 'Null Value',
+                 help="This Value is used if the field is empty",
                  size=50, store=False),
         'copyvalue':fields.char(
-                'Expression', 
-                size=100, 
+                'Expression',
+                size=100,
                 help="Copy and paste the value in the "
-                "location you want to use a system value.", 
+                "location you want to use a system value.",
                 store=False),
         #Table Fields
         'table_model_object_field':fields.many2one(
-               'ir.model.fields', 
-               string="Table Field", 
+               'ir.model.fields',
+               string="Table Field",
                help="Select the field from the model you want to use."
-               "\nOnly one2many & many2many fields can be used for tables)", 
+               "\nOnly one2many & many2many fields can be used for tables)",
                store=False),
         'table_sub_object':fields.many2one(
-               'ir.model', 
-               'Table-model', 
+               'ir.model',
+               'Table-model',
                help="This field shows the model you will"
                " be using for your table", store=False),
         'table_required_fields':fields.many2many(
-             'ir.model.fields', 
-             'fields_table_rel', 
-             'field_id', 'table_id', 
-             string="Required Fields", 
-             help="Select the fieldsyou require in the table)", 
+             'ir.model.fields',
+             'fields_table_rel',
+             'field_id', 'table_id',
+             string="Required Fields",
+             help="Select the fieldsyou require in the table)",
              store=False),
         'table_html':fields.text(
-             'HTML code', 
+             'HTML code',
              help="Copy this html code to your HTML message"
-             " body for displaying the info in your mail.", 
+             " body for displaying the info in your mail.",
              store=False),
         'send_on_create': fields.boolean(
-             'Send on Create', 
+             'Send on Create',
              help='Sends an e-mail when a new document is created.'),
         'send_on_write': fields.boolean(
-            'Send on Update', 
+            'Send on Update',
             help='Sends an e-mail when a document is modified.'),
         'partner_event': fields.char(
-             'Partner ID to log Events', 
-             size=250, 
+             'Partner ID to log Events',
+             size=250,
              help="Partner ID who to log and email event."
              " Placeholders can be used here. eg. ${object.partner_id.id}"),
         'partner_event_type_id':fields.many2one(
-            'res.partner.event.type', 
-            'Partner Event Type', 
+            'res.partner.event.type',
+            'Partner Event Type',
             readonly=True),
         'canal_id': fields.many2one(
-            'res.partner.canal', 
+            'res.partner.canal',
             'Channel'),
         'partner_type': fields.selection(
              [
-              ('customer', 'Customer'), 
-              ('retailer', 'Retailer'), 
+              ('customer', 'Customer'),
+              ('retailer', 'Retailer'),
               ('prospect', 'Commercial Prospect'),
               ], 'Partner Relation'),
+        #Template language(engine eg.Mako) specifics
+        'template_language':fields.selection(
+                TEMPLATE_ENGINES,
+                'Templating Language',
+                required=True
+                )
     }
 
     _defaults = {
@@ -474,20 +480,41 @@ class poweremail_templates(osv.osv):
         default.update({'name':new_name, })
         return super(poweremail_templates, self).copy(cr, uid, id, default, context)
     
-    def compute_pl(self, model_object_field, sub_model_object_field, null_value):
+    def compute_pl(self,
+                   model_object_field,
+                   sub_model_object_field,
+                   null_value, template_language='mako'):
+        """
+        Returns the expression based on data provided
+        @param model_object_field: First level field
+        @param sub_model_object_field: Second level drilled down field (M2O)
+        @param null_value: What has to be returned if the value is empty
+        @param template_language: The language used for templating
+        @return: computed expression
+        """
         #Configure for MAKO
         copy_val = ''
-        if model_object_field:
-            copy_val = "${object." + model_object_field
-        if sub_model_object_field:
-            copy_val += "." + sub_model_object_field
-        if null_value:
-            copy_val += " or '" + null_value + "'"
-        if model_object_field:
-            copy_val += "}"
+        if template_language == 'mako':
+            if model_object_field:
+                copy_val = "${object." + model_object_field
+            if sub_model_object_field:
+                copy_val += "." + sub_model_object_field
+            if null_value:
+                copy_val += " or '" + null_value + "'"
+            if model_object_field:
+                copy_val += "}"
+        elif template_language == 'django':
+            if model_object_field:
+                copy_val = "object." + model_object_field
+            if sub_model_object_field:
+                copy_val += "." + sub_model_object_field
+            if null_value:
+                copy_val = "{% if " + copy_val + " %}{{" + copy_val + "}}{% else %}" + null_value + "{% endif %}"  
+            else:
+                copy_val = "{{" + copy_val + "}}"        
         return copy_val 
             
-    def _onchange_model_object_field(self, cr, uid, ids, model_object_field, context=None):
+    def _onchange_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
         result = {}
@@ -497,13 +524,20 @@ class poweremail_templates(osv.osv):
             res_ids = self.pool.get('ir.model').search(cr, uid, [('model', '=', field_obj.relation)], context=context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
-                result['copyvalue'] = self.compute_pl(False, False, False)
+                result['copyvalue'] = self.compute_pl(False,
+                                                      False,
+                                                      False,
+                                                      template_language)
                 result['sub_model_object_field'] = False
                 result['null_value'] = False
         else:
             #Its a simple field... just compute placeholder
             result['sub_object'] = False
-            result['copyvalue'] = self.compute_pl(field_obj.name, False, False)
+            result['copyvalue'] = self.compute_pl(field_obj.name,
+                                                  False,
+                                                  False,
+                                                  template_language
+                                                  )
             result['sub_model_object_field'] = False
             result['null_value'] = False
         return {'value':result}
@@ -511,7 +545,7 @@ class poweremail_templates(osv.osv):
 
 
         
-    def _onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, context=None):
+    def _onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
         if not model_object_field or not sub_model_object_field:
             return {}
         result = {}
@@ -521,18 +555,26 @@ class poweremail_templates(osv.osv):
             sub_field_obj = self.pool.get('ir.model.fields').browse(cr, uid, sub_model_object_field, context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
-                result['copyvalue'] = self.compute_pl(field_obj.name, sub_field_obj.name, False)
+                result['copyvalue'] = self.compute_pl(field_obj.name,
+                                                      sub_field_obj.name,
+                                                      False,
+                                                      template_language
+                                                      )
                 result['sub_model_object_field'] = sub_model_object_field
                 result['null_value'] = False
         else:
             #Its a simple field... just compute placeholder
             result['sub_object'] = False
-            result['copyvalue'] = self.compute_pl(field_obj.name, False, False)
+            result['copyvalue'] = self.compute_pl(field_obj.name,
+                                                  False,
+                                                  False,
+                                                  template_language
+                                                  )
             result['sub_model_object_field'] = False
             result['null_value'] = False
         return {'value':result}
 
-    def _onchange_null_value(self, cr, uid, ids, model_object_field, sub_model_object_field, null_value, context=None):
+    def _onchange_null_value(self, cr, uid, ids, model_object_field, sub_model_object_field, null_value, template_language, context=None):
         if not model_object_field and not null_value:
             return {}
         result = {}
@@ -542,13 +584,21 @@ class poweremail_templates(osv.osv):
             sub_field_obj = self.pool.get('ir.model.fields').browse(cr, uid, sub_model_object_field, context)
             if res_ids:
                 result['sub_object'] = res_ids[0]
-                result['copyvalue'] = self.compute_pl(field_obj.name, sub_field_obj.name, null_value)
+                result['copyvalue'] = self.compute_pl(field_obj.name,
+                                                      sub_field_obj.name,
+                                                      null_value,
+                                                      template_language
+                                                      )
                 result['sub_model_object_field'] = sub_model_object_field
                 result['null_value'] = null_value
         else:
             #Its a simple field... just compute placeholder
             result['sub_object'] = False
-            result['copyvalue'] = self.compute_pl(field_obj.name, False, null_value)
+            result['copyvalue'] = self.compute_pl(field_obj.name,
+                                                  False,
+                                                  null_value,
+                                                  template_language
+                                                  )
             result['sub_model_object_field'] = False
             result['null_value'] = null_value
         return {'value':result}
@@ -567,7 +617,7 @@ class poweremail_templates(osv.osv):
             result['sub_object'] = False
         return {'value':result}
 
-    def _onchange_table_required_fields(self, cr, uid, ids, table_model_object_field, table_required_fields, context=None):
+    def _onchange_table_required_fields(self, cr, uid, ids, table_model_object_field, table_required_fields, template_language, context=None):
         print table_model_object_field, table_required_fields
         if not table_model_object_field or not table_required_fields:
             return {'value':{'table_html': False}}
@@ -583,6 +633,7 @@ class poweremail_templates(osv.osv):
             result += "</td>"
         result += "\n</tr>\n"
         #Table header is defined,  now mako for table
+        #TODO: Fix for django
         result += "%for o in object." + table_field_obj.name + ":\n<tr>"
         for each_rec in table_required_fields[0][2]:
             result += "\n<td>${o."
@@ -747,7 +798,7 @@ class poweremail_preview(osv.osv_memory):
         
     _columns = {
         'ref_template':fields.many2one(
-                                       'poweremail.templates', 
+                                       'poweremail.templates',
                                        'Template', readonly=True),
         'rel_model':fields.many2one('ir.model', 'Model', readonly=True),
         'rel_model_ref':fields.selection(_get_model_recs, 'Referred Document'),
