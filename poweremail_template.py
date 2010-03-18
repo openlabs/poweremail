@@ -58,7 +58,7 @@ except:
     LOGGER.notifyChannel(
                          _("Power Email"),
                          netsvc.LOG_ERROR,
-                         _("Mako templates not installed")
+                         _("Django templates not installed")
                          )
 
 import poweremail_engines
@@ -352,7 +352,7 @@ class poweremail_templates(osv.osv):
         'partner_event': fields.char(
              'Partner ID to log Events',
              size=250,
-             help="Partner ID who to log and email event."
+             help="Partner ID who an email event is logged."
              " Placeholders can be used here. eg. ${object.partner_id.id}"),
         'partner_event_type_id':fields.many2one(
             'res.partner.event.type',
@@ -581,9 +581,6 @@ class poweremail_templates(osv.osv):
             result['sub_model_object_field'] = False
             result['null_value'] = False
         return {'value':result}
-
-
-
         
     def _onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
         if not model_object_field or not sub_model_object_field:
@@ -782,8 +779,8 @@ class poweremail_templates(osv.osv):
                     document = False
                     if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object', '=', data['model'])], context=context):
                         document = data['model'] + ',%i' % recid
-                    elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
-                        document = 'ir.attachment,%i' % attid
+                    #elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
+                    #    document = 'ir.attachment,%i' % attid
                     self.pool.get('res.partner.event').create(cr, uid, {
                         'name': name,
                         'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
