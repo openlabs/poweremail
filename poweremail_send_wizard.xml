@@ -12,7 +12,7 @@
 						<field name="rel_model" colspan="2" />
 						<field name="from" required="1" colspan="2" />
 					</group>
-					<group col="4" colspan="4" attrs="{'invisible':[('state','!=','single')]}">
+					<group col="4" colspan="4">
 						<group col="6" colspan="4">
 							<field name="to" select="1" colspan="4" />
 							<newline />
@@ -39,17 +39,20 @@
 							</page>
 						</notebook>
 						<field name="signature" colspan="4" />
-						<button name="sav_to_drafts" string="Save in Drafts" type="object" />
-						<button name="send_mail" string="Send now" type="object" />
-						<button special="cancel" string="Discard Mail" />
+					</group>
+					<group col="4" colspan="4" attrs="{'invisible':[('state','!=','single')]}">
+						<button icon="gtk-apply" name="sav_to_drafts" string="Save in Drafts" type="object" />
+						<button icon="gtk-ok" name="send_mail" string="Send now" type="object" />
+						<button icon="gtk-cancel" special="cancel" string="Discard Mail" />
 					</group>
 					<group col="4" colspan="4" attrs="{'invisible':[('state','=','single')]}">
+					    <label string="Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to language." colspan="4"/>
 						<field name="requested" />
 						<field name="generated" />
-						<button name="_get_generated" string="Send all mails" type="object" states="multi" colspan="2" />
-						<button special="cancel" string="Discard Mail" colspan="2" states="multi" />
+						<button icon="gtk-ok" name="_get_generated" string="Send all mails" type="object" states="multi" colspan="2" />
+						<button icon="gtk-cancel" special="cancel" string="Discard Mail" colspan="2" states="multi" />
 					</group>
-					<button special="cancel" string="Close" colspan="4" states="done" />
+					<button icon="gtk-ok" special="cancel" string="Close" colspan="4" states="done" />
 					<field name="state" />
 					<newline />
 					<label string="After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve" colspan="4"/>
