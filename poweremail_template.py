@@ -448,7 +448,7 @@ class poweremail_templates(osv.osv):
                 self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
 
     def create(self, cr, uid, vals, context=None):
-        id = super(poweremail_templates, self).create(cr, uid, vals, context)   
+        id = super(poweremail_templates, self).create(cr, uid, vals, context)
         src_obj = self.pool.get('ir.model').read(cr, uid, vals['object_name'], ['model'], context)['model']
         vals['ref_ir_act_window'] = self.pool.get('ir.actions.act_window').create(cr, uid, {
              'name': _("%s Mail Form") % vals['name'],
@@ -469,6 +469,10 @@ class poweremail_templates(osv.osv):
              'value': "ir.actions.act_window," + str(vals['ref_ir_act_window']),
              'object': True,
          }, context)
+        self.write(cr, uid, id, {
+            'ref_ir_act_window': vals['ref_ir_act_window'],
+            'ref_ir_value': vals['ref_ir_value'],
+        }, context)
         if vals.get('auto_email'):
             self.update_auto_email(cr, uid, [id], context)
         if vals.get('send_on_create') or vals.get('send_on_write'): 
@@ -513,11 +517,12 @@ class poweremail_templates(osv.osv):
         if default is None:
             default = {}
         default = default.copy()
-        new_name = "Copy of template " + default.get('name', 'No Name')
+        old = self.read(cr, uid, id, ['name'], context=context)
+        new_name = _("Copy of template ") + old.get('name', 'No Name')
         check = self.search(cr, uid, [('name', '=', new_name)], context=context)
         if check:
             new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
-        default.update({'name':new_name, })
+        default.update({'name':new_name, 'partner_event_type_id': False})
         return super(poweremail_templates, self).copy(cr, uid, id, default, context)
     
     def compute_pl(self,
