@@ -27,7 +27,12 @@
 					<newline />
 					<field name="body_text" />
 					<newline />
-					<field name="body_html" widget="text_html" />
+					<!-- <field name="body_html" widget="text_html" />-->
+					<!-- 
+					Removed text_html because it doesnt work in GTK
+					And TinyMCE messes up the HTML in Web Client
+					 -->
+					<field name="body_html"/>
 					<newline />
 					<field name="report" />
 					<group>

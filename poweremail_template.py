@@ -35,8 +35,9 @@ TEMPLATE_ENGINES = []
 from osv import osv, fields
 from tools.translate import _
 #Try and check the available templating engines
+from mako.template import Template  #For backward combatibility
 try:
-    from mako.template import Template
+    from mako.template import Template as MakoTemplate
     from mako import exceptions
     TEMPLATE_ENGINES.append(('mako', 'Mako Templates'))
 except:
@@ -46,7 +47,7 @@ except:
                          _("Mako templates not installed")
                          )
 try:
-    from django.template import Context, Template
+    from django.template import Context, Template as DjangoTemplate
     #Workaround for bug:
     #http://code.google.com/p/django-tagging/issues/detail?id=110
     from django.conf import settings
@@ -137,6 +138,45 @@ def new_register_all(db):
 
 report.interface.register_all = new_register_all
 
+def get_value(cursor, user, recid, message=None, template=None, context=None):
+    """
+    Evaluates an expression and returns its value
+    @param cursor: Database Cursor
+    @param user: ID of current user
+    @param recid: ID of the target record under evaluation
+    @param message: The expression to be avaluated
+    @param template: BrowseRecord object of the current template
+    @param context: Open ERP Context
+    @return: Computed message (unicode) or u""
+    """
+    pool = pooler.get_pool(cursor.dbname)
+    if message is None:
+        message = {}
+    #Returns the computed expression
+    if message:
+        try:
+            message = tools.ustr(message)
+            object = pool.get(template.model_int_name).browse(cursor, user, recid, context)
+            env = {
+                'user':pool.get('res.users').browse(cursor, user, user, context),
+                'db':cursor.dbname
+                   }
+            if template.template_language == 'mako':
+                templ = MakoTemplate(message, input_encoding='utf-8')
+                reply = MakoTemplate(message).render_unicode(object=object, 
+                                                             peobject=object, 
+                                                             env=env, 
+                                                             format_exceptions=True)
+            elif template.template_language == 'django':
+                templ = DjangoTemplate(message)
+                env['object'] = object
+                env['peobject'] = object
+                reply = templ.render(Context(env))
+            return reply
+        except Exception:
+            return u""
+    else:
+        return message
 
 class poweremail_templates(osv.osv):
     _name = "poweremail.templates"
@@ -644,6 +684,7 @@ class poweremail_templates(osv.osv):
         return {'value':{'table_html':result}}
 
     def get_value(self, cr, uid, recid, message=None, template=None, context=None):
+        raise DeprecationWarning("This function will be depreciated in 0.8, Please use the global method get_value")
         if message is None:
             message = {}
         #Returns the computed expression
@@ -686,19 +727,19 @@ class poweremail_templates(osv.osv):
             try:
                 self.engine = self.pool.get("poweremail.engines")
                 #Search translated template
-                lang = self.get_value(cr, uid, recid, template.lang, template, context)
+                lang = get_value(cr, uid, recid, template.lang, template, context)
                 if lang:
                     ctx = context.copy()
                     ctx.update({'lang':lang})
                     template = self.browse(cr, uid, id, ctx)
                 vals = {
                         'pem_from': tools.ustr(from_account['name']) + "<" + tools.ustr(from_account['email_id']) + ">",
-                        'pem_to':self.get_value(cr, uid, recid, template.def_to, template, context),
-                        'pem_cc':self.get_value(cr, uid, recid, template.def_cc, template, context),
-                        'pem_bcc':self.get_value(cr, uid, recid, template.def_bcc, template, context),
-                        'pem_subject':self.get_value(cr, uid, recid, template.def_subject, template, context),
-                        'pem_body_text':self.get_value(cr, uid, recid, template.def_body_text, template, context),
-                        'pem_body_html':self.get_value(cr, uid, recid, template.def_body_html, template, context),
+                        'pem_to':get_value(cr, uid, recid, template.def_to, template, context),
+                        'pem_cc':get_value(cr, uid, recid, template.def_cc, template, context),
+                        'pem_bcc':get_value(cr, uid, recid, template.def_bcc, template, context),
+                        'pem_subject':get_value(cr, uid, recid, template.def_subject, template, context),
+                        'pem_body_text':get_value(cr, uid, recid, template.def_body_text, template, context),
+                        'pem_body_html':get_value(cr, uid, recid, template.def_body_html, template, context),
                         'pem_account_id' :from_account['id'], #This is a mandatory field when automatic emails are sent
                         'state':'na',
                         'folder':'outbox',
@@ -722,7 +763,7 @@ class poweremail_templates(osv.osv):
                     new_att_vals = {
                                     'name':vals['pem_subject'] + ' (Email Attachment)',
                                     'datas':base64.b64encode(result),
-                                    'datas_fname':tools.ustr(self.get_value(cr, uid, recid, template.file_name, template, context) or 'Report') + "." + format,
+                                    'datas_fname':tools.ustr(get_value(cr, uid, recid, template.file_name, template, context) or 'Report') + "." + format,
                                     'description':vals['pem_body_text'] or "No Description",
                                     'res_model':'poweremail.mailbox',
                                     'res_id':mail_id
@@ -732,7 +773,7 @@ class poweremail_templates(osv.osv):
                         self.pool.get('poweremail.mailbox').write(cr, uid, mail_id, {'pem_attachments_ids':[[6, 0, [attid]]], 'mail_type':'multipart/mixed'}, context)
                 sent_recs.append(recid)
                 # Create a partner event
-                if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self.get_value(cr, uid, recid, template.partner_event, template, context):
+                if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and get_value(cr, uid, recid, template.partner_event, template, context):
                     name = vals['pem_subject']
                     if isinstance(name, str):
                         name = unicode(name, 'utf-8')
@@ -746,7 +787,7 @@ class poweremail_templates(osv.osv):
                     self.pool.get('res.partner.event').create(cr, uid, {
                         'name': name,
                         'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
-                        'partner_id': self.get_value(cr, uid, recid, template.partner_event, template, context),
+                        'partner_id': get_value(cr, uid, recid, template.partner_event, template, context),
                         'date': time.strftime('%Y-%m-%d %H:%M:%S'),
                         'canal_id': template.canal_id and template.canal_id.id or False,
                         'partner_type': template.partner_type,
@@ -778,6 +819,7 @@ class poweremail_preview(osv.osv_memory):
             return ref_obj_recs
     
     def get_value(self, cr, uid, recid, message=None, template=None, context=None):
+        raise DeprecationWarning("This function will be depreciated in 0.8, Please use the global method get_value")
         if message is None:
             message = {}
         #Returns the computed expression
@@ -825,19 +867,18 @@ class poweremail_preview(osv.osv_memory):
             context = self.context
         template = self.pool.get('poweremail.templates').browse(cr, uid, context['active_id'], context)
         #Search translated template
-        lang = self.get_value(cr, uid, rel_model_ref, template.lang, template, context)
+        lang = get_value(cr, uid, rel_model_ref, template.lang, template, context)
         if lang:
             ctx = context.copy()
             ctx.update({'lang':lang})
             template = self.pool.get('poweremail.templates').browse(cr, uid, context['active_id'], ctx)
-        vals['to'] = self.get_value(cr, uid, rel_model_ref, template.def_to, template, context)
-        vals['cc'] = self.get_value(cr, uid, rel_model_ref, template.def_cc, template, context)
-        vals['bcc'] = self.get_value(cr, uid, rel_model_ref, template.def_bcc, template, context)
-        vals['subject'] = self.get_value(cr, uid, rel_model_ref, template.def_subject, template, context)
-        vals['body_text'] = self.get_value(cr, uid, rel_model_ref, template.def_body_text, template, context)
-        vals['body_html'] = self.get_value(cr, uid, rel_model_ref, template.def_body_html, template, context)
-        vals['report'] = self.get_value(cr, uid, rel_model_ref, template.file_name, template, context)
-        #print "Vals>>>>>",vals
+        vals['to'] = get_value(cr, uid, rel_model_ref, template.def_to, template, context)
+        vals['cc'] = get_value(cr, uid, rel_model_ref, template.def_cc, template, context)
+        vals['bcc'] = get_value(cr, uid, rel_model_ref, template.def_bcc, template, context)
+        vals['subject'] = get_value(cr, uid, rel_model_ref, template.def_subject, template, context)
+        vals['body_text'] = get_value(cr, uid, rel_model_ref, template.def_body_text, template, context)
+        vals['body_html'] = get_value(cr, uid, rel_model_ref, template.def_body_html, template, context)
+        vals['report'] = get_value(cr, uid, rel_model_ref, template.file_name, template, context)
         return {'value':vals}
         
 poweremail_preview()
