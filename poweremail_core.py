@@ -204,37 +204,69 @@ class poweremail_core_accounts(osv.osv):
                           }
                 }
     
-    
-    def out_connection(self, cursor, user, ids, context=None):
+    def _get_outgoing_server(self, cursor, user, ids, context=None):
         """
-        checks SMTP credentials and confirms if outgoing connection works
-        (Attached to button)
+        Returns the Out Going Connection (SMTP) object
+        
+        @attention: DO NOT USE except_osv IN THIS METHOD
+        @param cursor: Database Cursor
+        @param user: ID of current user
+        @param ids: ID/list of ids of current object for 
+                    which connection is required
+                    First ID will be chosen from lists
+        @param context: Context
+        
+        @return: SMTP server object or Exception
         """
-        #TODO:Reuse smtp_connection and remove duplicate code
-        rec = self.browse(cursor, user, ids, context)[0]
-        if rec:
-            if rec.smtpserver and rec.smtpport: 
+        #Type cast ids to integer
+        if type(ids) == list:
+            id = ids[0]
+        this_object = self.browse(cursor, user, id, context)
+        if this_object:
+            if this_object.smtpserver and this_object.smtpport: 
                 try:
-                    serv = smtplib.SMTP(rec.smtpserver, rec.smtpport)
+                    serv = smtplib.SMTP(this_object.smtpserver, this_object.smtpport)
                     serv.ehlo()
-                    if rec.smtpssl:
+                    if this_object.smtpssl:
                         serv.starttls()
                         serv.ehlo()
                 except Exception, error:
-                    raise osv.except_osv(_("SMTP Server Error"),
-                                         _("An error occurred : %s ") % error)
+                    raise error
                 try:
-                    if serv.has_extn('AUTH') or rec.smtpuname or rec.smtppass:
-                        serv.login(rec.smtpuname, rec.smtppass)
+                    if serv.has_extn('AUTH') or this_object.smtpuname or this_object.smtppass:
+                        serv.login(this_object.smtpuname, this_object.smtppass)
                 except Exception, error:
-                    raise osv.except_osv(_("SMTP Server Login Error"),
-                                         _("An error occurred : %s ") % error)
-                raise osv.except_osv(_("Information"),
-                                     _("SMTP Test Connection Was Successful"))
-
-    def in_connection(self, cursor, user, ids, context={}):
+                    raise error
+                return serv
+            raise Exception(_("SMTP SERVER or PORT not specified"))
+        raise Exception(_("Core connection for the given ID does not exist"))
+    
+    def _check_outgoing_connection(self, cursor, user, ids, context=None):
         """
-        Checks IMAP or POP3 credentials and returns if credentials are right
+        checks SMTP credentials and confirms if outgoing connection works
+        (Attached to button)
+        @param cursor: Database Cursor
+        @param user: ID of current user
+        @param ids: list of ids of current object for 
+                    which connection is required
+        @param context: Context
+        """
+        try:
+            self._get_outgoing_server(cursor, user, ids, context)
+            raise osv.except_osv(_("SMTP Test Connection Was Successful"),'')
+        except osv.except_osv, success_message:
+            raise success_message
+        except Exception, error:
+            raise osv.except_osv(
+                                 _("Out going connection test"),
+                                 _("Reason: %s") % error
+                                 )
+        
+    def in_connection(self, cursor, user, ids, context={}):
+        raise DeprecationWarning("This function will be depreciated in 0.8,"
+                                 " Please use the global method get_value")
+        """
+        DEPRECIATED
         """
         #TODO:Re Use a common in_connection which other methods could use
         rec = self.browse(cursor, user, ids, context)[0]
@@ -248,14 +280,14 @@ class poweremail_core_accounts(osv.osv):
                         else:
                             serv = imaplib.IMAP4(rec.iserver, rec.isport)
                     except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Error"), 
+                        raise osv.except_osv(_("IMAP Server Error"),
                                              _("An error occurred : %s ") % error)
                     try:
                         serv.login(rec.isuser, rec.ispass)
                     except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Login Error"), 
+                        raise osv.except_osv(_("IMAP Server Login Error"),
                                              _("An error occurred : %s ") % error)
-                    raise osv.except_osv(_("Information"), 
+                    raise osv.except_osv(_("Information"),
                                          _("IMAP Test Connection Was Successful"))
                 else:
                     #Extract POP3 connection into separate private method

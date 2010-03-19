@@ -55,7 +55,7 @@
 								<field name="smtpport" select="2" colspan="2" />
 								<field name="smtpssl" select="2" colspan="2" />
 							</group>
-							<button name="out_connection" type="object" string="Check Outgoing Connection" />
+							<button name="_check_outgoing_connection" type="object" string="Check Outgoing Connection" />
 							<separator string="User Information" colspan="4" />
 							<group col="2" colspan="2">
 								<field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" colspan="2" />

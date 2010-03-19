@@ -684,7 +684,8 @@ class poweremail_templates(osv.osv):
         return {'value':{'table_html':result}}
 
     def get_value(self, cr, uid, recid, message=None, template=None, context=None):
-        raise DeprecationWarning("This function will be depreciated in 0.8, Please use the global method get_value")
+        raise DeprecationWarning("This function will be depreciated in 0.8,"
+                                 " Please use the global method get_value")
         if message is None:
             message = {}
         #Returns the computed expression
