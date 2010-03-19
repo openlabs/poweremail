@@ -58,7 +58,7 @@ except:
     LOGGER.notifyChannel(
                          _("Power Email"),
                          netsvc.LOG_ERROR,
-                         _("Mako templates not installed")
+                         _("Django templates not installed")
                          )
 
 import poweremail_engines
@@ -352,7 +352,7 @@ class poweremail_templates(osv.osv):
         'partner_event': fields.char(
              'Partner ID to log Events',
              size=250,
-             help="Partner ID who to log and email event."
+             help="Partner ID who an email event is logged."
              " Placeholders can be used here. eg. ${object.partner_id.id}"),
         'partner_event_type_id':fields.many2one(
             'res.partner.event.type',
@@ -448,7 +448,7 @@ class poweremail_templates(osv.osv):
                 self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
 
     def create(self, cr, uid, vals, context=None):
-        id = super(poweremail_templates, self).create(cr, uid, vals, context)   
+        id = super(poweremail_templates, self).create(cr, uid, vals, context)
         src_obj = self.pool.get('ir.model').read(cr, uid, vals['object_name'], ['model'], context)['model']
         vals['ref_ir_act_window'] = self.pool.get('ir.actions.act_window').create(cr, uid, {
              'name': _("%s Mail Form") % vals['name'],
@@ -469,6 +469,10 @@ class poweremail_templates(osv.osv):
              'value': "ir.actions.act_window," + str(vals['ref_ir_act_window']),
              'object': True,
          }, context)
+        self.write(cr, uid, id, {
+            'ref_ir_act_window': vals['ref_ir_act_window'],
+            'ref_ir_value': vals['ref_ir_value'],
+        }, context)
         if vals.get('auto_email'):
             self.update_auto_email(cr, uid, [id], context)
         if vals.get('send_on_create') or vals.get('send_on_write'): 
@@ -513,11 +517,12 @@ class poweremail_templates(osv.osv):
         if default is None:
             default = {}
         default = default.copy()
-        new_name = "Copy of template " + default.get('name', 'No Name')
+        old = self.read(cr, uid, id, ['name'], context=context)
+        new_name = _("Copy of template ") + old.get('name', 'No Name')
         check = self.search(cr, uid, [('name', '=', new_name)], context=context)
         if check:
             new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
-        default.update({'name':new_name, })
+        default.update({'name':new_name, 'partner_event_type_id': False})
         return super(poweremail_templates, self).copy(cr, uid, id, default, context)
     
     def compute_pl(self,
@@ -581,9 +586,6 @@ class poweremail_templates(osv.osv):
             result['sub_model_object_field'] = False
             result['null_value'] = False
         return {'value':result}
-
-
-
         
     def _onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
         if not model_object_field or not sub_model_object_field:
@@ -783,8 +785,8 @@ class poweremail_templates(osv.osv):
                     document = False
                     if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object', '=', data['model'])], context=context):
                         document = data['model'] + ',%i' % recid
-                    elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
-                        document = 'ir.attachment,%i' % attid
+                    #elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
+                    #    document = 'ir.attachment,%i' % attid
                     self.pool.get('res.partner.event').create(cr, uid, {
                         'name': name,
                         'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],

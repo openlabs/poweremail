@@ -36,7 +36,7 @@ class poweremail_send_wizard(osv.osv_memory):
     _description = 'This is the wizard for sending mail'
     _rec_name = "subject"
 
-    def _get_accounts(self,cr,uid,context=None):
+    def _get_accounts(self, cr, uid, context=None):
         if context is None:
             context = {}
 
@@ -57,40 +57,21 @@ class poweremail_send_wizard(osv.osv_memory):
                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
                raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
-    def _get_generated(self,cr,uid,ids=None,context=None):
-        if ids is None:
-            ids = []
-        if context is None:
-            context = {}
-        logger = netsvc.Logger()
-        screen_vals = self.read(cr,uid,ids[0],[], context)
-        context['account_id'] = screen_vals[0]['from']
-        template = self._get_template(cr, uid, context)
-        if context['src_rec_ids'] and len(context['src_rec_ids'])>1 and template:
-            #Means there are multiple items selected for email. Just send them no need preview
-            result = self.pool.get('poweremail.templates').generate_mail(cr,uid,template.id,context['src_rec_ids'],context) 
-            if result:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
-                self.write(cr,uid,ids,{
-                    'generated':len(result),
-                    'state':'done'
-                }, context)
-            else:
-                raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
-        return True
-
-    def get_value(self,cr,uid, template, message, context=None):
+    def get_value(self, cr, uid, template, message, context=None, id=None):
+        """Gets the value of the message parsed with the content of object id (or the first 'src_rec_ids' if id is not given)"""
         if not message:
             return ''
         try:
+            if not id:
+                id = context['src_rec_ids'][0]
             message = tools.ustr(message)
-            object = self.pool.get(template.model_int_name).browse(cr,uid,context['src_rec_ids'][0],context)
-            templ = Template(message,input_encoding='utf-8')
+            object = self.pool.get(template.model_int_name).browse(cr, uid, id, context)
+            templ = Template(message, input_encoding='utf-8')
             env = {
-                'user':self.pool.get('res.users').browse(cr,uid,uid, context),
+                'user':self.pool.get('res.users').browse(cr, uid, uid, context),
                 'db':cr.dbname
             }
-            reply = Template(message).render_unicode(object=object,peobject=object,env=env,format_exceptions=True)
+            reply = Template(message).render_unicode(object=object, peobject=object, env=env, format_exceptions=True)
             return reply
         except Exception, e:
             return ""
@@ -112,7 +93,7 @@ class poweremail_send_wizard(osv.osv_memory):
 
         template = self.pool.get('poweremail.templates').browse(cr, uid, template_ids[0], context)
 
-        lang = self.get_value( cr, uid, template, template.lang, context )
+        lang = self.get_value(cr, uid, template, template.lang, context)
         if lang:
             # Use translated template if necessary
             ctx = context.copy()
@@ -124,7 +105,10 @@ class poweremail_send_wizard(osv.osv_memory):
         template = self._get_template(cr, uid, context)
         if not template:
             return False
-        return self.get_value( cr, uid, template, getattr(template, field), context )
+        if len(context['src_rec_ids']) > 1: # Multiple Mail: Gets original template values for multiple email change
+            return getattr(template, field)
+        else: # Simple Mail: Gets computed template values
+            return self.get_value(cr, uid, template, getattr(template, field), context)
 
     _columns = {
         'state':fields.selection([
@@ -153,8 +137,8 @@ class poweremail_send_wizard(osv.osv_memory):
 
     _defaults = {
         'state': lambda self,cr,uid,ctx: len(ctx['src_rec_ids']) > 1 and 'multi' or 'single',
-        'rel_model': lambda self,cr,uid,ctx:self.pool.get('ir.model').search(cr,uid,[('model','=',ctx['src_model'])],context=ctx)[0],
-        'rel_model_ref': lambda self,cr,uid,ctx:ctx['active_id'],
+        'rel_model': lambda self,cr,uid,ctx: self.pool.get('ir.model').search(cr,uid,[('model','=',ctx['src_model'])],context=ctx)[0],
+        'rel_model_ref': lambda self,cr,uid,ctx: ctx['active_id'],
         'to': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_to', ctx),
         'cc': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_cc', ctx),
         'bcc': lambda self,cr,uid,ctx: self._get_template_value(cr, uid, 'def_bcc', ctx),
@@ -174,64 +158,105 @@ class poweremail_send_wizard(osv.osv_memory):
             result['attachment_ids']['domain'] = [('res_model','=',context['src_model']),('res_id','=',context['active_id'])]
         return result
 
-    def sav_to_drafts(self,cr,uid,ids,context=None):
+    def sav_to_drafts(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        mailid = self.save_to_mailbox(cr,uid,ids,context)
-        if self.pool.get('poweremail.mailbox').write(cr,uid,mailid,{'folder':'drafts'}, context):
+        mailid = self.save_to_mailbox(cr, uid, ids, context)
+        if self.pool.get('poweremail.mailbox').write(cr, uid, mailid, {'folder':'drafts'}, context):
             return {'type':'ir.actions.act_window_close' }
 
-    def send_mail(self,cr,uid,ids,context=None):
+    def send_mail(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        mailid = self.save_to_mailbox(cr,uid,ids,context)
-        if self.pool.get('poweremail.mailbox').write(cr,uid,mailid,{'folder':'outbox'}, context):
+        mailid = self.save_to_mailbox(cr, uid, ids, context)
+        if self.pool.get('poweremail.mailbox').write(cr, uid, mailid, {'folder':'outbox'}, context):
             return {'type':'ir.actions.act_window_close' }
-        
-    def save_to_mailbox(self,cr,uid,ids,context=None):
-        for id in ids:
-            screen_vals = self.read(cr,uid,id,[],context)[0]
+
+    def _get_generated(self, cr, uid, ids=None, context=None):
+        if ids is None:
+            ids = []
+        if context is None:
+            context = {}
+        logger = netsvc.Logger()
+        if context['src_rec_ids'] and len(context['src_rec_ids'])>1:
+            #Means there are multiple items selected for email.
+            mail_ids = self.save_to_mailbox(cr, uid, ids, context)
+            if mail_ids:
+                self.pool.get('poweremail.mailbox').write(cr, uid, mail_ids, {'folder':'outbox'}, context)
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
+                self.write(cr, uid, ids, {
+                    'generated':len(mail_ids),
+                    'state':'done'
+                }, context)
+            else:
+                raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
+#        screen_vals = self.read(cr,uid,ids[0],[], context)
+#        context['account_id'] = screen_vals[0]['from']
+#        template = self._get_template(cr, uid, context)
+#        if context['src_rec_ids'] and len(context['src_rec_ids'])>1 and template:
+#            #Means there are multiple items selected for email. Just send them no need preview
+#            result = self.pool.get('poweremail.templates').generate_mail(cr,uid,template.id,context['src_rec_ids'],context) 
+#            if result:
+#                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
+#                self.write(cr,uid,ids,{
+#                    'generated':len(result),
+#                    'state':'done'
+#                }, context)
+#            else:
+#                raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
+        return True
+     
+    def save_to_mailbox(self, cr, uid, ids, context=None):
+        def get_end_value(id, value):
+            if len(context['src_rec_ids']) > 1: # Multiple Mail: Gets value from the template
+                return self.get_value(cr, uid, template, value, context, id)
+            else:
+                return value
+
+        mail_ids = []
+        template = self._get_template(cr, uid, context)
+        for id in context['src_rec_ids']:
+            screen_vals = self.read(cr, uid, ids[0], [],context)[0]
             accounts = self.pool.get('poweremail.core_accounts').read(cr, uid, screen_vals['from'], context=context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
-                'pem_to': screen_vals['to'],
-                'pem_cc': screen_vals['cc'],
-                'pem_bcc': screen_vals['bcc'],
-                'pem_subject': screen_vals['subject'],
-                'pem_body_text': screen_vals['body_text'],
-                'pem_body_html': screen_vals['body_html'],
+                'pem_to': get_end_value(id, screen_vals['to']),
+                'pem_cc': get_end_value(id, screen_vals['cc']),
+                'pem_bcc': get_end_value(id, screen_vals['bcc']),
+                'pem_subject': get_end_value(id, screen_vals['subject']),
+                'pem_body_text': get_end_value(id, screen_vals['body_text']),
+                'pem_body_html': get_end_value(id, screen_vals['body_html']),
                 'pem_account_id': screen_vals['from'],
                 'state':'na',
                 'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
             }
             if screen_vals['signature']:
-                signature = self.pool.get('res.users').read(cr,uid,uid,['signature'], context)['signature']
+                signature = self.pool.get('res.users').read(cr, uid, uid, ['signature'], context)['signature']
                 vals['pem_body_text'] = tools.ustr(vals['pem_body_text'] or '') + signature
                 vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
 
             attachment_ids = []
 
             #Create partly the mail and later update attachments
-            mail_id = self.pool.get('poweremail.mailbox').create(cr,uid,vals, context)
-            template = self._get_template(cr, uid, context)
+            mail_id = self.pool.get('poweremail.mailbox').create(cr, uid, vals, context)
+            mail_ids.append(mail_id)
             if template.report_template:
                 record_id = screen_vals['rel_model_ref']
-                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr,uid,template.report_template.id,['report_name'], context)['report_name']
+                reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr, uid, template.report_template.id, ['report_name'], context)['report_name']
                 data = {}
                 data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model'], context).model
 
                 # Ensure report is rendered using template's language
                 ctx = context.copy()
                 if template.lang:
-                    ctx['lang'] = self.get_value( cr, uid, template, template.lang, context )
+                    ctx['lang'] = self.get_value(cr, uid, template, template.lang, context)
                 service = netsvc.LocalService(reportname)
                 (result, format) = service.create(cr, uid, [record_id], data, ctx)
-
                 attachment_id = self.pool.get('ir.attachment').create(cr, uid, {
-                    'name': _('%s (Email Attachment)').encode("utf-8") % screen_vals['subject'],
+                    'name': _('%s (Email Attachment)') % tools.ustr(vals['pem_subject']),
                     'datas': base64.b64encode(result),
-                    'datas_fname': tools.ustr(screen_vals['report'] or _('Report')) + "." + format,
-                    'description': screen_vals['body_text'] or _("No Description"),
+                    'datas_fname': tools.ustr(get_end_value(id, screen_vals['report']) or _('Report')) + "." + format,
+                    'description': vals['pem_body_text'] or _("No Description"),
                     'res_model': 'poweremail.mailbox',
                     'res_id': mail_id
                 }, context)
@@ -266,7 +291,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 self.pool.get('res.partner.event').create(cr, uid, {
                     'name': name,
                     'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
-                    'partner_id': self._get_template_value(cr, uid, 'partner_event', context),
+                    'partner_id': self.get_value(cr, uid, template, template.partner_event, context, id),
                     'date': time.strftime('%Y-%m-%d %H:%M:%S'),
                     'canal_id': template.canal_id and template.canal_id.id or False,
                     'partner_type': template.partner_type,
@@ -274,7 +299,7 @@ class poweremail_send_wizard(osv.osv_memory):
                     'document': document,
                 })
 
-            return mail_id
+        return mail_ids
 poweremail_send_wizard()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
