@@ -1,3 +1,6 @@
+"""
+Email templates & preview
+"""
 #########################################################################
 #Power Email is a module for Open ERP which enables it to send mails    #
 #Core settings are stored here                                          #
@@ -89,6 +92,7 @@ def send_on_write(self, cr, uid, ids, vals, context=None):
 # may mean allow creating/writing objects without an e-mail being sent.
 
 old_register_all = report.interface.register_all
+
 def new_register_all(db):
     value = old_register_all(db)
 
@@ -179,6 +183,8 @@ def get_value(cursor, user, recid, message=None, template=None, context=None):
         return message
 
 class poweremail_templates(osv.osv):
+    "Templates for sending Email"
+    
     _name = "poweremail.templates"
     _description = 'Power Email Templates for Models'
 

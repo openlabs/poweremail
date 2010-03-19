@@ -253,59 +253,113 @@ class poweremail_core_accounts(osv.osv):
         """
         try:
             self._get_outgoing_server(cursor, user, ids, context)
-            raise osv.except_osv(_("SMTP Test Connection Was Successful"),'')
+            raise osv.except_osv(_("SMTP Test Connection Was Successful"), '')
         except osv.except_osv, success_message:
             raise success_message
         except Exception, error:
             raise osv.except_osv(
-                                 _("Out going connection test"),
+                                 _("Out going connection test failed"),
                                  _("Reason: %s") % error
                                  )
+    
+    def _get_imap_server(self, record):
+        """
+        @param record: Browse record of current connection
+        @return: IMAP or IMAP_SSL object
+        """
+        if record:
+            if record.isssl:
+                serv = imaplib.IMAP4_SSL(record.iserver, record.isport)
+            else:
+                serv = imaplib.IMAP4(record.iserver, record.isport)
+            #Now try to login
+            serv.login(record.isuser, record.ispass)
+            return serv
+        raise Exception(
+                        _("Programming Error in _get_imap_server method"
+                        "The record received is invalid")
+                        )
         
-    def in_connection(self, cursor, user, ids, context={}):
-        raise DeprecationWarning("This function will be depreciated in 0.8,"
-                                 " Please use the global method get_value")
+    def _get_pop3_server(self, record):
         """
-        DEPRECIATED
+        @param record: Browse record of current connection
+        @return: POP3 or POP3_SSL object
         """
-        #TODO:Re Use a common in_connection which other methods could use
-        rec = self.browse(cursor, user, ids, context)[0]
-        if rec:
-            if rec.iserver and rec.isport and rec.isuser and rec.ispass:
-                if rec.iserver_type == 'imap':
-                    #Extract IMAP connection into separate private method
-                    try:
-                        if rec.isssl:
-                            serv = imaplib.IMAP4_SSL(rec.iserver, rec.isport)
-                        else:
-                            serv = imaplib.IMAP4(rec.iserver, rec.isport)
-                    except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Error"),
-                                             _("An error occurred : %s ") % error)
-                    try:
-                        serv.login(rec.isuser, rec.ispass)
-                    except imaplib.IMAP4.error, error:
-                        raise osv.except_osv(_("IMAP Server Login Error"),
-                                             _("An error occurred : %s ") % error)
-                    raise osv.except_osv(_("Information"),
-                                         _("IMAP Test Connection Was Successful"))
-                else:
-                    #Extract POP3 connection into separate private method
-                    try:
-                        if rec.isssl:
-                            serv = poplib.POP3_SSL(rec.iserver, rec.isport)
-                        else:
-                            serv = poplib.POP3(rec.iserver, rec.isport)
-                    except Exception, error:
-                        raise osv.except_osv(_("POP3 Server Error"), _("An error occurred : %s ") % error)
-                    try:
-                        serv.user(rec.isuser)
-                        serv.pass_(rec.ispass)
-                    except Exception, error:
-                        raise osv.except_osv(_("POP3 Server Login Error"), _("An error occurred : %s ") % error)
-                    raise osv.except_osv(_("Information"), _("POP3 Test Connection Was Successful"))
-        return True
-
+        if record:
+            if record.isssl:
+                serv = poplib.POP3_SSL(record.iserver, record.isport)
+            else:
+                serv = poplib.POP3(record.iserver, record.isport)
+            #Now try to login
+            serv.user(record.isuser)
+            serv.pass_(record.ispass)
+            return serv
+        raise Exception(
+                        _("Programming Error in _get_pop3_server method"
+                        "The record received is invalid")
+                        )
+            
+    def _get_incoming_server(self, cursor, user, ids, context=None):
+        """
+        Returns the Incoming Server object
+        Could be IMAP/IMAP_SSL/POP3/POP3_SSL
+        
+        @attention: DO NOT USE except_osv IN THIS METHOD
+        
+        @param cursor: Database Cursor
+        @param user: ID of current user
+        @param ids: ID/list of ids of current object for 
+                    which connection is required
+                    First ID will be chosen from lists
+        @param context: Context
+        
+        @return: IMAP/POP3 server object or Exception
+        """        
+        #Type cast ids to integer
+        if type(ids) == list:
+            id = ids[0]
+        this_object = self.browse(cursor, user, id, context)
+        if this_object:
+            #First validate data
+            if not this_object.iserver:
+                raise Exception(_("Incoming server is not defined"))
+            if not this_object.isport:
+                raise Exception(_("Incoming port is not defined"))
+            if not this_object.isuser:
+                raise Exception(_("Incoming server user name is not defined"))
+            if not this_object.isuser:
+                raise Exception(_("Incoming server password is not defined"))
+            #Now fetch the connection
+            if this_object.iserver_type == 'imap':
+                serv = self._get_imap_server(this_object)
+            elif this_object.iserver_type == 'pop3':
+                serv = self._get_pop3_server(this_object)
+            return serv
+        raise Exception(
+                    _("The specified record for connection does not exist")
+                        )
+        
+    def _check_incoming_connection(self, cursor, user, ids, context=None):
+        """
+        checks incoming credentials and confirms if outgoing connection works
+        (Attached to button)
+        @param cursor: Database Cursor
+        @param user: ID of current user
+        @param ids: list of ids of current object for 
+                    which connection is required
+        @param context: Context
+        """
+        try:
+            self._get_incoming_server(cursor, user, ids, context)
+            raise osv.except_osv(_("Incoming Test Connection Was Successful"), '')
+        except osv.except_osv, success_message:
+            raise success_message
+        except Exception, error:
+            raise osv.except_osv(
+                                 _("In coming connection test failed"),
+                                 _("Reason: %s") % error
+                                 )
+            
     def do_approval(self, cr, uid, ids, context={}):
         #TODO: Check if user has rights
         self.write(cr, uid, ids, {'state':'approved'}, context=context)
