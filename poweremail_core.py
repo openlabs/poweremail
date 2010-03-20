@@ -408,6 +408,7 @@ class poweremail_core_accounts(osv.osv):
         return result
     
     def send_mail(self, cr, uid, ids, addresses, subject='', body=None, payload=None, context=None):
+        #TODO: Replace all this crap with a single email object
         if body is None:
             body = {}
         if payload is None:
