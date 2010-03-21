@@ -789,10 +789,11 @@ class poweremail_templates(osv.osv):
                     if len(name) > 64:
                         name = name[:61] + '...'
                     document = False
-                    if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object', '=', data['model'])], context=context):
-                        document = data['model'] + ',%i' % recid
-                    #elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
-                    #    document = 'ir.attachment,%i' % attid
+                    if template.report_template:
+                        if self.pool.get('res.request.link').search(cr, uid, [('object', '=', data['model'])], context=context):
+                            document = data['model'] + ',%i' % recid
+                        elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
+                            document = 'ir.attachment,%i' % attid
                     self.pool.get('res.partner.event').create(cr, uid, {
                         'name': name,
                         'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],

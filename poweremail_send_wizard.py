@@ -190,20 +190,6 @@ class poweremail_send_wizard(osv.osv_memory):
                 }, context)
             else:
                 raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
-#        screen_vals = self.read(cr,uid,ids[0],[], context)
-#        context['account_id'] = screen_vals[0]['from']
-#        template = self._get_template(cr, uid, context)
-#        if context['src_rec_ids'] and len(context['src_rec_ids'])>1 and template:
-#            #Means there are multiple items selected for email. Just send them no need preview
-#            result = self.pool.get('poweremail.templates').generate_mail(cr,uid,template.id,context['src_rec_ids'],context) 
-#            if result:
-#                logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Emails for multiple items saved in outbox."))
-#                self.write(cr,uid,ids,{
-#                    'generated':len(result),
-#                    'state':'done'
-#                }, context)
-#            else:
-#                raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
         return True
      
     def save_to_mailbox(self, cr, uid, ids, context=None):
@@ -241,7 +227,6 @@ class poweremail_send_wizard(osv.osv_memory):
             mail_id = self.pool.get('poweremail.mailbox').create(cr, uid, vals, context)
             mail_ids.append(mail_id)
             if template.report_template:
-                record_id = screen_vals['rel_model_ref']
                 reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr, uid, template.report_template.id, ['report_name'], context)['report_name']
                 data = {}
                 data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model'], context).model
@@ -249,9 +234,9 @@ class poweremail_send_wizard(osv.osv_memory):
                 # Ensure report is rendered using template's language
                 ctx = context.copy()
                 if template.lang:
-                    ctx['lang'] = self.get_value(cr, uid, template, template.lang, context)
+                    ctx['lang'] = self.get_value(cr, uid, template, template.lang, context, id)
                 service = netsvc.LocalService(reportname)
-                (result, format) = service.create(cr, uid, [record_id], data, ctx)
+                (result, format) = service.create(cr, uid, [id], data, ctx)
                 attachment_id = self.pool.get('ir.attachment').create(cr, uid, {
                     'name': _('%s (Email Attachment)') % tools.ustr(vals['pem_subject']),
                     'datas': base64.b64encode(result),
@@ -285,7 +270,7 @@ class poweremail_send_wizard(osv.osv_memory):
                     name = name[:61] + '...'
                 document = False
                 if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
-                    document = data['model']+',%i' % record_id
+                    document = data['model']+',%i' % id
                 elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
                     document = 'ir.attachment,%i' % attachment_ids[0]
                 self.pool.get('res.partner.event').create(cr, uid, {
