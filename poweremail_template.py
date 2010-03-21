@@ -555,13 +555,12 @@ class poweremail_templates(osv.osv):
                 copy_val += "}"
         elif template_language == 'django':
             if model_object_field:
-                copy_val = "object." + model_object_field
+                copy_val = "{{object." + model_object_field
             if sub_model_object_field:
                 copy_val += "." + sub_model_object_field
             if null_value:
-                copy_val = "{% if " + copy_val + " %}{{" + copy_val + "}}{% else %}" + null_value + "{% endif %}"  
-            else:
-                copy_val = "{{" + copy_val + "}}"        
+                copy_val = copy_val + '|default:"' + null_value + '"'  
+            copy_val = copy_val + "}}"        
         return copy_val 
             
     def _onchange_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
