@@ -1,6 +1,6 @@
 """
-#Power Email is a module for Open ERP which enables it to send mails    #
-#Core settings are stored here                                          #
+Power Email is a module for Open ERP which enables it to send mails
+The mailbox is an object which stores the actual email                                          
 """
 #########################################################################
 #   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
@@ -33,14 +33,17 @@ import tools
 
 LOGGER = netsvc.Logger()
 
-class poweremail_mailbox(osv.osv):
+class PoweremailMailbox(osv.osv):
     _name = "poweremail.mailbox"
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
     _rec_name = "pem_subject"
     _order = "date_mail desc"
     
     def run_mail_scheduler(self, cursor, user, context=None):
-        
+        """
+        This method is called by Open ERP Scheduler
+        to periodically receive & fetch mails
+        """
         try:
             self.get_all_mail(cursor, user, context={'all_accounts':True})
         except Exception, e:
@@ -147,41 +150,79 @@ class poweremail_mailbox(osv.osv):
             self.historise(cr, uid, [id], "Full email downloaded", context)
     
     _columns = {
-            'pem_from':fields.char('From', size=64),
-            'pem_to':fields.char('Recepient (To)', size=250,),
-            'pem_cc':fields.char(' CC', size=250),
-            'pem_bcc':fields.char(' BCC', size=250),
-            'pem_subject':fields.char(' Subject', size=200,),
-            'pem_body_text':fields.text('Standard Body (Text)'),
-            'pem_body_html':fields.text('Body (Text-Web Client Only)'),
-            'pem_attachments_ids':fields.many2many('ir.attachment', 'mail_attachments_rel', 'mail_id', 'att_id', 'Attachments'),
-            'pem_account_id' :fields.many2one('poweremail.core_accounts', 'User account', required=True),
-            'pem_user':fields.related('pem_account_id', 'user', type="many2one", relation="res.users", string="User"),
-            'server_ref':fields.integer('Server Reference of mail', help="Applicable for inward items only"),
+            'pem_from':fields.char(
+                            'From', 
+                            size=64),
+            'pem_to':fields.char(
+                            'Recepient (To)', 
+                            size=250,),
+            'pem_cc':fields.char(
+                            ' CC', 
+                            size=250),
+            'pem_bcc':fields.char(
+                            ' BCC', 
+                            size=250),
+            'pem_subject':fields.char(
+                            ' Subject', 
+                            size=200,),
+            'pem_body_text':fields.text(
+                            'Standard Body (Text)'),
+            'pem_body_html':fields.text(
+                            'Body (Text-Web Client Only)'),
+            'pem_attachments_ids':fields.many2many(
+                            'ir.attachment', 
+                            'mail_attachments_rel', 
+                            'mail_id', 
+                            'att_id', 
+                            'Attachments'),
+            'pem_account_id' :fields.many2one(
+                            'poweremail.core_accounts', 
+                            'User account', 
+                            required=True),
+            'pem_user':fields.related(
+                            'pem_account_id', 
+                            'user', 
+                            type="many2one", 
+                            relation="res.users", 
+                            string="User"),
+            'server_ref':fields.integer(
+                            'Server Reference of mail', 
+                            help="Applicable for inward items only"),
             'pem_recd':fields.char('Received at', size=50),
             'mail_type':fields.selection([
-                                    ('multipart/mixed', 'Has Attachments'),
-                                    ('multipart/alternative', 'Plain Text & HTML with no attachments'),
-                                    ('multipart/related', 'Intermixed content'),
-                                    ('text/plain', 'Plain Text'),
-                                    ('text/html', 'HTML Body'),
-                                    ], 'Mail Contents'),
+                            ('multipart/mixed', 
+                             'Has Attachments'),
+                            ('multipart/alternative', 
+                             'Plain Text & HTML with no attachments'),
+                            ('multipart/related', 
+                             'Intermixed content'),
+                            ('text/plain', 
+                             'Plain Text'),
+                            ('text/html', 
+                             'HTML Body'),
+                            ], 'Mail Contents'),
+            #I like GMAIL which allows putting same mail in many folders
+            #Lets plan it for 0.9
             'folder':fields.selection([
-                                    ('inbox', 'Inbox'),
-                                    ('drafts', 'Drafts'),
-                                    ('outbox', 'Outbox'),
-                                    ('trash', 'Trash'),
-                                    ('followup', 'Follow Up'),
-                                    ('sent', 'Sent Items'),
-                                    ], 'Folder', required=True),
+                            ('inbox', 'Inbox'),
+                            ('drafts', 'Drafts'),
+                            ('outbox', 'Outbox'),
+                            ('trash', 'Trash'),
+                            ('followup', 'Follow Up'),
+                            ('sent', 'Sent Items'),
+                            ], 'Folder', required=True),
             'state':fields.selection([
-                                    ('read', 'Read'),
-                                    ('unread', 'Un-Read'),
-                                    ('na', 'Not Applicable'),
-                                    ('sending', 'Sending'),
-                                    ], 'Status', required=True),
-            'date_mail':fields.datetime('Rec/Sent Date'),
-            'history':fields.text('History', readonly=True, store=True)
+                            ('read', 'Read'),
+                            ('unread', 'Un-Read'),
+                            ('na', 'Not Applicable'),
+                            ('sending', 'Sending'),
+                            ], 'Status', required=True),
+            'date_mail':fields.datetime(
+                            'Rec/Sent Date'),
+            'history':fields.text(
+                            'History', 
+                            readonly=True, 
+                            store=True)
         }
 
     _defaults = {
@@ -213,22 +254,37 @@ class poweremail_mailbox(osv.osv):
         return super(osv.osv, self).search(cr, uid, args, offset, limit,
                 order, context=context, count=count)
 
-poweremail_mailbox()
+PoweremailMailbox()
 
-class poweremail_conversation(osv.osv):
+
+class PoweremailConversation(osv.osv):
+    """
+    This is an ambitious approach to grouping emails 
+    by automatically grouping attributes
+    Something like Gmail
+    
+    Warning: Incomplete
+    """
     _name = "poweremail.conversation"
     _description = "Conversations are groups of related emails"
+    
     _columns = {
-        'name':fields.char('Name', size=250),
-        'mails':fields.one2many('poweremail.mailbox', 'conversation_id', 'Related Emails'),
+        'name':fields.char(
+                    'Name', 
+                    size=250),
+        'mails':fields.one2many(
+                    'poweremail.mailbox', 
+                    'conversation_id', 
+                    'Related Emails'),
                 }
-poweremail_conversation()
+PoweremailConversation()
 
-class poweremail_mailbox(osv.osv):
+
+class PoweremailMailboxConversation(osv.osv):
     _inherit = "poweremail.mailbox"
     _columns = {
         'conversation_id':fields.many2one('poweremail.conversation', 'Conversation')
                 }
-poweremail_mailbox()
+PoweremailMailboxConversation()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
