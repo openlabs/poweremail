@@ -665,29 +665,37 @@ class poweremail_templates(osv.osv):
         return {'value':result}
 
     def _onchange_table_required_fields(self, cr, uid, ids, table_model_object_field, table_required_fields, template_language, context=None):
-        print table_model_object_field, table_required_fields
         if not table_model_object_field or not table_required_fields:
             return {'value':{'table_html': False}}
         result = ''
         table_field_obj = self.pool.get('ir.model.fields').browse(cr, uid, table_model_object_field, context)
         field_obj = self.pool.get('ir.model.fields')         
         #Generate Html Header
-        result += "<p>\n<table>\n<tr>"
+        result += "<p>\n<table border='1'>\n<thead>\n<tr>"
         for each_rec in table_required_fields[0][2]:
             result += "\n<td>"
             record = field_obj.browse(cr, uid, each_rec, context)
             result += record.field_description
             result += "</td>"
-        result += "\n</tr>\n"
+        result += "\n</tr>\n</thead>\n<tbody>\n"
         #Table header is defined,  now mako for table
-        #TODO: Fix for django
-        result += "%for o in object." + table_field_obj.name + ":\n<tr>"
-        for each_rec in table_required_fields[0][2]:
-            result += "\n<td>${o."
-            record = field_obj.browse(cr, uid, each_rec, context)
-            result += record.name
-            result += "}</td>"
-        result += "\n</tr>\n%endfor\n</table>\n</p>"
+        print "Language:", template_language
+        if template_language == 'mako':
+            result += "%for o in object." + table_field_obj.name + ":\n<tr>"
+            for each_rec in table_required_fields[0][2]:
+                result += "\n<td>${o."
+                record = field_obj.browse(cr, uid, each_rec, context)
+                result += record.name
+                result += "}</td>"
+            result += "\n</tr>\n%endfor\n</tbody>\n</table>\n</p>"
+        elif template_language == 'django':
+            result += "{% for o in object." + table_field_obj.name + " %}\n<tr>"
+            for each_rec in table_required_fields[0][2]:
+                result += "\n<td>{{o."
+                record = field_obj.browse(cr, uid, each_rec, context)
+                result += record.name
+                result += "}}</td>"
+            result += "\n</tr>\n{% endfor %}\n</tbody>\n</table>\n</p>"
         return {'value':{'table_html':result}}
 
     def _generate_partner_events(self,
@@ -1018,6 +1026,20 @@ class poweremail_preview(osv.osv_memory):
             ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr, uid, ref_obj_ids, context)
             return ref_obj_recs
     
+    def _default_model(self, cursor, user, context=None):
+        """
+        Returns the default value for model field
+        @param cursor: Database Cursor
+        @param user: ID of current user
+        @param context: Open ERP Context
+        """
+        return self.pool.get('poweremail.templates').read(
+                                                   cursor,
+                                                   user,
+                                                   context['active_id'],
+                                                   ['object_name'],
+                                                   context)['object_name']
+        
     _columns = {
         'ref_template':fields.many2one(
                                        'poweremail.templates',
@@ -1034,7 +1056,7 @@ class poweremail_preview(osv.osv_memory):
     }
     _defaults = {
         'ref_template': lambda self, cr, uid, ctx:ctx['active_id'],
-        'rel_model': lambda self, cr, uid, ctx:self.pool.get('poweremail.templates').read(cr, uid, ctx['active_id'], ['object_name'], ctx)['object_name']
+        'rel_model': _default_model
     }
 
     def _on_change_ref(self, cr, uid, ids, rel_model_ref, context=None):
