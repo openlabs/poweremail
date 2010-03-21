@@ -886,7 +886,7 @@ class poweremail_core_accounts(osv.osv):
 poweremail_core_accounts()
 
 
-class poweremail_core_selfolder(osv.osv_memory):
+class PoweremailSelectFolder(osv.osv_memory):
     _name = "poweremail.core_selfolder"
     _description = "Shows a list of IMAP folders"
 
@@ -972,6 +972,6 @@ class poweremail_core_selfolder(osv.osv_memory):
         else:
             raise osv.except_osv(_("Folder Error"), _("Select a folder before you save record "))
         
-poweremail_core_selfolder()
+PoweremailSelectFolder()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

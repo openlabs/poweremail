@@ -30,6 +30,7 @@ import base64
 import time
 from tools.translate import _
 import tools
+from poweremail_template import get_value
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'
@@ -57,25 +58,14 @@ class poweremail_send_wizard(osv.osv_memory):
                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
                raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
-    def get_value(self, cr, uid, template, message, context=None, id=None):
+    def get_value(self, cursor, user, template, message, context=None, id=None):
         """Gets the value of the message parsed with the content of object id (or the first 'src_rec_ids' if id is not given)"""
         if not message:
             return ''
-        try:
-            if not id:
-                id = context['src_rec_ids'][0]
-            message = tools.ustr(message)
-            object = self.pool.get(template.model_int_name).browse(cr, uid, id, context)
-            templ = Template(message, input_encoding='utf-8')
-            env = {
-                'user':self.pool.get('res.users').browse(cr, uid, uid, context),
-                'db':cr.dbname
-            }
-            reply = Template(message).render_unicode(object=object, peobject=object, env=env, format_exceptions=True)
-            return reply
-        except Exception, e:
-            return ""
-
+        if not id:
+            id = context['src_rec_ids'][0]
+        return get_value(cursor, user, id, message, template, context)
+    
     def _get_template(self, cr, uid, context=None):
         if context is None:
             context = {}

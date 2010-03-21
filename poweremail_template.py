@@ -3,7 +3,6 @@ Email templates & preview
 """
 #########################################################################
 #Power Email is a module for Open ERP which enables it to send mails    #
-#Core settings are stored here                                          #
 #########################################################################
 #   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
 #   #   #   #  #   #      #  #     #  #    #    # # #  #  #  #    #     #
@@ -148,7 +147,7 @@ def get_value(cursor, user, recid, message=None, template=None, context=None):
     @param cursor: Database Cursor
     @param user: ID of current user
     @param recid: ID of the target record under evaluation
-    @param message: The expression to be avaluated
+    @param message: The expression to be evaluated
     @param template: BrowseRecord object of the current template
     @param context: Open ERP Context
     @return: Computed message (unicode) or u""
@@ -167,16 +166,16 @@ def get_value(cursor, user, recid, message=None, template=None, context=None):
                    }
             if template.template_language == 'mako':
                 templ = MakoTemplate(message, input_encoding='utf-8')
-                reply = MakoTemplate(message).render_unicode(object=object, 
-                                                             peobject=object, 
-                                                             env=env, 
+                reply = MakoTemplate(message).render_unicode(object=object,
+                                                             peobject=object,
+                                                             env=env,
                                                              format_exceptions=True)
             elif template.template_language == 'django':
                 templ = DjangoTemplate(message)
                 env['object'] = object
                 env['peobject'] = object
                 reply = templ.render(Context(env))
-            return reply
+            return reply or False
         except Exception:
             return u""
     else:
@@ -651,7 +650,7 @@ class poweremail_templates(osv.osv):
             result['null_value'] = null_value
         return {'value':result}
                
-    def _onchange_table_model_object_field(self, cr, uid, ids, model_object_field, context=None):
+    def _onchange_table_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
         result = {}
@@ -691,124 +690,315 @@ class poweremail_templates(osv.osv):
         result += "\n</tr>\n%endfor\n</table>\n</p>"
         return {'value':{'table_html':result}}
 
-    def get_value(self, cr, uid, recid, message=None, template=None, context=None):
-        raise DeprecationWarning("This function will be depreciated in 0.8,"
-                                 " Please use the global method get_value")
-        if message is None:
-            message = {}
-        #Returns the computed expression
-        if message:
-            try:
-                message = tools.ustr(message)
-                object = self.pool.get(template.model_int_name).browse(cr, uid, recid, context)
-                templ = Template(message, input_encoding='utf-8')
-                env = {
-                    'user':self.pool.get('res.users').browse(cr, uid, uid, context),
-                    'db':cr.dbname
-                       }
-                reply = Template(message).render_unicode(object=object, peobject=object, env=env, format_exceptions=True)
-                return reply
-            except Exception:
-                return u""
-        else:
-            return message
+    def _generate_partner_events(self,
+                                 cursor,
+                                 user,
+                                 template,
+                                 record_id,
+                                 mail,
+                                 context=None):
+        """
+        Generates partner event if configured
+        @author: Jordi Esteve
         
-    def generate_mail(self, cr, uid, id, recids, context=None):
-        #Generates an email an saves to outbox given the template id & record ID of a record in template's model
-        #id: ID of template to be used
-        #recid: record id for the mail
-        #Context: 'account_id':The id of account to send from
+        @param cursor: Database Cursor
+        @param user: ID of User
+        @param template: Browse record of
+                         template
+        @param record_id: ID of the target model
+                          for which this mail has
+                          to be generated
+        @param mail: Browse record of email object 
+        
+        @return: True 
+        """
+        name = mail.pem_subject
+        if isinstance(name, str):
+            name = unicode(name, 'utf-8')
+        if len(name) > 64:
+            name = name[:61] + '...'
+        document = False
+        if template.report_template:
+            if self.pool.get('res.request.link').search(
+                                    cursor,
+                                    user,
+                                    [('object', '=', template.model_int_name)],
+                                    context=context):
+                document = data['model'] + ',%i' % record_id
+            elif mail.pem_attachments_ids \
+                    and self.pool.get('res.request.link').search(
+                                        cursor,
+                                        user,
+                                        [('object', '=', 'ir.attachment')],
+                                        context=context):
+                document = 'ir.attachment,%i' % mail.pem_attachments_ids[0]
+        event_vals = {
+            'name': name,
+            'description': mail.pem_body_text and mail.pem_body_text \
+                                                    or mail.pem_body_html,
+            'partner_id': get_value(cursor,
+                                    user,
+                                    record_id,
+                                    template.partner_event,
+                                    template,
+                                    context),
+            'date': time.strftime('%Y-%m-%d %H:%M:%S'),
+            'canal_id': template.canal_id and template.canal_id.id or False,
+            'partner_type': template.partner_type,
+            'user_id': user,
+            'document': document,
+        }
+        
+        self.pool.get('res.partner.event').create(cursor,
+                                                  user,
+                                                  event_vals,
+                                                  context)
+        return True
+    
+    def _generate_attach_reports(self,
+                                 cursor,
+                                 user,
+                                 template,
+                                 record_id,
+                                 mail,
+                                 context=None):
+        """
+        Generate report to be attached and attach it
+        to the email
+        
+        @param cursor: Database Cursor
+        @param user: ID of User
+        @param template: Browse record of
+                         template
+        @param record_id: ID of the target model
+                          for which this mail has
+                          to be generated
+        @param mail: Browse record of email object 
+        @return: True 
+        """
+        reportname = 'report.' + \
+            self.pool.get('ir.actions.report.xml').read(
+                                         cursor,
+                                         user,
+                                         template.report_template.id,
+                                         ['report_name'],
+                                         context)['report_name']
+        service = netsvc.LocalService(reportname)
+        data = {}
+        data['model'] = template.model_int_name
+        (result, format) = service.create(cursor,
+                                          user,
+                                          [record_id],
+                                          data,
+                                          context)
+        attachment_obj = self.pool.get('ir.attachment')
+        new_att_vals = {
+            'name':mail.pem_subject + ' (Email Attachment)',
+            'datas':base64.b64encode(result),
+            'datas_fname':tools.ustr(
+                             get_value(
+                                   cursor,
+                                   user,
+                                   record_id,
+                                   template.file_name,
+                                   template,
+                                   context
+                                   ) or 'Report') + "." + format,
+            'description':mail.pem_subject or "No Description",
+            'res_model':'poweremail.mailbox',
+            'res_id':mail.id
+        }
+        attachment_id = attachment_obj.create(cursor,
+                                              user,
+                                              new_att_vals,
+                                              context)
+        if attachment_id:
+            self.pool.get('poweremail.mailbox').write(
+                              cursor,
+                              user,
+                              mail.id,
+                              {
+                               'pem_attachments_ids':[
+                                                  [6, 0, [attachment_id]]
+                                                    ],
+                               'mail_type':'multipart/mixed'
+                               },
+                               context)
+        return True
+    
+    def _generate_mailbox_item_from_template(self,
+                                      cursor,
+                                      user,
+                                      template,
+                                      record_id,
+                                      context=None):
+        """
+        Generates an email from the template for
+        record record_id of target object
+        
+        @param cursor: Database Cursor
+        @param user: ID of User
+        @param template: Browse record of
+                         template
+        @param record_id: ID of the target model
+                          for which this mail has
+                          to be generated
+        @return: ID of created object 
+        """
         if context is None:
             context = {}
-        logger = netsvc.Logger()
-        sent_recs = []
-        from_account = False
-        template = self.browse(cr, uid, id, context)
-        if not template:
-            return
-
-        #If account to send from is in context select it, else use enforced account 
+        #If account to send from is in context select it, else use enforced account
         if 'account_id' in context.keys():
-            from_account = self.pool.get('poweremail.core_accounts').read(cr, uid, context['account_id'], ['name', 'email_id'], context)
+            from_account = self.pool.get('poweremail.core_accounts').read(
+                                                    cursor,
+                                                    user,
+                                                    context.get('account_id'),
+                                                    ['name', 'email_id'],
+                                                    context
+                                                    )
         else:
-            from_account = {'id':template.enforce_from_account.id, 'name':template.enforce_from_account.name, 'email_id':template.enforce_from_account.email_id}
-        for recid in recids:
-            try:
-                self.engine = self.pool.get("poweremail.engines")
-                #Search translated template
-                lang = get_value(cr, uid, recid, template.lang, template, context)
-                if lang:
-                    ctx = context.copy()
-                    ctx.update({'lang':lang})
-                    template = self.browse(cr, uid, id, ctx)
-                vals = {
-                        'pem_from': tools.ustr(from_account['name']) + "<" + tools.ustr(from_account['email_id']) + ">",
-                        'pem_to':get_value(cr, uid, recid, template.def_to, template, context),
-                        'pem_cc':get_value(cr, uid, recid, template.def_cc, template, context),
-                        'pem_bcc':get_value(cr, uid, recid, template.def_bcc, template, context),
-                        'pem_subject':get_value(cr, uid, recid, template.def_subject, template, context),
-                        'pem_body_text':get_value(cr, uid, recid, template.def_body_text, template, context),
-                        'pem_body_html':get_value(cr, uid, recid, template.def_body_html, template, context),
-                        'pem_account_id' :from_account['id'], #This is a mandatory field when automatic emails are sent
-                        'state':'na',
-                        'folder':'outbox',
-                        'mail_type':'multipart/alternative' #Options:'multipart/mixed','multipart/alternative','text/plain','text/html'
-                    }
-                if template.use_sign:
-                    sign = self.pool.get('res.users').read(cr, uid, uid, ['signature'], context)['signature']
-                    if vals['pem_body_text']:
-                        vals['pem_body_text'] += sign
-                    if vals['pem_body_html']:
-                        vals['pem_body_html'] += sign
-                #Create partly the mail and later update attachments
-                mail_id = self.pool.get('poweremail.mailbox').create(cr, uid, vals, context)
-                if template.report_template:
-                    reportname = 'report.' + self.pool.get('ir.actions.report.xml').read(cr, uid, template.report_template.id, ['report_name'], context)['report_name']
-                    service = netsvc.LocalService(reportname)
-                    data = {}
-                    data['model'] = template.model_int_name
-                    (result, format) = service.create(cr, uid, [recid], data, context)
-                    att_obj = self.pool.get('ir.attachment')
-                    new_att_vals = {
-                                    'name':vals['pem_subject'] + ' (Email Attachment)',
-                                    'datas':base64.b64encode(result),
-                                    'datas_fname':tools.ustr(get_value(cr, uid, recid, template.file_name, template, context) or 'Report') + "." + format,
-                                    'description':vals['pem_body_text'] or "No Description",
-                                    'res_model':'poweremail.mailbox',
-                                    'res_id':mail_id
-                                        }
-                    attid = att_obj.create(cr, uid, new_att_vals, context)
-                    if attid:
-                        self.pool.get('poweremail.mailbox').write(cr, uid, mail_id, {'pem_attachments_ids':[[6, 0, [attid]]], 'mail_type':'multipart/mixed'}, context)
-                sent_recs.append(recid)
-                # Create a partner event
-                if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and get_value(cr, uid, recid, template.partner_event, template, context):
-                    name = vals['pem_subject']
-                    if isinstance(name, str):
-                        name = unicode(name, 'utf-8')
-                    if len(name) > 64:
-                        name = name[:61] + '...'
-                    document = False
-                    if template.report_template:
-                        if self.pool.get('res.request.link').search(cr, uid, [('object', '=', data['model'])], context=context):
-                            document = data['model'] + ',%i' % recid
-                        elif attid and self.pool.get('res.request.link').search(cr, uid, [('object', '=', 'ir.attachment')], context=context):
-                            document = 'ir.attachment,%i' % attid
-                    self.pool.get('res.partner.event').create(cr, uid, {
-                        'name': name,
-                        'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
-                        'partner_id': get_value(cr, uid, recid, template.partner_event, template, context),
-                        'date': time.strftime('%Y-%m-%d %H:%M:%S'),
-                        'canal_id': template.canal_id and template.canal_id.id or False,
-                        'partner_type': template.partner_type,
-                        'user_id': uid,
-                        'document': document,
-                    })
-            except Exception, error:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Email Generation failed, Reason:%s") % (error))
-                return sent_recs
-        #all mails saved
-        return sent_recs
+            from_account = {
+                            'id':template.enforce_from_account.id,
+                            'name':template.enforce_from_account.name,
+                            'email_id':template.enforce_from_account.email_id
+                            }
+        lang = get_value(cursor,
+                         user,
+                         record_id,
+                         template.lang,
+                         template,
+                         context)
+        if lang:
+            ctx = context.copy()
+            ctx.update({'lang':lang})
+            template = self.browse(cursor, user, template_id, context=ctx)
+        mailbox_values = {
+            'pem_from': tools.ustr(from_account['name']) + \
+                        "<" + tools.ustr(from_account['email_id']) + ">",
+            'pem_to':get_value(cursor,
+                               user,
+                               record_id,
+                               template.def_to,
+                               template,
+                               context),
+            'pem_cc':get_value(cursor,
+                               user,
+                               record_id,
+                               template.def_cc,
+                               template,
+                               context),
+            'pem_bcc':get_value(cursor,
+                                user,
+                                record_id,
+                                template.def_bcc,
+                                template,
+                                context),
+            'pem_subject':get_value(cursor,
+                                    user,
+                                    record_id,
+                                    template.def_subject,
+                                    template,
+                                    context),
+            'pem_body_text':get_value(cursor,
+                                      user,
+                                      record_id,
+                                      template.def_body_text,
+                                      template,
+                                      context),
+            'pem_body_html':get_value(cursor,
+                                      user,
+                                      record_id,
+                                      template.def_body_html,
+                                      template,
+                                      context),
+            'pem_account_id' :from_account['id'],
+            #This is a mandatory field when automatic emails are sent
+            'state':'na',
+            'folder':'drafts',
+            'mail_type':'multipart/alternative' 
+        }
+        #Use signatures if allowed
+        if template.use_sign:
+            sign = self.pool.get('res.users').read(cursor,
+                                                   user,
+                                                   user,
+                                                   ['signature'],
+                                                   context)['signature']
+            if mailbox_values['pem_body_text']:
+                mailbox_values['pem_body_text'] += sign
+            if mailbox_values['pem_body_html']:
+                mailbox_values['pem_body_html'] += sign
+        mailbox_id = self.pool.get('poweremail.mailbox').create(
+                                                             cursor,
+                                                             user,
+                                                             mailbox_values,
+                                                             context)
+        return mailbox_id
+        
+    def generate_mail(self,
+                      cursor,
+                      user,
+                      template_id,
+                      record_ids,
+                      context=None):
+        if context is None:
+            context = {}
+        template = self.browse(cursor, user, template_id, context=context)
+        if not template:
+            raise Exception("The requested template could not be loaded")
+        for record_id in record_ids:
+            mailbox_id = self._generate_mailbox_item_from_template(
+                                                                cursor,
+                                                                user,
+                                                                template,
+                                                                record_id,
+                                                                context)
+            mail = self.pool.get('poweremail.mailbox').browse(
+                                                        cursor,
+                                                        user,
+                                                        mailbox_id,
+                                                        context=context
+                                                              )
+            if template.report_template:
+                self._generate_attach_reports(
+                                              cursor,
+                                              user,
+                                              template,
+                                              record_id,
+                                              mail,
+                                              context
+                                              )
+            # Create a partner event
+            if template.partner_event and \
+                template.partner_event_type_id and \
+                    self.pool.get('res.partner.event.type').check(
+                                    cursor,
+                                    user,
+                                    template.partner_event_type_id.key) and \
+                                        get_value(cursor,
+                                                  user,
+                                                  record_id,
+                                                  template.partner_event,
+                                                  template,
+                                                  context):
+                self._generate_partner_events(cursor,
+                                              user,
+                                              template,
+                                              record_id,
+                                              mail,
+                                              context)
+            # This should be the last statement in this method.
+            # This prevents attempts by the scheduler to send
+            # Emails before all the work is complete in
+            # Generating email, attachments and event
+            self.pool.get('poweremail.mailbox').write(
+                                                cursor,
+                                                user,
+                                                mailbox_id,
+                                                {'folder':'outbox'},
+                                                context=context
+                                                      )
+        return True
 
 poweremail_templates()
 
@@ -828,26 +1018,6 @@ class poweremail_preview(osv.osv_memory):
             ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr, uid, ref_obj_ids, context)
             return ref_obj_recs
     
-    def get_value(self, cr, uid, recid, message=None, template=None, context=None):
-        raise DeprecationWarning("This function will be depreciated in 0.8, Please use the global method get_value")
-        if message is None:
-            message = {}
-        #Returns the computed expression
-        if message:
-            try:
-                message = tools.ustr(message)
-                object = self.pool.get(template.model_int_name).browse(cr, uid, recid, context)
-                env = {
-                    'user':self.pool.get('res.users').browse(cr, uid, uid, context),
-                    'db':cr.dbname
-                       }
-                reply = Template(message).render_unicode(object=object, peobject=object, env=env, format_exceptions=True)
-                return reply
-            except Exception:
-                return exceptions.text_error_template().render()
-        else:
-            return message
-        
     _columns = {
         'ref_template':fields.many2one(
                                        'poweremail.templates',
