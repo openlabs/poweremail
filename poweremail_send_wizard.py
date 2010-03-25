@@ -208,8 +208,9 @@ class poweremail_send_wizard(osv.osv_memory):
             }
             if screen_vals['signature']:
                 signature = self.pool.get('res.users').read(cr, uid, uid, ['signature'], context)['signature']
-                vals['pem_body_text'] = tools.ustr(vals['pem_body_text'] or '') + signature
-                vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
+                if signature:
+                    vals['pem_body_text'] = tools.ustr(vals['pem_body_text'] or '') + signature
+                    vals['pem_body_html'] = tools.ustr(vals['pem_body_html'] or '') + signature
 
             attachment_ids = []
 
