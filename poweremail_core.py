@@ -156,7 +156,7 @@ class poweremail_core_accounts(osv.osv):
          'rec_headers_den_mail':lambda * a:True,
          'dont_auto_down_attach':lambda * a:True,
          'send_pref':lambda * a: 'html',
-         'smtptls':lambda *a:True,
+         'smtptls':lambda * a:True,
      }
     
     _sql_constraints = [
@@ -224,8 +224,8 @@ class poweremail_core_accounts(osv.osv):
         """
         #Type cast ids to integer
         if type(ids) == list:
-            id = ids[0]
-        this_object = self.browse(cursor, user, id, context)
+            ids = ids[0]
+        this_object = self.browse(cursor, user, ids, context)
         if this_object:
             if this_object.smtpserver and this_object.smtpport: 
                 try:
@@ -324,8 +324,8 @@ class poweremail_core_accounts(osv.osv):
         """        
         #Type cast ids to integer
         if type(ids) == list:
-            id = ids[0]
-        this_object = self.browse(cursor, user, id, context)
+            ids = ids[0]
+        this_object = self.browse(cursor, user, ids, context)
         if this_object:
             #First validate data
             if not this_object.iserver:
@@ -372,23 +372,16 @@ class poweremail_core_accounts(osv.osv):
         self.write(cr, uid, ids, {'state':'approved'}, context=context)
 #        wf_service = netsvc.LocalService("workflow")
 
-    def smtp_connection(self, cr, uid, id, context=None):
+    def smtp_connection(self, cursor, user, id, context=None):
+        """
+        This method should now wrap smtp_connection
+        """
         #This function returns a SMTP server object
         logger = netsvc.Logger()
-        core_obj = self.browse(cr, uid, id, context)
+        core_obj = self.browse(cursor, user, id, context)
         if core_obj.smtpserver and core_obj.smtpport and core_obj.state == 'approved':
             try:
-                serv = smtplib.SMTP(core_obj.smtpserver, core_obj.smtpport)
-                if core_obj.smtpssl:
-                    serv.ehlo()
-                    serv.starttls()
-                    serv.ehlo()
-            except Exception, error:
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Could not connect to server\nError: %s") % (id, error))
-                return False
-            try:
-                if core_obj.smtpuname and core_obj.smtppass:
-                    serv.login(core_obj.smtpuname, core_obj.smtppass)
+                serv = self._get_outgoing_server(cursor, user, id, context)
             except Exception, error:
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed on login. Probable Reason:Could not login to server\nError: %s") % (id, error))
                 return False
