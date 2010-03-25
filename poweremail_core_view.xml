@@ -54,6 +54,7 @@
 								<field name="smtpserver" select="1" colspan="2" />
 								<field name="smtpport" select="2" colspan="2" />
 								<field name="smtpssl" select="2" colspan="2" />
+								<field name="smtptls" select="2" colspan="2" />
 							</group>
 							<button name="_check_outgoing_connection" type="object" string="Check Outgoing Connection" />
 							<separator string="User Information" colspan="4" />

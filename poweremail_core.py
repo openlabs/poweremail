@@ -82,7 +82,10 @@ class poweremail_core_accounts(osv.osv):
                                 size=120, invisible=True,
                                 required=False, readonly=True,
                                 states={'draft':[('readonly', False)]}),
-        'smtpssl':fields.boolean('Use SSL',
+        'smtptls':fields.boolean('Use TLS',
+                                 states={'draft':[('readonly', False)]}, readonly=True),
+                                
+        'smtpssl':fields.boolean('Use SSL/TLS (only in python 2.6)',
                                  states={'draft':[('readonly', False)]}, readonly=True),
         'send_pref':fields.selection([
                                       ('html', 'HTML otherwise Text'),
@@ -153,6 +156,7 @@ class poweremail_core_accounts(osv.osv):
          'rec_headers_den_mail':lambda * a:True,
          'dont_auto_down_attach':lambda * a:True,
          'send_pref':lambda * a: 'html',
+         'smtptls':lambda *a:True,
      }
     
     _sql_constraints = [
@@ -225,9 +229,12 @@ class poweremail_core_accounts(osv.osv):
         if this_object:
             if this_object.smtpserver and this_object.smtpport: 
                 try:
-                    serv = smtplib.SMTP(this_object.smtpserver, this_object.smtpport)
-                    serv.ehlo()
                     if this_object.smtpssl:
+                        serv = smtplib.SMTP_SSL(this_object.smtpserver, this_object.smtpport)
+                    else:
+                        serv = smtplib.SMTP(this_object.smtpserver, this_object.smtpport)
+                    if this_object.smtptls:
+                        serv.ehlo()
                         serv.starttls()
                         serv.ehlo()
                 except Exception, error:
