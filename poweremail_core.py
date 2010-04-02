@@ -32,7 +32,8 @@ from email import Encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.header import decode_header
+from email.header import decode_header, Header
+from email.utils import formatdate
 import re
 import netsvc
 import poplib
@@ -431,7 +432,10 @@ class poweremail_core_accounts(osv.osv):
                     msg = MIMEMultipart()
                     if subject:
                         msg['Subject'] = subject
-                    msg['From'] = tools.ustr(core_obj.name + "<" + core_obj.email_id + ">")
+                    sender_name = Header(core_obj.name, 'utf-8').encode()
+                    msg['From'] = sender_name + " <" + core_obj.email_id + ">"
+                    msg['Organization'] = tools.ustr(core_obj.user.company_id.name)
+                    msg['Date'] = formatdate()
                     addresses_l = self.get_ids_from_dict(addresses) 
                     if addresses_l['To']:
                         msg['To'] = u','.join(addresses_l['To'])
