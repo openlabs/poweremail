@@ -58,99 +58,112 @@ class poweremail_core_accounts(osv.osv):
                             ]
     _columns = {
         'name': fields.char('Email Account Desc',
-                            size=64, required=True,
-                            readonly=True, select=True,
-                            states={'draft':[('readonly', False)]}),
+                        size=64, required=True,
+                        readonly=True, select=True,
+                        states={'draft':[('readonly', False)]}),
         'user':fields.many2one('res.users',
-                               'Related User', required=True,
-                               readonly=True, states={'draft':[('readonly', False)]}),
+                        'Related User', required=True,
+                        readonly=True, states={'draft':[('readonly', False)]}),
         'email_id': fields.char('Email ID',
-                                size=120, required=True,
-                                readonly=True, states={'draft':[('readonly', False)]} ,
-                                help=" eg:yourname@yourdomain.com "),
+                        size=120, required=True,
+                        readonly=True, states={'draft':[('readonly', False)]} ,
+                        help=" eg:yourname@yourdomain.com "),
         'smtpserver': fields.char('Server',
-                                  size=120, required=True,
-                                  readonly=True, states={'draft':[('readonly', False)]},
-                                  help="Enter name of outgoing server,eg:smtp.gmail.com "),
+                        size=120, required=True,
+                        readonly=True, states={'draft':[('readonly', False)]},
+                        help="Enter name of outgoing server,eg:smtp.gmail.com "),
         'smtpport': fields.integer('SMTP Port ',
-                                   size=64, required=True,
-                                   readonly=True, states={'draft':[('readonly', False)]},
-                                   help="Enter port number,eg:SMTP-587 "),
+                        size=64, required=True,
+                        readonly=True, states={'draft':[('readonly', False)]},
+                        help="Enter port number,eg:SMTP-587 "),
         'smtpuname': fields.char('User Name',
-                                 size=120, required=False,
-                                 readonly=True, states={'draft':[('readonly', False)]}),
+                        size=120, required=False,
+                        readonly=True, states={'draft':[('readonly', False)]}),
         'smtppass': fields.char('Password',
-                                size=120, invisible=True,
-                                required=False, readonly=True,
-                                states={'draft':[('readonly', False)]}),
+                        size=120, invisible=True,
+                        required=False, readonly=True,
+                        states={'draft':[('readonly', False)]}),
         'smtptls':fields.boolean('Use TLS',
-                                 states={'draft':[('readonly', False)]}, readonly=True),
+                        states={'draft':[('readonly', False)]}, readonly=True),
                                 
         'smtpssl':fields.boolean('Use SSL/TLS (only in python 2.6)',
-                                 states={'draft':[('readonly', False)]}, readonly=True),
+                        states={'draft':[('readonly', False)]}, readonly=True),
         'send_pref':fields.selection([
                                       ('html', 'HTML otherwise Text'),
                                       ('text', 'Text otherwise HTML'),
                                       ('both', 'Both HTML & Text')
                                       ], 'Mail Format', required=True),
         'iserver':fields.char('Incoming Server',
-                              size=100, readonly=True,
-                              states={'draft':[('readonly', False)]},
-                              help="Enter name of incoming server,eg:imap.gmail.com "),
+                        size=100, readonly=True,
+                        states={'draft':[('readonly', False)]},
+                        help="Enter name of incoming server,eg:imap.gmail.com "),
         'isport': fields.integer('Port',
-                                 readonly=True, states={'draft':[('readonly', False)]},
-                                 help="For example IMAP: 993,POP3:995 "),
+                        readonly=True, states={'draft':[('readonly', False)]},
+                        help="For example IMAP: 993,POP3:995 "),
         'isuser':fields.char('User Name',
-                             size=100, readonly=True,
-                             states={'draft':[('readonly', False)]}),
+                        size=100, readonly=True,
+                        states={'draft':[('readonly', False)]}),
         'ispass':fields.char('Password',
-                             size=100, readonly=True,
-                             states={'draft':[('readonly', False)]}),
+                        size=100, readonly=True,
+                        states={'draft':[('readonly', False)]}),
         'iserver_type': fields.selection([
-                                          ('imap', 'IMAP'),
-                                          ('pop3', 'POP3')
-                                          ], 'Server Type', readonly=True,
-                                          states={'draft':[('readonly', False)]}),
+                        ('imap', 'IMAP'),
+                        ('pop3', 'POP3')
+                        ], 'Server Type', readonly=True,
+                        states={'draft':[('readonly', False)]}),
         'isssl':fields.boolean('Use SSL',
-                               readonly=True, states={'draft':[('readonly', False)]}),
+                        readonly=True, states={
+                                           'draft':[('readonly', False)]
+                                           }),
         'isfolder':fields.char('Folder',
-                               readonly=True, size=100,
-                               help="Folder to be used for downloading IMAP mails\n" \
-                               "Click on adjacent button to select from a list of folders"),
-        'last_mail_id':fields.integer('Last Downloaded Mail', readonly=True),
-        'rec_headers_den_mail':fields.boolean('First Receive headers, then download mail'),
-        'dont_auto_down_attach':fields.boolean('Dont Download attachments automatically'),
-        'allowed_groups':fields.many2many('res.groups',
-                                          'account_group_rel', 'templ_id', 'group_id',
-                                          string="Allowed User Groups",
-                                          help="Only users from these groups will be" \
-                                          "allowed to send mails from this ID"),
+                        readonly=True, size=100,
+                        help="Folder to be used for downloading IMAP mails\n" \
+                        "Click on adjacent button to select from a list of folders"),
+        'last_mail_id':fields.integer(
+                        'Last Downloaded Mail', readonly=True),
+        'rec_headers_den_mail':fields.boolean(
+                        'First Receive headers, then download mail'),
+        'dont_auto_down_attach':fields.boolean(
+                        'Dont Download attachments automatically'),
+        'allowed_groups':fields.many2many(
+                        'res.groups',
+                        'account_group_rel', 'templ_id', 'group_id',
+                        string="Allowed User Groups",
+                        help="Only users from these groups will be" \
+                        "allowed to send mails from this ID"),
         'company':fields.selection([
-                                    ('yes', 'Yes'),
-                                    ('no', 'No')
-                                    ], 'Company Mail A/c',
-                                    readonly=True,
-                                    help="Select if this mail account does not belong" \
-                                    "to specific user but the organisation as a whole." \
-                                    "eg:info@somedomain.com",
-                                    required=True, states={'draft':[('readonly', False)]}),
+                        ('yes', 'Yes'),
+                        ('no', 'No')
+                        ], 'Company Mail A/c',
+                        readonly=True,
+                        help="Select if this mail account does not belong" \
+                        "to specific user but the organisation as a whole." \
+                        "eg:info@somedomain.com",
+                        required=True, states={
+                                           'draft':[('readonly', False)]
+                                           }),
 
         'state':fields.selection([
                                   ('draft', 'Initiated'),
                                   ('suspended', 'Suspended'),
                                   ('approved', 'Approved')
-                                  ], 'Account Status', required=True, readonly=True),
+                                  ],
+                        'Account Status', required=True, readonly=True),
     }
 
     _defaults = {
-         'name':lambda self, cr, uid, ctx:self.pool.get('res.users').read(cr,
-                                                                          uid,
-                                                                          uid,
-                                                                          ['name'],
-                                                                          ctx)['name'],
+         'name':lambda self, cursor, user, context:self.pool.get(
+                                                'res.users'
+                                                ).read(
+                                                        cursor,
+                                                        user,
+                                                        user,
+                                                        ['name'],
+                                                        context
+                                                        )['name'],
          'smtpssl':lambda * a:True,
          'state':lambda * a:'draft',
-         'user':lambda self, cr, uid, ctx:uid,
+         'user':lambda self, cursor, user, context:user,
          'iserver_type':lambda * a:'imap',
          'isssl': lambda * a: True,
          'last_mail_id':lambda * a:0,
@@ -161,7 +174,8 @@ class poweremail_core_accounts(osv.osv):
      }
     
     _sql_constraints = [
-        ('email_uniq',
+        (
+         'email_uniq',
          'unique (email_id)',
          'Another setting already exists with this email ID !')
     ]
@@ -397,6 +411,8 @@ class poweremail_core_accounts(osv.osv):
         """
         Identifies email IDs separated by separators
         and returns a list
+        TODO: Doc this
+        "a@b.com,c@bcom; d@b.com;e@b.com->['a@b.com',...]"
         """
         email_sep_by_commas = ids_as_str \
                                     .replace('; ', ',') \
@@ -405,6 +421,9 @@ class poweremail_core_accounts(osv.osv):
         return email_sep_by_commas.split(',')
     
     def get_ids_from_dict(self, addresses={}):
+        """
+        TODO: Doc this
+        """
         result = {'all':[]}
         keys = ['To', 'CC', 'BCC']
         for each in keys:
@@ -485,6 +504,9 @@ class poweremail_core_accounts(osv.osv):
                 logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Mail from Account %s failed. Probable Reason:Account not approved") % id)
                                 
     def extracttime(self, time_as_string):
+        """
+        TODO: DOC THis
+        """
         logger = netsvc.Logger()
         #The standard email dates are of format similar to:
         #Thu, 8 Oct 2009 09:35:42 +0200
@@ -500,15 +522,26 @@ class poweremail_core_accounts(osv.osv):
             else:
                 sign = False
             try:
-                dt = datetime.datetime.strptime(date_temp_str, "%d %b %Y %H:%M:%S")
+                dt = datetime.datetime.strptime(
+                                            date_temp_str,
+                                            "%d %b %Y %H:%M:%S")
             except:
                 try:
-                    dt = datetime.datetime.strptime(date_temp_str, "%d %b %Y %H:%M")
+                    dt = datetime.datetime.strptime(
+                                            date_temp_str,
+                                            "%d %b %Y %H:%M")
                 except:
                     return False
             if sign:
                 try:
-                    offset = datetime.timedelta(hours=sign * int(date_list[5][1:3]), minutes=sign * int(date_list[5][3:5]))
+                    offset = datetime.timedelta(
+                                hours=sign * int(
+                                             date_list[5][1:3]
+                                                ),
+                                             minutes=sign * int(
+                                                            date_list[5][3:5]
+                                                                )
+                                                )
                 except Exception, e2:
                     """Looks like UT or GMT, just forget decoding"""
                     return False
@@ -518,10 +551,21 @@ class poweremail_core_accounts(osv.osv):
             date_as_date = dt.strftime('%Y-%m-%d %H:%M:%S')
             #print date_as_date
         except Exception, e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Datetime Extraction failed.Date:%s\tError:%s") % (time_as_string, e))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_WARNING,
+                    _(
+                      "Datetime Extraction failed.Date:%s \
+                      \tError:%s") % (
+                                    time_as_string,
+                                    e)
+                      )
         return date_as_date
         
     def save_header(self, cr, uid, mail, coreaccountid, serv_ref, context=None):
+        """
+        TODO:DOC this
+        """
         if context is None:
             context = {}
         #Internal function for saving of mail headers to mailbox
@@ -549,23 +593,47 @@ class poweremail_core_accounts(osv.osv):
         if mail.get_content_type() in self._known_content_types:
             vals['mail_type'] = mail.get_content_type()
         else:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_WARNING, _("Saving Header of unknown payload (%s) Account:%s.") % (mail.get_content_type(), coreaccountid))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_WARNING,
+                    _("Saving Header of unknown payload (%s) Account:%s.") % (
+                                                      mail.get_content_type(),
+                                                      coreaccountid)
+
+                    )
         #Create mailbox entry in Mail
         crid = False
         try:
         #print vals
             crid = mail_obj.create(cr, uid, vals, context)
         except Exception, e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s,Error:%s") % (coreaccountid, serv_ref, str(e)))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_ERROR,
+                    _("Save Header->Mailbox create error \
+                    Account:%s,Mail:%s,Error:%s") % (coreaccountid,
+                                                     serv_ref, str(e)))
         #Check if a create was success
         if crid:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_INFO,
+                    _("Header for Mail %s Saved successfully as \
+                    ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid)
+                    )
             crid = False
             return True
         else:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, serv_ref))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_ERROR,
+                    _("IMAP Mail->Mailbox create error \
+                    Account:%s,Mail:%s") % (coreaccountid, serv_ref))
 
     def save_fullmail(self, cr, uid, mail, coreaccountid, serv_ref, context=None):
+        """
+        TODO: Doc this
+        """
         if context is None:
             context = {}
         #Internal function for saving of mails to mailbox
@@ -580,7 +648,9 @@ class poweremail_core_accounts(osv.osv):
             'pem_cc':self.decode_header_text(mail['cc']),
             'pem_bcc':self.decode_header_text(mail['bcc']),
             'pem_recd':mail['date'],
-            'date_mail':self.extracttime(mail['date']) or time.strftime("%Y-%m-%d %H:%M:%S"),
+            'date_mail':self.extracttime(
+                            mail['date']
+                                ) or time.strftime("%Y-%m-%d %H:%M:%S"),
             'pem_subject':self.decode_header_text(mail['subject']),
             'server_ref':serv_ref,
             'folder':'inbox',
@@ -597,17 +667,38 @@ class poweremail_core_accounts(osv.osv):
         try:
             crid = mail_obj.create(cr, uid, vals, context)
         except Exception, e:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Save Header->Mailbox create error Account:%s,Mail:%s,Error:%s") % (coreaccountid, serv_ref, str(e)))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_ERROR,
+                    _("Save Header->Mailbox create error \
+                    Account:%s,Mail:%s,Error:%s") % (
+                                                    coreaccountid,
+                                                    serv_ref,
+                                                    str(e))
+                                )
         #Check if a create was success
         if crid:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Header for Mail %s Saved successfully as ID:%s for Account:%s.") % (serv_ref, crid, coreaccountid))
+            logger.notifyChannel(
+                    _("Power Email"),
+                    netsvc.LOG_INFO,
+                    _("Header for Mail %s Saved successfully \
+                    as ID:%s for Account:%s.") % (serv_ref,
+                                                  crid,
+                                                  coreaccountid))
             #If there are attachments save them as well
             if parsed_mail['attachments']:
-                self.save_attachments(cr, uid, mail, crid, parsed_mail, coreaccountid, context)
+                self.save_attachments(cr, uid, mail, crid,
+                                      parsed_mail, coreaccountid, context)
             crid = False
             return True
         else:
-            logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Mail->Mailbox create error Account:%s,Mail:%s") % (coreaccountid, mail[0].split()[0]))
+            logger.notifyChannel(
+                                 _("Power Email"),
+                                 netsvc.LOG_ERROR,
+                                 _("IMAP Mail->Mailbox create error \
+                                 Account:%s,Mail:%s") % (
+                                                         coreaccountid,
+                                                         mail[0].split()[0]))
 
     def complete_mail(self, cr, uid, mail, coreaccountid, serv_ref, mailboxref, context=None):
         if context is None:
@@ -784,11 +875,22 @@ class poweremail_core_accounts(osv.osv):
         #The function downloads the full mail for which only header was downloaded
         #ID:of poeremail core account
         #context: should have mailboxref, the ID of mailbox record
-        server_ref = self.pool.get('poweremail.mailbox').read(cr, uid, mailid, ['server_ref'], context)['server_ref']
-        id = self.pool.get('poweremail.mailbox').read(cr, uid, mailid, ['pem_account_id'], context)['pem_account_id'][0]
+        server_ref = self.pool.get(
+                        'poweremail.mailbox'
+                        ).read(cr, uid, mailid, 
+                               ['server_ref'], 
+                               context)['server_ref']
+        id = self.pool.get(
+                        'poweremail.mailbox'
+                        ).read(cr, uid, mailid, 
+                               ['pem_account_id'], 
+                               context)['pem_account_id'][0]
         logger = netsvc.Logger()
         #The Main reception function starts here
-        logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("Starting Full mail reception for mail:%s.") % (id))
+        logger.notifyChannel(
+                _("Power Email"), 
+                netsvc.LOG_INFO, 
+                _("Starting Full mail reception for mail:%s.") % (id))
         rec = self.browse(cr, uid, id, context)
         if rec:
             if rec.iserver and rec.isport and rec.isuser and rec.ispass :
@@ -796,24 +898,68 @@ class poweremail_core_accounts(osv.osv):
                     #Try Connecting to Server
                     try:
                         if rec.isssl:
-                            serv = imaplib.IMAP4_SSL(rec.iserver, rec.isport)
+                            serv = imaplib.IMAP4_SSL(
+                                                     rec.iserver, 
+                                                     rec.isport
+                                                     )
                         else:
-                            serv = imaplib.IMAP4(rec.iserver, rec.isport)
+                            serv = imaplib.IMAP4(
+                                                 rec.iserver, 
+                                                 rec.isport
+                                                 )
                     except imaplib.IMAP4.error, error:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Error Account:%s Error:%s.") % (id, error))
+                        logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_ERROR, 
+                                _(
+                                  "IMAP Server Error Account:%s Error:%s."
+                                  ) % (id, error))
                     #Try logging in to server
                     try:
                         serv.login(rec.isuser, rec.ispass)
                     except imaplib.IMAP4.error, error:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Login Error Account:%s Error:%s.") % (id, error))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Server Connected & logged in successfully Account:%s.") % (id))
+                        logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_ERROR, 
+                                _(
+                        "IMAP Server Login Error Account:%s Error:%s."
+                                ) % (id, error))
+                    logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_INFO, 
+                                _(
+                        "IMAP Server Connected & logged in \
+                        successfully Account:%s."
+                                ) % (id))
                     #Select IMAP folder
                     try:
                         typ, msg_count = serv.select('"%s"' % rec.isfolder)#typ,msg_count: practically not used here
                     except imaplib.IMAP4.error, error:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("IMAP Server Folder Selection Error Account:%s Error:%s.") % (id, error))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder selected successfully Account:%s.") % (id))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("IMAP Folder Statistics for Account:%s:%s") % (id, serv.status('"%s"' % rec.isfolder, '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)')[1][0]))
+                        logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_ERROR, 
+                                _(
+                      "IMAP Server Folder Selection \
+                      Error Account:%s Error:%s."
+                                  ) % (id, error))
+                    logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_INFO, 
+                                _(
+                      "IMAP Folder selected successfully Account:%s."
+                                  ) % (id))
+                    logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_INFO, 
+                                _(
+                      "IMAP Folder Statistics for Account:%s:%s"
+                                  ) % (
+                           id, 
+                           serv.status(
+                                '"%s"' % rec.isfolder, 
+                                '(MESSAGES RECENT UIDNEXT UIDVALIDITY UNSEEN)'
+                                )[1][0])
+                                  )
                     #If there are newer mails than the ones in mailbox
                     typ, msg = serv.fetch(str(server_ref), '(FLAGS RFC822)')
                     for i in range(0, len(msg) / 2):
@@ -823,32 +969,62 @@ class poweremail_core_accounts(osv.osv):
                             if '\Seen' in flags:
                                 context['state'] = 'read' 
                             mail = email.message_from_string(mails[1])
-                            self.complete_mail(cr, uid, mail, id, server_ref, mailid, context)
+                            self.complete_mail(cr, uid, mail, id, 
+                                               server_ref, mailid, context)
                     serv.close()
                     serv.logout()
                 elif rec.iserver_type == 'pop3':
                     #Try Connecting to Server
                     try:
                         if rec.isssl:
-                            serv = poplib.POP3_SSL(rec.iserver, rec.isport)
+                            serv = poplib.POP3_SSL(
+                                            rec.iserver, 
+                                            rec.isport
+                                                )
                         else:
-                            serv = poplib.POP3(rec.iserver, rec.isport)
+                            serv = poplib.POP3(
+                                            rec.iserver, 
+                                            rec.isport
+                                            )
                     except Exception, error:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Error Account:%s Error:%s.") % (id, error))
+                        logger.notifyChannel(
+                            _("Power Email"), 
+                            netsvc.LOG_ERROR, 
+                            _(
+                        "POP3 Server Error Account:%s Error:%s."
+                            ) % (id, error))
                     #Try logging in to server
                     try:
                         serv.user(rec.isuser)
                         serv.pass_(rec.ispass)
                     except Exception, error:
-                        logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("POP3 Server Login Error Account:%s Error:%s.") % (id, error))
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Server Connected & logged in successfully Account:%s.") % (id))
+                        logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_ERROR, 
+                                _(
+                    "POP3 Server Login Error Account:%s Error:%s."
+                                ) % (id, error))
+                    logger.notifyChannel(
+                                _("Power Email"), 
+                                netsvc.LOG_INFO, 
+                                _(
+                    "POP3 Server Connected & logged in \
+                    successfully Account:%s."
+                                ) % (id))
                     logger.notifyChannel(_("Power Email"), netsvc.LOG_INFO, _("POP3 Statistics:%s mails of %s size for Account:%s:") % (serv.stat()[0], serv.stat()[1], id))
                     #Download Full RF822 Mails
                     resp, msg, octet = serv.retr(server_ref) #Full Mail
                     mail = email.message_from_string(string.join(msg, "\n"))
-                    self.complete_mail(cr, uid, mail, id, server_ref, mailid, context)
+                    self.complete_mail(cr, uid, mail, id, 
+                                       server_ref, mailid, context)
                 else:
-                    logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete.") % (id))
+                    logger.notifyChannel(
+                        _("Power Email"), 
+                        netsvc.LOG_ERROR, 
+                        _(
+                          "Incoming server login attempt dropped Account:%s \
+                        Check if Incoming server attributes are complete."
+                        ) % (id))
     
     def send_receive(self, cr, uid, ids, context=None):
         self.get_mails(cr, uid, ids, context)
@@ -859,6 +1035,9 @@ class poweremail_core_accounts(osv.osv):
         return True
  
     def get_payloads(self, mail):
+        """
+        
+        """
         #This function will go through the mail and identify the payloads and return them
         parsed_mail = {
                 'text':False,
@@ -877,11 +1056,15 @@ class poweremail_core_accounts(osv.osv):
 
     def decode_header_text(self, text):
         """ Decode internationalized headers RFC2822.
-            To, CC, BCC, Subject fields can contain text slices with different encodes, like:
-                =?iso-8859-1?Q?Enric_Mart=ED?= <enricmarti@company.com>, =?Windows-1252?Q?David_G=F3mez?= <david@company.com>
-            Sometimes they include extra " character at the beginning/end of the contact name, like:
+            To, CC, BCC, Subject fields can contain 
+            text slices with different encodes, like:
+                =?iso-8859-1?Q?Enric_Mart=ED?= <enricmarti@company.com>, 
+                =?Windows-1252?Q?David_G=F3mez?= <david@company.com>
+            Sometimes they include extra " character at the beginning/
+            end of the contact name, like:
                 "=?iso-8859-1?Q?Enric_Mart=ED?=" <enricmarti@company.com>
-            and decode_header() does not work well, so we use regular expressions (?=   ? ?   ?=) to split the text slices
+            and decode_header() does not work well, so we use regular 
+            expressions (?=   ? ?   ?=) to split the text slices
         """
         if not text:
             return text        
@@ -889,7 +1072,11 @@ class poweremail_core_accounts(osv.osv):
         text2 = ''
         try:
             for t2 in p.split(text):
-                text2 += ''.join([s.decode(t or 'ascii') for (s, t) in decode_header(t2)]).encode('utf-8')
+                text2 += ''.join(
+                            [s.decode(
+                                      t or 'ascii'
+                                    ) for (s, t) in decode_header(t2)]
+                                ).encode('utf-8')
         except:
             return text
         return text2
@@ -908,11 +1095,14 @@ class PoweremailSelectFolder(osv.osv_memory):
 	    # Or a tuple like this: ('(\\HasNoChildren) "/" {18}', 'INBOX/contacts')
             if isinstance(imap_folder, tuple):
                 return imap_folder[1]
-            result = re.search(r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")?([^\"]*)(?:\")?', imap_folder)
+            result = re.search(
+                        r'(?:\([^\)]*\)\s\")(.)(?:\"\s)(?:\")?([^\"]*)(?:\")?',
+                        imap_folder)
             seperator = result.groups()[0]
             folder_readable_name = ""
             splitname = result.groups()[1].split(seperator) #Not readable now
-            if len(splitname) > 1:#If a parent and child exists, format it as parent/child/grandchild
+            #If a parent and child exists, format it as parent/child/grandchild
+            if len(splitname) > 1:
                 for i in range(0, len(splitname) - 1):
                     folder_readable_name = splitname[i] + '/'
                 folder_readable_name = folder_readable_name + splitname[-1]
@@ -923,7 +1113,9 @@ class PoweremailSelectFolder(osv.osv_memory):
     
     def _get_folders(self, cr, uid, context=None):
         if 'active_ids' in context.keys():
-            record = self.pool.get('poweremail.core_accounts').browse(cr, uid, context['active_ids'][0], context)
+            record = self.pool.get(
+                        'poweremail.core_accounts'
+                        ).browse(cr, uid, context['active_ids'][0], context)
             if record:
                 folderlist = []
                 try:
@@ -932,15 +1124,19 @@ class PoweremailSelectFolder(osv.osv_memory):
                     else:
                         serv = imaplib.IMAP4(record.iserver, record.isport)
                 except imaplib.IMAP4.error, error:
-                    raise osv.except_osv(_("IMAP Server Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server Error"), 
+                                         _("An error occurred : %s ") % error)
                 except Exception, error:
-                    raise osv.except_osv(_("IMAP Server connection Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server connection Error"), 
+                                         _("An error occurred : %s ") % error)
                 try:
                     serv.login(record.isuser, record.ispass)
                 except imaplib.IMAP4.error, error:
-                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server Login Error"), 
+                                         _("An error occurred : %s ") % error)
                 except Exception, error:
-                    raise osv.except_osv(_("IMAP Server Login Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server Login Error"), 
+                                         _("An error occurred : %s ") % error)
                 try:
                     for folders in serv.list()[1]:
                         folder_readable_name = self.makereadable(folders)
@@ -950,13 +1146,18 @@ class PoweremailSelectFolder(osv.osv_memory):
                             data = folders
                         if data.find('Noselect') == -1: #If it is a selectable folder
 			    if folder_readable_name:
-                                folderlist.append((folder_readable_name, folder_readable_name))
+                                folderlist.append(
+                                                  (folder_readable_name, 
+                                                   folder_readable_name)
+                                                  )
                         if folder_readable_name == 'INBOX':
                             self.inboxvalue = folder_readable_name
                 except imaplib.IMAP4.error, error:
-                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server Folder Error"), 
+                                         _("An error occurred : %s ") % error)
                 except Exception, error:
-                    raise osv.except_osv(_("IMAP Server Folder Error"), _("An error occurred : %s ") % error)
+                    raise osv.except_osv(_("IMAP Server Folder Error"), 
+                                         _("An error occurred : %s ") % error)
             else:
                 folderlist = [('invalid', 'Invalid')]
         else:
@@ -964,8 +1165,13 @@ class PoweremailSelectFolder(osv.osv_memory):
         return folderlist
 
     _columns = {
-        'name':fields.many2one('poweremail.core_accounts', string='Email Account', readonly=True),
-        'folder':fields.selection(_get_folders, string="IMAP Folder"),
+        'name':fields.many2one(
+                        'poweremail.core_accounts',
+                        string='Email Account',
+                        readonly=True),
+        'folder':fields.selection(
+                        _get_folders,
+                        string="IMAP Folder"),
     }
 
     _defaults = {
@@ -974,15 +1180,31 @@ class PoweremailSelectFolder(osv.osv_memory):
     }
 
     def sel_folder(self, cr, uid, ids, context=None):
+        """
+        TODO: Doc This
+        """
         if self.read(cr, uid, ids, ['folder'], context)[0]['folder']:
-            if not self.read(cr, uid, ids, ['folder'], context)[0]['folder'] == 'invalid':
-                self.pool.get('poweremail.core_accounts').write(cr, uid, context['active_ids'][0], {'isfolder':self.read(cr, uid, ids, ['folder'], context)[0]['folder']})
-                return {'type':'ir.actions.act_window_close'}
+            if not self.read(cr, uid, ids, 
+                             ['folder'], context)[0]['folder'] == 'invalid':
+                self.pool.get(
+                        'poweremail.core_accounts'
+                            ).write(cr, uid, context['active_ids'][0], 
+                                    {
+                                     'isfolder':self.read(cr, uid, ids, 
+                                                  ['folder'], 
+                                                  context)[0]['folder']
+                                    })
+                return {
+                        'type':'ir.actions.act_window_close'
+                        }
             else:
-                raise osv.except_osv(_("Folder Error"), _("This is an invalid folder "))
+                raise osv.except_osv(
+                                     _("Folder Error"), 
+                                     _("This is an invalid folder "))
         else:
-            raise osv.except_osv(_("Folder Error"), _("Select a folder before you save record "))
-        
+            raise osv.except_osv(
+                                 _("Folder Error"), 
+                                 _("Select a folder before you save record "))
 PoweremailSelectFolder()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
