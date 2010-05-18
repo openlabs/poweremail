@@ -70,18 +70,18 @@ import pooler
 
 def send_on_create(self, cr, uid, vals, context=None):
     id = self.old_create(cr, uid, vals, context)
-    template = self.pool.get('poweremail.templates').browse(cr, 1, self.template_id, context)
+    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
     # Ensure it's still configured to send on create
     if template.send_on_create:
-        self.pool.get('poweremail.templates').generate_mail(cr, 1, self.template_id, [id], context)
+        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, [id], context)
     return id
 
 def send_on_write(self, cr, uid, ids, vals, context=None):
     result = self.old_write(cr, uid, ids, vals, context)
-    template = self.pool.get('poweremail.templates').browse(cr, 1, self.template_id, context)
+    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
     # Ensure it's still configured to send on write
     if template.send_on_write:
-        self.pool.get('poweremail.templates').generate_mail(cr, 1, self.template_id, ids, context)
+        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, ids, context)
     return result
     
 
