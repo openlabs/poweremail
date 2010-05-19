@@ -878,7 +878,7 @@ class poweremail_templates(osv.osv):
         if lang:
             ctx = context.copy()
             ctx.update({'lang':lang})
-            template = self.browse(cursor, user, template_id, context=ctx)
+            template = self.browse(cursor, user, template.id, context=ctx)
         mailbox_values = {
             'pem_from': tools.ustr(from_account['name']) + \
                         "<" + tools.ustr(from_account['email_id']) + ">",
