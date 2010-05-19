@@ -783,6 +783,16 @@ class poweremail_templates(osv.osv):
         @param mail: Browse record of email object 
         @return: True 
         """
+        lang = get_value(cursor,
+                         user,
+                         record_id,
+                         template.lang,
+                         template,
+                         context)
+        if lang:
+            ctx = context.copy()
+            ctx.update({'lang':lang})
+            template = self.browse(cursor, user, template.id, context=ctx)
         reportname = 'report.' + \
             self.pool.get('ir.actions.report.xml').read(
                                          cursor,
