@@ -24,7 +24,7 @@
 #########################################################################
 #__author__="sharoon"
 #__date__ ="$4 Aug, 2009 1:47:16 PM$"
-from osv import fields,osv
+from osv import fields, osv
 import netsvc
 from tools.translate import _
 
@@ -32,31 +32,59 @@ class actions_server(osv.osv):
     _inherit = 'ir.actions.server'
     _description = 'Server action with Power Email update'
     _columns = {
-        'state': fields.selection([
-            ('poweremail','Power Email'),
-            ('client_action','Client Action'),
-            ('dummy','Dummy'),
-            ('loop','Iteration'),
-            ('code','Python Code'),
-            ('trigger','Trigger'),
-            ('email','Email'),
-            ('sms','SMS'),
-            ('object_create','Create Object'),
-            ('object_write','Write Object'),
-            ('other','Multi Actions'),
-        ], 'Action Type', required=True, size=32, help="Type of the Action that is to be executed"),
-        'poweremail_template':fields.many2one('poweremail.templates','Template',ondelete='cascade')#In view customize such that domain('object_name','=',model_id)
+        'state': fields.selection(
+                [
+            ('poweremail', 'Power Email'),
+            ('client_action', 'Client Action'),
+            ('dummy', 'Dummy'),
+            ('loop', 'Iteration'),
+            ('code', 'Python Code'),
+            ('trigger', 'Trigger'),
+            ('email', 'Email'),
+            ('sms', 'SMS'),
+            ('object_create', 'Create Object'),
+            ('object_write', 'Write Object'),
+            ('other', 'Multi Actions'),
+                ], 'Action Type', 
+                required=True, size=32, 
+                help="Type of the Action that is to be executed"),
+        'poweremail_template':fields.many2one(
+                                        'poweremail.templates',
+                                        'Template',
+                                        ondelete='cascade')
     }
 
     def run(self, cr, uid, ids, context=None):
-        print cr,uid,ids,context
+        """
+        Crap code inherited from Server Actions
+        TODO:
+            Improve quality and check if it affects
+            Looks like var names are important in the call
+        """
         if context is None:
             context = {}
         logger = netsvc.Logger()
-        logger.notifyChannel('Server Action', netsvc.LOG_INFO, 'Started Server Action with Power Email update')
+        logger.notifyChannel(
+                             'Server Action',
+                             netsvc.LOG_INFO,
+                             'Started Server Action with Power Email update')
 
         for action in self.browse(cr, uid, ids, context):
-            if action.state=='poweremail':
+            obj_pool = self.pool.get(action.model_id.model)
+            obj = obj_pool.browse(cr, uid, context['active_id'], context=context)
+            cxt = {
+                'context':context, 
+                'object': obj, 
+                'time':time,
+                'cr': cr,
+                'pool' : self.pool,
+                'uid' : uid
+            }
+            expr = eval(str(action.condition), cxt)
+            if not expr:
+                continue
+            
+            if action.state == 'poweremail':
                 if not action.poweremail_template:
                     raise osv.except_osv(_('Error'), _("Please specify an template to use for auto email in poweremail !"))
                 templ_id = action.poweremail_template.id
@@ -64,7 +92,7 @@ class actions_server(osv.osv):
                 self.pool.get('poweremail.templates').generate_mail(cr, uid, templ_id, [context['active_id']], context)
                 return False
             else:
-                return super(actions_server,self).run(cr, uid, ids, context)
+                return super(actions_server, self).run(cr, uid, ids, context)
 actions_server()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
