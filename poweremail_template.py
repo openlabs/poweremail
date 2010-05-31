@@ -731,7 +731,7 @@ class poweremail_templates(osv.osv):
                                     user,
                                     [('object', '=', template.model_int_name)],
                                     context=context):
-                document = data['model'] + ',%i' % record_id
+                document = template.model_int_name + ',%i' % record_id
             elif mail.pem_attachments_ids \
                     and self.pool.get('res.request.link').search(
                                         cursor,
