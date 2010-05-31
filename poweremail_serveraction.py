@@ -22,8 +22,7 @@
 #You should have received a copy of the GNU General Public License      #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
-#__author__="sharoon"
-#__date__ ="$4 Aug, 2009 1:47:16 PM$"
+import time
 from osv import fields, osv
 import netsvc
 from tools.translate import _
