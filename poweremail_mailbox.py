@@ -113,6 +113,9 @@ class PoweremailMailbox(osv.osv):
             try:
                 core_obj = self.pool.get('poweremail.core_accounts')
                 values = self.read(cr, uid, id, [], context) #Values will be a dictionary of all entries in the record ref by id
+                pem_to = (values['pem_to'] or '').strip()
+                if pem_to in ('', 'False'):
+                        continue
                 payload = {}
                 if values['pem_attachments_ids']:
                     #Get filenames & binary of attachments
