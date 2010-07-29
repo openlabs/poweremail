@@ -263,7 +263,7 @@ class poweremail_core_accounts(osv.osv):
             raise Exception(_("SMTP SERVER or PORT not specified"))
         raise Exception(_("Core connection for the given ID does not exist"))
     
-    def _check_outgoing_connection(self, cursor, user, ids, context=None):
+    def check_outgoing_connection(self, cursor, user, ids, context=None):
         """
         checks SMTP credentials and confirms if outgoing connection works
         (Attached to button)

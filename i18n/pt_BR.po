@@ -1,0 +1,1351 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+#	* poweremail
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0dev\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2010-07-28 19:40:26+0000\n"
+"PO-Revision-Date: 2010-07-28 19:40:26+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,iserver:0
+msgid "Enter name of incoming server,eg:imap.gmail.com "
+msgstr "Enter name of incoming server,eg:imap.gmail.com "
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send mail Wizard"
+msgstr "Send mail Wizard"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_administration_server
+msgid "Power Email"
+msgstr "Power Email"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_core_selfolder
+msgid "Shows a list of IMAP folders"
+msgstr "Shows a list of IMAP folders"
+
+#. module: poweremail
+#: help:poweremail.templates,lang:0
+msgid "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+msgstr "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+
+#. module: poweremail
+#: field:poweremail.templates,def_bcc:0
+msgid "Default BCC"
+msgstr "BCC Padrão"
+
+#. module: poweremail
+#: field:poweremail.templates,send_on_create:0
+msgid "Send on Create"
+msgstr "Enviar ao Criar"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Get Mail"
+msgstr "Get Mail"
+
+#. module: poweremail
+#: field:poweremail.templates,null_value:0
+msgid "Null Value"
+msgstr "Valor Nulo"
+
+#. module: poweremail
+#: constraint:ir.actions.act_window:0
+msgid "Invalid model name in the action definition."
+msgstr "Nome de modelo inválido na definição da ação"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Wizard Complete"
+msgstr "Wizard Complete"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Log partner events"
+msgstr "Log de Eventos do Parceiro"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Plain Text & HTML with no attachments"
+msgstr "Plain Text & HTML with no attachments"
+
+#. module: poweremail
+#: help:poweremail.templates,table_model_object_field:0
+msgid "Select the field from the model you want to use.\n"
+"Only one2many & many2many fields can be used for tables)"
+msgstr "Select the field from the model you want to use.\n"
+"Only one2many & many2many fields can be used for tables)"
+
+#. module: poweremail
+#: help:poweremail.templates,model_object_field:0
+msgid "Select the field from the model you want to use.\n"
+"If it is a relationship field you will be able to choose the nested values in the box below\n"
+"(Note:If there are no values make sure you have selected the correct model)"
+msgstr "Select the field from the model you want to use.\n"
+"If it is a relationship field you will be able to choose the nested values in the box below\n"
+"(Note:If there are no values make sure you have selected the correct model)"
+
+#. module: poweremail
+#: field:poweremail.preview,body_html:0
+#: field:poweremail.preview,body_text:0
+#: field:poweremail.send.wizard,body_html:0
+#: field:poweremail.send.wizard,body_text:0
+msgid "Body"
+msgstr "Corpo"
+
+#. module: poweremail
+#: help:poweremail.templates,def_cc:0
+msgid "The default CC for the email. Placeholders can be used here."
+msgstr "The default CC for the email. Placeholders can be used here."
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send now"
+msgstr "Enviar Agora"
+
+#. module: poweremail
+#: field:poweremail.templates,attached_wkf:0
+msgid "Workflow"
+msgstr "Workflow"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: view:poweremail.templates:0
+msgid "Standard Body"
+msgstr "Corpo Padrão"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_company
+msgid "Company"
+msgstr "Empresa"
+
+#. module: poweremail
+#: view:ir.actions.server:0
+msgid "Email Configuration"
+msgstr "Configuração de Email"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send all mails"
+msgstr "Enviar Todos os Emails"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_per
+msgid "Personal Account"
+msgstr "Conta Pessoal"
+
+#. module: poweremail
+#: field:poweremail.mailbox,server_ref:0
+msgid "Server Reference of mail"
+msgstr "Server Reference of mail"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,iserver_type:0
+msgid "Server Type"
+msgstr "Tipo do Servidor"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal_my
+#: view:poweremail.core_accounts:0
+msgid "My Accounts"
+msgstr "Minhas Contas"
+
+#. module: poweremail
+#: field:poweremail.preview,rel_model_ref:0
+#: field:poweremail.send.wizard,rel_model_ref:0
+msgid "Referred Document"
+msgstr "Referred Document"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+#: selection:poweremail.core_accounts,state:0
+msgid "Approved"
+msgstr "Approved"
+
+#. module: poweremail
+#: field:poweremail.templates,table_html:0
+msgid "HTML code"
+msgstr "Código HTML"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Incoming"
+msgstr "Entrada"
+
+#. module: poweremail
+#: help:poweremail.templates,file_name:0
+msgid "File name pattern can be specified with placeholders.eg. 2009_SO003.pdf"
+msgstr "File name pattern can be specified with placeholders.eg. 2009_SO003.pdf"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_ir_actions_server
+msgid "ir.actions.server"
+msgstr "ir.actions.server"
+
+#. module: poweremail
+#: field:poweremail.preview,to:0
+#: field:poweremail.send.wizard,to:0
+msgid "To"
+msgstr "Para"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_recd:0
+msgid "Received at"
+msgstr "Received at"
+
+#. module: poweremail
+#: field:poweremail.core_selfolder,name:0
+msgid "Email Account"
+msgstr "Email Account"
+
+#. module: poweremail
+#: field:poweremail.mailbox,conversation_id:0
+msgid "Conversation"
+msgstr "Conversation"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_form
+msgid "E-M@IL Templates"
+msgstr "Modelos de E-M@IL"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,smtpport:0
+msgid "Enter port number,eg:SMTP-587 "
+msgstr "Entre o número da porta ,ex:SMTP-587 "
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtpssl:0
+msgid "Use SSL/TLS (only in python 2.6)"
+msgstr "Usar SSL/TLS (Somente no python 2.6)"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Not Applicable"
+msgstr "Não Aplicável"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Approve Account"
+msgstr "Aprovar Conta"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,email_id:0
+msgid "Email ID"
+msgstr "ID Email"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,full_success:0
+msgid "Complete Success"
+msgstr "Completado com Sucesso"
+
+#. module: poweremail
+#: field:poweremail.templates,use_sign:0
+msgid "Use Signature"
+msgstr "Usar Assinatura"
+
+#. module: poweremail
+#: model:ir.module.module,shortdesc:poweremail.module_meta_information
+msgid "Powerful Email capabilities for Open ERP"
+msgstr "Powerful Email capabilities for Open ERP"
+
+#. module: poweremail
+#: view:poweremail.preview:0
+msgid "OK"
+msgstr "OK"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,requested:0
+msgid "No of requested Mails"
+msgstr "No of requested Mails"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Download Full Mail"
+msgstr "Baixar E-mail Completo"
+
+#. module: poweremail
+#: selection:poweremail.templates,partner_type:0
+msgid "Retailer"
+msgstr "Retailer"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_body_text:0
+#: field:poweremail.templates,def_body_text:0
+msgid "Standard Body (Text)"
+msgstr "Corpo Padrão (Texto)"
+
+#. module: poweremail
+#: field:poweremail.conversation,mails:0
+msgid "Related Emails"
+msgstr "Email Relatado"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "Both HTML & Text"
+msgstr "Tanto HTML & Text"
+
+#. module: poweremail
+#: field:poweremail.core_selfolder,folder:0
+msgid "IMAP Folder"
+msgstr "Pasta IMAP"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,company:0
+msgid "Select if this mail account does not belongto specific user but the organisation as a whole.eg:info@somedomain.com"
+msgstr "Select if this mail account does not belongto specific user but the organisation as a whole.eg:info@somedomain.com"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Accounts"
+msgstr "Accounts"
+
+#. module: poweremail
+#: field:poweremail.templates,server_action:0
+msgid "Related Server Action"
+msgstr "Server Action Relacionada"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_follow_company
+msgid "Follow-up"
+msgstr "Follow-up"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_conversation
+msgid "Conversations are groups of related emails"
+msgstr "Conversations are groups of related emails"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_mailbox
+msgid "Power Email Mailbox included all type inbox,outbox,junk.."
+msgstr "Power Email Mailbox included all type inbox,outbox,junk.."
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to language."
+msgstr "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to language."
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isssl:0
+msgid "Use SSL"
+msgstr "Usar SSL"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,smtpserver:0
+msgid "Enter name of outgoing server,eg:smtp.gmail.com "
+msgstr "Enter name of outgoing server,eg:smtp.gmail.com "
+
+#. module: poweremail
+#: field:poweremail.preview,subject:0
+#: field:poweremail.send.wizard,subject:0
+msgid "Subject"
+msgstr "Assunto"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_from:0
+msgid "From"
+msgstr "De"
+
+#. module: poweremail
+#: field:ir.actions.server,poweremail_template:0
+#: field:poweremail.preview,ref_template:0
+#: field:poweremail.send.wizard,ref_template:0
+msgid "Template"
+msgstr "Modelo"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Sending"
+msgstr "Enviando"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Insert Simple Field"
+msgstr "Inserir um Campo Simples"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Send/Receive"
+msgstr "Enviar/Receber"
+
+#. module: poweremail
+#: field:poweremail.templates,table_sub_object:0
+msgid "Table-model"
+msgstr "Table-model"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_mailbox_all_main2
+msgid "MailBox"
+msgstr "Caixa de Email"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.wizard_poweremail_preview
+msgid "Template Preview"
+msgstr "Visualizar Modelo"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_body_html:0
+#: field:poweremail.templates,def_body_html:0
+msgid "Body (Text-Web Client Only)"
+msgstr "Body (Text-Web Client Only)"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_preview
+msgid "Power Email Template Preview"
+msgstr "Power Email Template Preview"
+
+#. module: poweremail
+#: help:poweremail.templates,send_on_write:0
+msgid "Sends an e-mail when a document is modified."
+msgstr "Sends an e-mail when a document is modified."
+
+#. module: poweremail
+#: view:ir.actions.server:0
+msgid "All values for the mail can be configured in the template editor itself."
+msgstr "All values for the mail can be configured in the template editor itself."
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Follow Up"
+msgstr "Power Email Follow Up"
+
+#. module: poweremail
+#: field:poweremail.templates,canal_id:0
+msgid "Channel"
+msgstr "Canal"
+
+#. module: poweremail
+#: help:poweremail.templates,def_to:0
+msgid "The default recepient of email.Placeholders can be used here."
+msgstr "The default recepient of email.Placeholders can be used here."
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,iserver_type:0
+msgid "POP3"
+msgstr "POP3"
+
+#. module: poweremail
+#: field:poweremail.templates,partner_type:0
+msgid "Partner Relation"
+msgstr "Parceiro Relacionado"
+
+#. module: poweremail
+#: selection:poweremail.templates,template_language:0
+msgid "Mako Templates"
+msgstr "Mako Templates"
+
+#. module: poweremail
+#: help:poweremail.templates,send_on_create:0
+msgid "Sends an e-mail when a new document is created."
+msgstr "Sends an e-mail when a new document is created."
+
+#. module: poweremail
+#: help:poweremail.core_accounts,isport:0
+msgid "For example IMAP: 993,POP3:995 "
+msgstr "For example IMAP: 993,POP3:995 "
+
+#. module: poweremail
+#: selection:poweremail.mailbox,folder:0
+msgid "Sent Items"
+msgstr "Itens Enviados"
+
+#. module: poweremail
+#: view:poweremail.preview:0
+msgid "Power Email Preview"
+msgstr "Power Email Preview"
+
+#. module: poweremail
+#: field:poweremail.templates,name:0
+msgid "Name of Template"
+msgstr "Nome do Modelo"
+
+#. module: poweremail
+#: help:poweremail.templates,null_value:0
+msgid "This Value is used if the field is empty"
+msgstr "This Value is used if the field is empty"
+
+#. module: poweremail
+#: model:ir.module.module,description:poweremail.module_meta_information
+msgid "\n"
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"\n"
+"    Features:\n"
+"\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"\n"
+"    "
+msgstr "\n"
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"\n"
+"    Features:\n"
+"\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"\n"
+"    "
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtptls:0
+msgid "Use TLS"
+msgstr "Usar TLS"
+
+#. module: poweremail
+#: help:poweremail.templates,def_body_html:0
+#: help:poweremail.templates,def_body_text:0
+msgid "The text version of the mail"
+msgstr "The text version of the mail"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_account_id:0
+msgid "User account"
+msgstr "User account"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,signature:0
+msgid "Attach my signature to mail"
+msgstr "Incluir a minha assinatura ao Email"
+
+#. module: poweremail
+#: field:poweremail.templates,table_required_fields:0
+msgid "Required Fields"
+msgstr "Campos Requeridos"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_configuration_server
+msgid "Configuration"
+msgstr "Configuração"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: view:poweremail.templates:0
+msgid "Advanced"
+msgstr "Advanced"
+
+#. module: poweremail
+#: constraint:ir.cron:0
+msgid "Invalid arguments"
+msgstr "Argumentos Inválidos"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Expression Builder"
+msgstr "Construtor de Expressão"
+
+#. module: poweremail
+#: constraint:ir.ui.view:0
+msgid "Invalid XML for View Architecture!"
+msgstr "Invalido XML para Arquitetura da View"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,state:0
+msgid "Account Status"
+msgstr "Status da Conta"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "HTML Body"
+msgstr "HTML Body"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "security"
+msgstr "Segurança"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Suspend Account"
+msgstr "Suspender Conta"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_my
+msgid "My Account"
+msgstr "Minhas Contas"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Select Folder"
+msgstr "Selecionar Pasta"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "SMTP Server"
+msgstr "Servidor SMTP"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Preview Template"
+msgstr "Visualizar Modelo"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtpserver:0
+msgid "Server"
+msgstr "Servidor"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_subject:0
+msgid " Subject"
+msgstr "Assunto"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: poweremail
+#: help:poweremail.templates,sub_model_object_field:0
+msgid "When you choose relationship fields this field will specify the sub value you can use."
+msgstr "When you choose relationship fields this field will specify the sub value you can use."
+
+#. module: poweremail
+#: field:poweremail.templates,lang:0
+msgid "Language"
+msgstr "Idioma"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Attachments (Report to attach)"
+msgstr "Anexos (Relatórios para Anexar)"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Security"
+msgstr "Segurança"
+
+#. module: poweremail
+#: field:poweremail.templates,sub_object:0
+msgid "Sub-model"
+msgstr "Sub-Modelo"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,iserver_type:0
+msgid "IMAP"
+msgstr "IMAP"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Body (Plain Text)"
+msgstr "Corpo (Plain Text)"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Body (Text)"
+msgstr "Corpo (Texto)"
+
+#. module: poweremail
+#: field:poweremail.mailbox,date_mail:0
+msgid "Rec/Sent Date"
+msgstr "Rec/Sent Date"
+
+#. module: poweremail
+#: field:poweremail.templates,send_on_write:0
+msgid "Send on Update"
+msgstr "Enviar ao Atualizar"
+
+#. module: poweremail
+#: field:poweremail.templates,report_template:0
+msgid "Report to send"
+msgstr "Relatório para Enviar"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Server Information"
+msgstr "Informação do Servidor"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,generated:0
+msgid "No of generated Mails"
+msgstr "No of generated Mails"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Mail Details"
+msgstr "Detalhes do Email"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Outbox"
+msgstr "Caixa de Sair do Power Email"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Multiple Mail Wizard Step 1"
+msgstr "Multiple Mail Wizard Step 1"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "HTML otherwise Text"
+msgstr "HTML otherwise Text"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,user:0
+msgid "Related User"
+msgstr "Usuário Relacionado"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Power Email Configuration"
+msgstr "Configuração do Power Email"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,company:0
+msgid "Company Mail A/c"
+msgstr "Email Corporativo"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,company:0
+msgid "Yes"
+msgstr "Sim"
+
+#. module: poweremail
+#: field:poweremail.templates,ref_ir_act_window:0
+msgid "Window Action"
+msgstr "Window Action"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Note: HTML body can't be edited with GTK desktop          client."
+msgstr "Note: HTML body can't be edited with GTK desktop          client."
+
+#. module: poweremail
+#: field:poweremail.templates,ref_ir_value:0
+msgid "Wizard Button"
+msgstr "Wizard Button"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Drafts"
+msgstr "Rascunhos"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,company:0
+msgid "No"
+msgstr "Não"
+
+#. module: poweremail
+#: field:poweremail.mailbox,mail_type:0
+msgid "Mail Contents"
+msgstr "Mail Contents"
+
+#. module: poweremail
+#: field:poweremail.preview,bcc:0
+#: field:poweremail.send.wizard,bcc:0
+msgid "BCC"
+msgstr "BCC"
+
+#. module: poweremail
+#: selection:poweremail.templates,partner_type:0
+msgid "Commercial Prospect"
+msgstr "Prospecto Comercial"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Plain Text"
+msgstr "Plain Text"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Draft"
+msgstr "Draft"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,allowed_groups:0
+msgid "Only users from these groups will beallowed to send mails from this ID"
+msgstr "Only users from these groups will beallowed to send mails from this ID"
+
+#. module: poweremail
+#: constraint:ir.ui.menu:0
+msgid "Error ! You can not create recursive Menu."
+msgstr "Erro ! Voc6e não pode criar um menu recursivo."
+
+#. module: poweremail
+#: field:poweremail.templates,model_int_name:0
+msgid "Model Internal Name"
+msgstr "Nome Interno do Modelo"
+
+#. module: poweremail
+#: help:poweremail.mailbox,server_ref:0
+msgid "Applicable for inward items only"
+msgstr "Applicable for inward items only"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Check Incoming Connection"
+msgstr "Testar Conexão de Entrada"
+
+#. module: poweremail
+#: field:poweremail.mailbox,state:0
+#: field:poweremail.send.wizard,state:0
+msgid "Status"
+msgstr "Status"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Email action and wizard"
+msgstr "Email action and wizard"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Outgoing"
+msgstr "Saída"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,state:0
+msgid "Initiated"
+msgstr "Iniciado"
+
+#. module: poweremail
+#: field:poweremail.send.wizard,from:0
+msgid "From Account"
+msgstr "Conta de Origem"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Intermixed content"
+msgstr "Intermixed content"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_templates
+msgid "Power Email Templates for Models"
+msgstr "Power Email Templates for Models"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_template_form
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_template_tree_all
+msgid "Email Templates"
+msgstr "Modelos de Email"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isuser:0
+#: field:poweremail.core_accounts,smtpuname:0
+msgid "User Name"
+msgstr "Nome do Usuário"
+
+#. module: poweremail
+#: field:poweremail.templates,sub_model_object_field:0
+msgid "Sub Field"
+msgstr "Sub Campo"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_user:0
+msgid "User"
+msgstr "Usuário"
+
+#. module: poweremail
+#: help:poweremail.templates,allowed_groups:0
+msgid "Only users from these groups will be allowed to send mails from this Template"
+msgstr "Only users from these groups will be allowed to send mails from this Template"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Outbox"
+msgstr "Caixa de Saída"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Save in Drafts"
+msgstr "Salvar em Rascunhos"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Power Email Templates"
+msgstr "Modelos Power Email"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Add here all attachments of the current document you want to include in the e-mail."
+msgstr "Adicione aqui todos os anexo do documento atual ao e-mail."
+
+#. module: poweremail
+#: field:poweremail.preview,cc:0
+#: field:poweremail.send.wizard,cc:0
+msgid "CC"
+msgstr "CC"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Send Mail"
+msgstr "Enviar Email"
+
+#. module: poweremail
+#: field:poweremail.templates,file_name:0
+msgid "File Name Pattern"
+msgstr "Nome do Arquivo Padrão"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.act_selfolder_form
+msgid "IMAP Folder Selection Wizard"
+msgstr "IMAP Folder Selection Wizard"
+
+#. module: poweremail
+#: help:poweremail.templates,auto_email:0
+msgid "Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\n"
+"Note:Auto email can be enabled only after saving template."
+msgstr "Selecting Auto Email will create a server action for you which automatically sends mail after a new record is created.\n"
+"Note:Auto email can be enabled only after saving template."
+
+#. module: poweremail
+#: field:poweremail.send.wizard,report:0
+msgid "Report File Name"
+msgstr "Nome do Relatório"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,iserver:0
+msgid "Incoming Server"
+msgstr "Servidor de Entrada"
+
+#. module: poweremail
+#: field:poweremail.templates,table_model_object_field:0
+msgid "Table Field"
+msgstr "Table Field"
+
+#. module: poweremail
+#: field:poweremail.templates,copyvalue:0
+msgid "Expression"
+msgstr "Expressão"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,dont_auto_down_attach:0
+msgid "Dont Download attachments automatically"
+msgstr "Dont Download attachments automatically"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,history:0
+msgid "History"
+msgstr "Histórico"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Un-Read"
+msgstr "Un-Read"
+
+#. module: poweremail
+#: help:poweremail.templates,use_sign:0
+msgid "the signature from the User detailswill be appened to the mail"
+msgstr "the signature from the User detailswill be appened to the mail"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_attachments_ids:0
+#: view:poweremail.send.wizard:0
+#: field:poweremail.send.wizard,attachment_ids:0
+msgid "Attachments"
+msgstr "Anexos"
+
+#. module: poweremail
+#: field:poweremail.templates,auto_email:0
+msgid "Auto Email"
+msgstr "Email Automático"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_bcc:0
+msgid " BCC"
+msgstr " BCC"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_cc:0
+msgid " CC"
+msgstr " CC"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Automatic Email"
+msgstr "Email Automático"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Request Re-activation"
+msgstr "Requisitar Ativação"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Discard Mail"
+msgstr "Descartar Email"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Drafts"
+msgstr "Power Email Drafts"
+
+#. module: poweremail
+#: help:poweremail.templates,copyvalue:0
+msgid "Copy and paste the value in the location you want to use a system value."
+msgstr "Copy and paste the value in the location you want to use a system value."
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Close"
+msgstr "Fechar"
+
+#. module: poweremail
+#: selection:poweremail.core_accounts,send_pref:0
+msgid "Text otherwise HTML"
+msgstr "Text otherwise HTML"
+
+#. module: poweremail
+#: field:poweremail.mailbox,pem_to:0
+#: field:poweremail.templates,def_to:0
+msgid "Recepient (To)"
+msgstr "Recepient (To)"
+
+#. module: poweremail
+#: help:poweremail.templates,enforce_from_account:0
+msgid "Emails will be sent only from this account."
+msgstr "Emails will be sent only from this account."
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Body (HTML-Web Client Only)"
+msgstr "Body (HTML-Web Client Only)"
+
+#. module: poweremail
+#: constraint:ir.model:0
+msgid "The Object name must start with x_ and not contain any special character !"
+msgstr "O nome do objeto precisa iniciar com x_ e não conter nenhum caracter especial!"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve"
+msgstr "Depois de pressionar enviar todos os Emails, os Emails serão enviados na próxima sincronização."
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
+msgid "Personal"
+msgstr "Personal"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,allowed_groups:0
+#: view:poweremail.templates:0
+#: field:poweremail.templates,allowed_groups:0
+msgid "Allowed User Groups"
+msgstr "Grupos Permitidos"
+
+#. module: poweremail
+#: field:poweremail.templates,model_object_field:0
+msgid "Field"
+msgstr "Campo"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,name:0
+msgid "Email Account Desc"
+msgstr "Descrição da Conta"
+
+#. module: poweremail
+#: help:poweremail.templates,table_required_fields:0
+msgid "Select the fieldsyou require in the table)"
+msgstr "Select the fieldsyou require in the table)"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+#: selection:poweremail.core_accounts,state:0
+msgid "Suspended"
+msgstr "Suspended"
+
+#. module: poweremail
+#: view:poweremail.core_selfolder:0
+msgid "Ok"
+msgstr "Ok"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isfolder:0
+#: field:poweremail.mailbox,folder:0
+msgid "Folder"
+msgstr "Pasta"
+
+#. module: poweremail
+#: help:poweremail.templates,def_bcc:0
+msgid "The default BCC for the email. Placeholders can be used here."
+msgstr "The default BCC for the email. Placeholders can be used here."
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_follow_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_inbox_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_outbox_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_sent_tree_company
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_trash_tree_company
+msgid "Email Mailbox"
+msgstr "Email Mailbox"
+
+#. module: poweremail
+#: help:poweremail.templates,sub_object:0
+msgid "When a relation field is used this field will show you the type of field you have selected"
+msgstr "When a relation field is used this field will show you the type of field you have selected"
+
+#. module: poweremail
+#: field:poweremail.templates,partner_event:0
+msgid "Partner ID to log Events"
+msgstr "Partner ID to log Events"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_trash_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Trash"
+msgstr "Lixeira"
+
+#. module: poweremail
+#: field:poweremail.templates,def_cc:0
+msgid "Default CC"
+msgstr "CC Padrão"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,state:0
+msgid "Read"
+msgstr "Ler"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_res_groups
+msgid "res.groups"
+msgstr "res.groups"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,rec_headers_den_mail:0
+msgid "First Receive headers, then download mail"
+msgstr "Primeiro receba o cabeçalho, depois faça download do email"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,smtpport:0
+msgid "SMTP Port "
+msgstr "Porta SMTP"
+
+#. module: poweremail
+#: field:poweremail.templates,template_language:0
+msgid "Templating Language"
+msgstr "Templating Language"
+
+#. module: poweremail
+#: help:poweremail.templates,table_sub_object:0
+msgid "This field shows the model you will be using for your table"
+msgstr "This field shows the model you will be using for your table"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "User Information"
+msgstr "Informação do Usuário"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_sent_company
+msgid "Sent"
+msgstr "Enviado"
+
+#. module: poweremail
+#: view:poweremail.templates:0
+msgid "Insert Table"
+msgstr "Inserir Tabela"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,isfolder:0
+msgid "Folder to be used for downloading IMAP mails\n"
+"Click on adjacent button to select from a list of folders"
+msgstr "Folder to be used for downloading IMAP mails\n"
+"Click on adjacent button to select from a list of folders"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,ispass:0
+#: field:poweremail.core_accounts,smtppass:0
+msgid "Password"
+msgstr "Senha"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,folder:0
+msgid "Follow Up"
+msgstr "Follow Up"
+
+#. module: poweremail
+#: selection:poweremail.templates,partner_type:0
+msgid "Customer"
+msgstr "Cliente"
+
+#. module: poweremail
+#: field:poweremail.preview,report:0
+msgid "Report Name"
+msgstr "Nome do Relatório"
+
+#. module: poweremail
+#: field:poweremail.conversation,name:0
+msgid "Name"
+msgstr "Nome"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_core_accounts
+msgid "poweremail.core_accounts"
+msgstr "poweremail.core_accounts"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Trash"
+msgstr "Lixeira Power Email"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal
+#: view:poweremail.core_accounts:0
+msgid "Personal Accounts"
+msgstr "Contas Pessoais"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Sent"
+msgstr "Power Email Sent"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+#: view:poweremail.templates:0
+msgid "Body (HTML)"
+msgstr "Corpo (HTML)"
+
+#. module: poweremail
+#: help:poweremail.templates,table_html:0
+msgid "Copy this html code to your HTML message body for displaying the info in your mail."
+msgstr "Copy this html code to your HTML message body for displaying the info in your mail."
+
+#. module: poweremail
+#: field:poweremail.templates,attached_activity:0
+msgid "Activity"
+msgstr "Atividade"
+
+#. module: poweremail
+#: field:poweremail.preview,rel_model:0
+#: field:poweremail.send.wizard,rel_model:0
+#: field:poweremail.templates,object_name:0
+msgid "Model"
+msgstr "Modelo"
+
+#. module: poweremail
+#: help:poweremail.templates,server_action:0
+msgid "Corresponding server action is here."
+msgstr "Corresponding server action is here."
+
+#. module: poweremail
+#: help:poweremail.templates,partner_event:0
+msgid "Partner ID who an email event is logged. Placeholders can be used here. eg. ${object.partner_id.id}"
+msgstr "Partner ID who an email event is logged. Placeholders can be used here. eg. ${object.partner_id.id}"
+
+#. module: poweremail
+#: help:poweremail.templates,def_subject:0
+msgid "The default subject of email. Placeholders can be used here."
+msgstr "The default subject of email. Placeholders can be used here."
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_send_wizard
+msgid "This is the wizard for sending mail"
+msgstr "This is the wizard for sending mail"
+
+#. module: poweremail
+#: field:poweremail.templates,enforce_from_account:0
+msgid "Enforce From Account"
+msgstr "Forçar Conta de Origem"
+
+#. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_engines
+msgid "Power Email Engine"
+msgstr "Power Email Engine"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_all
+msgid "All Accounts"
+msgstr "Todas as Contas"
+
+#. module: poweremail
+#: field:poweremail.templates,def_subject:0
+msgid "Default Subject"
+msgstr "Assunto Padrão"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Check Outgoing Connection"
+msgstr "Testar Conexão de Saída"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,send_pref:0
+msgid "Mail Format"
+msgstr "Formato do Mail"
+
+#. module: poweremail
+#: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_co
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal_co
+#: view:poweremail.core_accounts:0
+msgid "Company Accounts"
+msgstr "Contas Corporativa"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,last_mail_id:0
+msgid "Last Downloaded Mail"
+msgstr "Last Downloaded Mail"
+
+#. module: poweremail
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox_company
+#: selection:poweremail.mailbox,folder:0
+msgid "Inbox"
+msgstr "Caixa de Entrada"
+
+#. module: poweremail
+#: selection:poweremail.send.wizard,state:0
+msgid "Simple Mail Wizard Step 1"
+msgstr "Simple Mail Wizard Step 1"
+
+#. module: poweremail
+#: selection:poweremail.mailbox,mail_type:0
+msgid "Has Attachments"
+msgstr "Has Attachments"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Power Email Inbox"
+msgstr "Power Email Inbox"
+
+#. module: poweremail
+#: field:poweremail.core_accounts,isport:0
+msgid "Port"
+msgstr "Porta"
+
+#. module: poweremail
+#: help:poweremail.core_accounts,email_id:0
+msgid " eg:yourname@yourdomain.com "
+msgstr " ex:yourname@seunominio.com "
+

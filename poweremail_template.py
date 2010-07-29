@@ -359,10 +359,10 @@ class poweremail_templates(osv.osv):
              size=250,
              help="Partner ID who an email event is logged."
              " Placeholders can be used here. eg. ${object.partner_id.id}"),
-        'partner_event_type_id':fields.many2one(
-            'res.partner.event.type',
-            'Partner Event Type',
-            readonly=True),
+        #'partner_event_type_id':fields.many2one(
+        #    'res.partner.event.type',
+        #    'Partner Event Type',
+        #    readonly=True),
         'canal_id': fields.many2one(
             'res.partner.canal',
             'Channel'),
@@ -437,20 +437,20 @@ class poweremail_templates(osv.osv):
                 obj.old_write = obj.write
                 obj.write = types.MethodType(send_on_write, obj, osv.osv)
 
-    def update_partner_event(self, cr, uid, ids, context):
-        for template in self.browse(cr, uid, ids, context):
-            if template.partner_event:
-                if not template.partner_event_type_id:
-                    # Create partner event type if necessary
-                    partner_event_type_id = self.pool.get('res.partner.event.type').create(cr, uid, {
-                        'name': _('EMAIL: ') + template.name,
-                        'key': 'email_' + template.name.lower().replace(' ', '_'),
-                    }, context)
-                    self.write(cr, uid, template.id, {
-                        'partner_event_type_id': partner_event_type_id,
-                    }, context)
-            elif template.partner_event_type_id:
-                self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
+    #def update_partner_event(self, cr, uid, ids, context):
+    #    for template in self.browse(cr, uid, ids, context):
+    #        if template.partner_event:
+    #            if not template.partner_event_type_id:
+    #                # Create partner event type if necessary
+    #                partner_event_type_id = self.pool.get('res.partner.event.type').create(cr, uid, {
+    #                    'name': _('EMAIL: ') + template.name,
+    #                    'key': 'email_' + template.name.lower().replace(' ', '_'),
+    #                }, context)
+    #                self.write(cr, uid, template.id, {
+    #                    'partner_event_type_id': partner_event_type_id,
+    #                }, context)
+    #        elif template.partner_event_type_id:
+    #            self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
 
     def create(self, cr, uid, vals, context=None):
         id = super(poweremail_templates, self).create(cr, uid, vals, context)
@@ -482,8 +482,8 @@ class poweremail_templates(osv.osv):
             self.update_auto_email(cr, uid, [id], context)
         if vals.get('send_on_create') or vals.get('send_on_write'): 
             self.update_send_on_store(cr, uid, [id], context)
-        if vals.get('partner_event'): 
-            self.update_partner_event(cr, uid, [id], context)
+        #if vals.get('partner_event'): 
+        #    self.update_partner_event(cr, uid, [id], context)
         return id
 
     def write(self, cr, uid, ids, vals, context=None):
@@ -492,8 +492,8 @@ class poweremail_templates(osv.osv):
             self.update_auto_email(cr, uid, ids, context)
         if 'send_on_create' in vals or 'send_on_write' in vals:
             self.update_send_on_store(cr, uid, ids, context)
-        if 'partner_event' in vals: 
-            self.update_partner_event(cr, uid, ids, context)
+        #if 'partner_event' in vals: 
+        #    self.update_partner_event(cr, uid, ids, context)
         return result
 
     def unlink(self, cr, uid, ids, context=None):
@@ -512,8 +512,8 @@ class poweremail_templates(osv.osv):
                     self.pool.get('ir.values').unlink(cr, uid, template.ref_ir_value.id, context)
                 if template.server_action:
                     self.pool.get('ir.actions.server').unlink(cr, uid, template.server_action.id, context)
-                if template.partner_event_type_id:
-                    self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
+                #if template.partner_event_type_id:
+                #    self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
             except:
                 raise osv.except_osv(_("Warning"), _("Deletion of Record failed"))
         return super(poweremail_templates, self).unlink(cr, uid, ids, context)
@@ -620,7 +620,7 @@ class poweremail_templates(osv.osv):
             result['null_value'] = False
         return {'value':result}
 
-    def _onchange_null_value(self, cr, uid, ids, model_object_field, sub_model_object_field, null_value, template_language, context=None):
+    def onchange_null_value(self, cr, uid, ids, model_object_field, sub_model_object_field, null_value, template_language, context=None):
         if not model_object_field and not null_value:
             return {}
         result = {}
@@ -986,18 +986,18 @@ class poweremail_templates(osv.osv):
                                               context
                                               )
             # Create a partner event
-            if template.partner_event and \
-                template.partner_event_type_id and \
-                    self.pool.get('res.partner.event.type').check(
-                                    cursor,
-                                    user,
-                                    template.partner_event_type_id.key) and \
-                                        get_value(cursor,
-                                                  user,
-                                                  record_id,
-                                                  template.partner_event,
-                                                  template,
-                                                  context):
+            if template.partner_event: #and \
+                #template.partner_event_type_id and \
+                #    self.pool.get('res.partner.event.type').check(
+                #                    cursor,
+                #                    user,
+                #                    template.partner_event_type_id.key) and \
+                #                        get_value(cursor,
+                #                                  user,
+                #                                  record_id,
+                #                                  template.partner_event,
+                #                                  template,
+                #                                  context):
                 self._generate_partner_events(cursor,
                                               user,
                                               template,
@@ -1068,7 +1068,7 @@ class poweremail_preview(osv.osv_memory):
         'rel_model': _default_model
     }
 
-    def _on_change_ref(self, cr, uid, ids, rel_model_ref, context=None):
+    def on_change_ref(self, cr, uid, ids, rel_model_ref, context=None):
         if context is None:
             context = {}
         if not rel_model_ref:

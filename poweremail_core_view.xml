@@ -56,7 +56,7 @@
 								<field name="smtpssl" select="2" colspan="2" />
 								<field name="smtptls" select="2" colspan="2" />
 							</group>
-							<button name="_check_outgoing_connection" type="object" string="Check Outgoing Connection" />
+							<button name="check_outgoing_connection" type="object" string="Check Outgoing Connection" />
 							<separator string="User Information" colspan="4" />
 							<group col="2" colspan="2">
 								<field name="email_id" select="1" on_change="on_change_emailid(name,email_id)" colspan="2" />
@@ -125,6 +125,28 @@
 				</tree>
 			</field>
 		</record>
+
+		<record id="poweremail_core_accounts_search" model="ir.ui.view">
+           <field name="name">poweremail.core_accounts.search</field>
+           <field name="model">poweremail.core_accounts</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+               <search string="Accounts">
+                    <filter icon="terp-personal" string="My Accounts" name="my" domain="[('user','=',uid)]"/>
+                    <filter icon="terp-personal+" string="Personal Accounts" domain="[('company','=','no')]"/>
+                    <filter icon="terp-go-home" string="Company Accounts" domain="[('company','=','yes')]"/>
+                    <separator orientation="vertical"/>
+                    <filter icon="terp-document-new" string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                    <filter icon="terp-emblem-important" string="Suspended" domain="[('state','=','suspended')]"/>
+                    <filter icon="terp-check" string="Approved" domain="[('state','=','approved')]"/>
+                    <separator orientation="vertical"/>
+                    <field name="name" select="1"/>
+                    <field name="user" select="1"/>
+                    <field name="email_id" select="1"/>
+               </search>
+           </field>
+        </record>
+
 
 		<record model="ir.actions.act_window" id="action_poweremail_core_accounts_tree_per">
 			<field name="name">Personal Account</field>

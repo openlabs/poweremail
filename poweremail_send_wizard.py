@@ -142,9 +142,14 @@ class poweremail_send_wizard(osv.osv_memory):
         'full_success': lambda *a: False
     }
 
-    def fields_get(self, cr, uid, fields=None, context=None, read_access=True):
-        result = super(poweremail_send_wizard, self).fields_get(cr, uid, fields, context, read_access)
-        if 'attachment_ids' in result:
+    #def fields_get(self, cr, uid, fields=None, context=None, read_access=True):
+    #    result = super(poweremail_send_wizard, self).fields_get(cr, uid, fields, context, read_access)
+    #    if 'attachment_ids' in result:
+    #        result['attachment_ids']['domain'] = [('res_model','=','purchase.order'),('res_id','=',context['active_id'])]
+    #    return result
+    def fields_get(self, cr, uid, fields=None, context=None, write_access=True):
+        result = super(poweremail_send_wizard, self).fields_get(cr, uid, fields, context, write_access)
+        if 'attachment_ids' in result and 'src_model' in context:
             result['attachment_ids']['domain'] = [('res_model','=',context['src_model']),('res_id','=',context['active_id'])]
         return result
 
@@ -188,11 +193,11 @@ class poweremail_send_wizard(osv.osv_memory):
                 return self.get_value(cr, uid, template, value, context, id)
             else:
                 return value
-
+    
         mail_ids = []
         template = self._get_template(cr, uid, context)
         for id in context['src_rec_ids']:
-            screen_vals = self.read(cr, uid, ids[0], [],context)[0]
+            screen_vals = self.read(cr, uid, ids[0], [],context)
             accounts = self.pool.get('poweremail.core_accounts').read(cr, uid, screen_vals['from'], context=context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
@@ -253,7 +258,8 @@ class poweremail_send_wizard(osv.osv_memory):
                 }, context)
 
             # Create a partner event
-            if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', context):
+            #if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', context):
+            if template.partner_event and self._get_template_value(cr, uid, 'partner_event', context):
                 name = vals['pem_subject']
                 if isinstance(name, str):
                     name = unicode(name, 'utf-8')
@@ -276,6 +282,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 })
 
         return mail_ids
+
 poweremail_send_wizard()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

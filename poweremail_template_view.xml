@@ -121,7 +121,7 @@
                             </notebook>
                             <group col="4">
                                 <field name="template_language"
-                                    on_change="_onchange_null_value(model_object_field,sub_model_object_field,null_value,template_language,context)" />
+                                    on_change="onchange_null_value(model_object_field,sub_model_object_field,null_value,template_language,context)" />
                                 <notebook>
                                     <page string="Insert Simple Field">
 
@@ -197,7 +197,7 @@
                             <separator string="Log partner events"
                                 colspan="4" />
                             <field name="partner_event" />
-                            <field name="partner_event_type_id" />
+                            <!-- <field name="partner_event_type_id" /> -->
                             <field name="canal_id"
                                 attrs="{'required':[('partner_event','!=',False)]}" />
                             <field name="partner_type"
