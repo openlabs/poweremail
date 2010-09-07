@@ -52,8 +52,7 @@
 				<xpath
 					expr="/form/notebook/page/field[@name='copy_object']"
 					position="replace">
-					<field name="copy_object" select="2"
-						attrs="{'required':[('state','!=','dummy'), ('state','!=','sms'), ('state','!=','code'), ('state','!=','loop'),('state','!=','trigger'), ('state','!=','client_action'), ('state','!=','email'), ('state','!=','sms'), ('state','!=','other'), ('state','!=','poweremail')]}" />
+                    <field name="copy_object" on_change="change_object(copy_object, state)" select="2" attrs="{'required':[('state','!=','dummy'), ('state','!=','sms'), ('state','!=','code'), ('state','!=','loop'), ('state','!=','trigger'), ('state','!=','object_write'), ('state','!=','object_create'), ('state','!=','client_action'), ('state','!=','email'), ('state','!=','sms'), ('state','!=','other'), ('state','!=','poweremail')]}"/>
 				</xpath>
 			</field>
 		</record>
