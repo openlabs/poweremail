@@ -184,6 +184,7 @@
                                 attrs="{'required':[('auto_email','=',True)],'readonly':[('auto_email','=', False)]}" />
                             <field name="send_on_create" />
                             <field name="send_on_write" />
+                            <field name="save_to_drafts" />
                             <separator string="Email action and wizard"
                                 colspan="4" />
                             <field name="server_action" readonly="1" />
