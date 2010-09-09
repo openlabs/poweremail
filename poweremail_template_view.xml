@@ -127,7 +127,7 @@
 
                                         <field name="model_object_field"
                                             domain="[('model_id','=',object_name),('ttype','!=','one2many'),('ttype','!=','many2many')]"
-                                            on_change="_onchange_model_object_field(model_object_field, template_language,context)"
+                                            on_change="onchange_model_object_field(model_object_field, template_language,context)"
                                             colspan="4" />
                                         <field name="sub_object"
                                             readonly="1" colspan="4" />

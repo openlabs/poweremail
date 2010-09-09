@@ -567,7 +567,7 @@ class poweremail_templates(osv.osv):
             copy_val = copy_val + "}}"        
         return copy_val 
             
-    def _onchange_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
+    def onchange_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
         result = {}
