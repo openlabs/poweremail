@@ -90,14 +90,12 @@ def send_on_write(self, cr, uid, ids, vals, context=None):
 # between when the pool is available and when this function is called which 
 # may mean allow creating/writing objects without an e-mail being sent.
 
-old_register_all = report.interface.register_all
 
 def new_register_all(db):
-    value = old_register_all(db)
-
     cr = db.cursor()
     pool = pooler.get_pool(cr.dbname)
-
+    value = pool.get('ir.actions.report.xml').register_all(cr)
+    
     # If poweremail.templates has not yet been initialized, do not try to
     # SELECT its table yet
     if not 'poweremail.templates' in pool.obj_list():
