@@ -47,7 +47,7 @@
             <field name="act_from" ref="act_draft"/>
             <field name="act_to" ref="act_approved"/>
             <field name="signal">button_approval</field>
-            <field name="role_id" ref="PE_ADMIN"/>
+            <field name="group_id" ref="PE_ADMIN"/>
         </record>
         
         <record id="trans_approved_suspended" model="workflow.transition">
