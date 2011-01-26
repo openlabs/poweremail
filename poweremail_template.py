@@ -593,7 +593,7 @@ class poweremail_templates(osv.osv):
             result['null_value'] = False
         return {'value':result}
         
-    def _onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
+    def onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
         if not model_object_field or not sub_model_object_field:
             return {}
         result = {}
@@ -651,7 +651,7 @@ class poweremail_templates(osv.osv):
             result['null_value'] = null_value
         return {'value':result}
                
-    def _onchange_table_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
+    def onchange_table_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
         result = {}
@@ -665,7 +665,7 @@ class poweremail_templates(osv.osv):
             result['sub_object'] = False
         return {'value':result}
 
-    def _onchange_table_required_fields(self, cr, uid, ids, table_model_object_field, table_required_fields, template_language, context=None):
+    def onchange_table_required_fields(self, cr, uid, ids, table_model_object_field, table_required_fields, template_language, context=None):
         if not table_model_object_field or not table_required_fields:
             return {'value':{'table_html': False}}
         result = ''
