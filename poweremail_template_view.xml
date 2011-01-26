@@ -245,17 +245,9 @@
             <field name="view_id" ref="poweremail_template_form" />
         </record>
 
+        <menuitem name="Templates" id="menu_poweremail_templates" parent="menu_poweremail_administration_server" />
 
-        <menuitem name="E-M@IL Templates" id="menu_poweremail_templates_all"
-            parent="menu_poweremail_administration_server" action="action_poweremail_template_tree_all" />
-
-        <menuitem name="E-M@IL Templates" id="menu_poweremail_templates_form"
-            parent="menu_poweremail_administration_server" action="action_poweremail_template_form"
-            sequence="10" />
+        <menuitem name="Email Templates" id="menu_poweremail_templates_all"
+            parent="menu_poweremail_templates" action="action_poweremail_template_tree_all" />
     </data>
 </openerp>
-
-
-
-
-
