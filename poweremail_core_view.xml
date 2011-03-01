@@ -91,7 +91,7 @@
 							</group>
 							<group col="2" colspan="2">
 
-								<button name="_check_incoming_connection" type="object" string="Check Incoming Connection" />
+								<button name="check_incoming_connection" type="object" string="Check Incoming Connection" />
 							</group>
 						</page>
 						<page string="security" attrs="{'invisible':[('company','!=','yes')]}">

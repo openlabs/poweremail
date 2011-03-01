@@ -361,7 +361,7 @@ class poweremail_core_accounts(osv.osv):
                     _("The specified record for connection does not exist")
                         )
         
-    def _check_incoming_connection(self, cursor, user, ids, context=None):
+    def check_incoming_connection(self, cursor, user, ids, context=None):
         """
         checks incoming credentials and confirms if outgoing connection works
         (Attached to button)
