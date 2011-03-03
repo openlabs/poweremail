@@ -227,10 +227,12 @@ class poweremail_send_wizard(osv.osv_memory):
                 data = {}
                 data['model'] = self.pool.get('ir.model').browse(cr, uid, screen_vals['rel_model'], context).model
 
-                # Ensure report is rendered using template's language
+                # Ensure report is rendered using template's language. If not found, user's launguage is used.
                 ctx = context.copy()
                 if template.lang:
                     ctx['lang'] = self.get_value(cr, uid, template, template.lang, context, id)
+                if not ctx.get('lang', False) or ctx['lang'] == 'False':
+                    ctx['lang'] = self.pool.get('res.users').read(cr, uid, uid, ['context_lang'], context)['context_lang']
                 service = netsvc.LocalService(reportname)
                 (result, format) = service.create(cr, uid, [id], data, ctx)
                 attachment_id = self.pool.get('ir.attachment').create(cr, uid, {

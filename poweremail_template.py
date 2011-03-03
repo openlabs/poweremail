@@ -1028,7 +1028,7 @@ class poweremail_preview(osv.osv_memory):
             context = {}
         #Fills up the selection box which allows records from the selected object to be displayed
         self.context = context
-        if 'active_id' in context.keys():
+        if 'active_id' in context.keys() and context.get('active_model', False) == 'poweremail.templates':
             ref_obj_id = self.pool.get('poweremail.templates').read(cr, uid, context['active_id'], ['object_name'], context)['object_name']
             ref_obj_name = self.pool.get('ir.model').read(cr, uid, ref_obj_id[0], ['model'], context)['model']
             ref_obj_ids = self.pool.get(ref_obj_name).search(cr, uid, [], context=context)

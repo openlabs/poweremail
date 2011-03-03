@@ -17,7 +17,7 @@
                     <field name="rel_model" />
                     <newline />
                     <field name="rel_model_ref"
-                        on_change="_on_change_ref(rel_model_ref, context)" />
+                        on_change="on_change_ref(rel_model_ref, context)" />
                     <newline />
                     <field name="to" />
                     <newline />
