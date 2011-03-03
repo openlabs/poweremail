@@ -119,6 +119,8 @@ def new_register_all(db):
         soc = record[2]
         sow = record[3]
         obj = pool.get(model)
+        if not obj:
+            continue
         if hasattr(obj, 'old_create'):
             obj.create = obj.old_create
             del obj.old_create
