@@ -197,11 +197,6 @@
                             <separator string="Log partner events"
                                 colspan="4" />
                             <field name="partner_event" />
-                            <!-- <field name="partner_event_type_id" /> -->
-                            <field name="canal_id"
-                                attrs="{'required':[('partner_event','!=',False)]}" />
-                            <field name="partner_type"
-                                attrs="{'required':[('partner_event','!=',False)]}" />
                         </page>
                     </notebook>
                 </form>

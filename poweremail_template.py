@@ -359,20 +359,6 @@ class poweremail_templates(osv.osv):
              size=250,
              help="Partner ID who an email event is logged."
              " Placeholders can be used here. eg. ${object.partner_id.id}"),
-        #'partner_event_type_id':fields.many2one(
-        #    'res.partner.event.type',
-        #    'Partner Event Type',
-        #    readonly=True),
-        'canal_id': fields.many2one(
-            'res.partner.canal',
-            'Channel'),
-        'partner_type': fields.selection(
-             [
-              ('customer', 'Customer'),
-              ('retailer', 'Retailer'),
-              ('prospect', 'Commercial Prospect'),
-              ], 'Partner Relation'),
-        #Template language(engine eg.Mako) specifics
         'template_language':fields.selection(
                 TEMPLATE_ENGINES,
                 'Templating Language',
@@ -437,21 +423,6 @@ class poweremail_templates(osv.osv):
                 obj.old_write = obj.write
                 obj.write = types.MethodType(send_on_write, obj, osv.osv)
 
-    #def update_partner_event(self, cr, uid, ids, context):
-    #    for template in self.browse(cr, uid, ids, context):
-    #        if template.partner_event:
-    #            if not template.partner_event_type_id:
-    #                # Create partner event type if necessary
-    #                partner_event_type_id = self.pool.get('res.partner.event.type').create(cr, uid, {
-    #                    'name': _('EMAIL: ') + template.name,
-    #                    'key': 'email_' + template.name.lower().replace(' ', '_'),
-    #                }, context)
-    #                self.write(cr, uid, template.id, {
-    #                    'partner_event_type_id': partner_event_type_id,
-    #                }, context)
-    #        elif template.partner_event_type_id:
-    #            self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
-
     def create(self, cr, uid, vals, context=None):
         id = super(poweremail_templates, self).create(cr, uid, vals, context)
         src_obj = self.pool.get('ir.model').read(cr, uid, vals['object_name'], ['model'], context)['model']
@@ -512,8 +483,6 @@ class poweremail_templates(osv.osv):
                     self.pool.get('ir.values').unlink(cr, uid, template.ref_ir_value.id, context)
                 if template.server_action:
                     self.pool.get('ir.actions.server').unlink(cr, uid, template.server_action.id, context)
-                #if template.partner_event_type_id:
-                #    self.pool.get('res.partner.event.type').unlink(cr, uid, template.partner_event_type_id.id, context)
             except:
                 raise osv.except_osv(_("Warning"), _("Deletion of Record failed"))
         return super(poweremail_templates, self).unlink(cr, uid, ids, context)
@@ -527,7 +496,7 @@ class poweremail_templates(osv.osv):
         check = self.search(cr, uid, [('name', '=', new_name)], context=context)
         if check:
             new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
-        default.update({'name':new_name, 'partner_event_type_id': False})
+        default.update({'name':new_name})
         return super(poweremail_templates, self).copy(cr, uid, id, default, context)
     
     def compute_pl(self,
@@ -678,7 +647,7 @@ class poweremail_templates(osv.osv):
             result += "</td>"
         result += "\n</tr>\n</thead>\n<tbody>\n"
         #Table header is defined,  now mako for table
-        print "Language:", template_language
+        #print "Language:", template_language
         if template_language == 'mako':
             result += "%for o in object." + table_field_obj.name + ":\n<tr>"
             for each_rec in table_required_fields[0][2]:
@@ -740,23 +709,19 @@ class poweremail_templates(osv.osv):
                                         context=context):
                 document = 'ir.attachment,%i' % mail.pem_attachments_ids[0]
         event_vals = {
+            'history': True,
             'name': name,
-            'description': mail.pem_body_text and mail.pem_body_text \
-                                                    or mail.pem_body_html,
-            'partner_id': get_value(cursor,
-                                    user,
-                                    record_id,
-                                    template.partner_event,
-                                    template,
-                                    context),
             'date': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'canal_id': template.canal_id and template.canal_id.id or False,
-            'partner_type': template.partner_type,
             'user_id': user,
-            'document': document,
+            'email_from': mail.pem_from or None,
+            'email_to': mail.pem_to or None,
+            'email_cc': mail.pem_cc or None,
+            'email_bcc': mail.pem_bcc or None,
+            'message_id': mail.id,
+            'description': mail.pem_body_text and mail.pem_body_text or mail.pem_body_html,
+            'partner_id': get_value(cursor, user, record_id, template.partner_event, template, context),
         }
-        
-        self.pool.get('res.partner.event').create(cursor,
+        self.pool.get('mailgate.message').create(cursor,
                                                   user,
                                                   event_vals,
                                                   context)
@@ -810,9 +775,9 @@ class poweremail_templates(osv.osv):
                                           context)
         attachment_obj = self.pool.get('ir.attachment')
         new_att_vals = {
-            'name':mail.pem_subject + ' (Email Attachment)',
-            'datas':base64.b64encode(result),
-            'datas_fname':tools.ustr(
+            'name': mail.pem_subject + ' (Email Attachment)',
+            'datas': base64.b64encode(result),
+            'datas_fname': tools.ustr(
                              get_value(
                                    cursor,
                                    user,
@@ -821,9 +786,9 @@ class poweremail_templates(osv.osv):
                                    template,
                                    context
                                    ) or 'Report') + "." + format,
-            'description':mail.pem_subject or "No Description",
-            'res_model':'poweremail.mailbox',
-            'res_id':mail.id
+            'description': mail.pem_subject or "No Description",
+            'res_model': 'poweremail.mailbox',
+            'res_id': mail.id
         }
         attachment_id = attachment_obj.create(cursor,
                                               user,
@@ -986,18 +951,9 @@ class poweremail_templates(osv.osv):
                                               context
                                               )
             # Create a partner event
-            if template.partner_event: #and \
-                #template.partner_event_type_id and \
-                #    self.pool.get('res.partner.event.type').check(
-                #                    cursor,
-                #                    user,
-                #                    template.partner_event_type_id.key) and \
-                #                        get_value(cursor,
-                #                                  user,
-                #                                  record_id,
-                #                                  template.partner_event,
-                #                                  template,
-                #                                  context):
+            cursor.execute("SELECT state from ir_module_module where state='installed' and name = 'mail_gateway'")
+            mail_gateway = cursor.fetchall()
+            if template.partner_event and mail_gateway:
                 self._generate_partner_events(cursor,
                                               user,
                                               template,

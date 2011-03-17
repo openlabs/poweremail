@@ -197,7 +197,7 @@ class poweremail_send_wizard(osv.osv_memory):
         mail_ids = []
         template = self._get_template(cr, uid, context)
         for id in context['src_rec_ids']:
-            screen_vals = self.read(cr, uid, ids[0], [],context)
+            screen_vals = self.read(cr, uid, ids[0], [], context)
             accounts = self.pool.get('poweremail.core_accounts').read(cr, uid, screen_vals['from'], context=context)
             vals = {
                 'pem_from': tools.ustr(accounts['name']) + "<" + tools.ustr(accounts['email_id']) + ">",
@@ -272,17 +272,24 @@ class poweremail_send_wizard(osv.osv_memory):
                     document = data['model']+',%i' % id
                 elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
                     document = 'ir.attachment,%i' % attachment_ids[0]
-                self.pool.get('res.partner.event').create(cr, uid, {
-                    'name': name,
-                    'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
-                    'partner_id': self.get_value(cr, uid, template, template.partner_event, context, id),
-                    'date': time.strftime('%Y-%m-%d %H:%M:%S'),
-                    'canal_id': template.canal_id and template.canal_id.id or False,
-                    'partner_type': template.partner_type,
-                    'user_id': uid,
-                    'document': document,
-                })
-
+                    
+                cr.execute("SELECT state from ir_module_module where state='installed' and name = 'mail_gateway'")
+                mail_gateway = cr.fetchall()
+                if mail_gateway:
+                    values = {
+                        'history': True,
+                        'name': name,
+                        'date': time.strftime('%Y-%m-%d %H:%M:%S'),
+                        'user_id': uid,
+                        'email_from': vals['pem_from'] or None,
+                        'email_to': vals['pem_to'] or None,
+                        'email_cc': vals['pem_cc'] or None,
+                        'email_bcc': vals['pem_bcc'] or None,
+                        'message_id': mail_id,
+                        'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
+                        'partner_id': self.get_value(cr, uid, template, template.partner_event, context, id),
+                    }
+                    self.pool.get('mailgate.message').create(cr, uid, values, context)
         return mail_ids
 
 poweremail_send_wizard()
