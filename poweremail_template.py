@@ -693,21 +693,23 @@ class poweremail_templates(osv.osv):
             name = unicode(name, 'utf-8')
         if len(name) > 64:
             name = name[:61] + '...'
-        document = False
+        model = res_id = False
         if template.report_template:
             if self.pool.get('res.request.link').search(
                                     cursor,
                                     user,
                                     [('object', '=', template.model_int_name)],
                                     context=context):
-                document = template.model_int_name + ',%i' % record_id
+                model = template.model_int_name
+                res_id = record_id
             elif mail.pem_attachments_ids \
                     and self.pool.get('res.request.link').search(
                                         cursor,
                                         user,
                                         [('object', '=', 'ir.attachment')],
                                         context=context):
-                document = 'ir.attachment,%i' % mail.pem_attachments_ids[0]
+                model = 'ir.attachment'
+                res_id = mail.pem_attachments_ids[0]
         event_vals = {
             'history': True,
             'name': name,
@@ -720,6 +722,8 @@ class poweremail_templates(osv.osv):
             'message_id': mail.id,
             'description': mail.pem_body_text and mail.pem_body_text or mail.pem_body_html,
             'partner_id': get_value(cursor, user, record_id, template.partner_event, template, context),
+            'model': model,
+            'res_id': res_id,
         }
         self.pool.get('mailgate.message').create(cursor,
                                                   user,

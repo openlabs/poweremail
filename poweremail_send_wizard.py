@@ -267,11 +267,14 @@ class poweremail_send_wizard(osv.osv_memory):
                     name = unicode(name, 'utf-8')
                 if len(name) > 64:
                     name = name[:61] + '...'
-                document = False
+
+                model = res_id = False
                 if template.report_template and self.pool.get('res.request.link').search(cr, uid, [('object','=',data['model'])], context=context):
-                    document = data['model']+',%i' % id
+                    model = data['model']
+                    res_id = id
                 elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
-                    document = 'ir.attachment,%i' % attachment_ids[0]
+                    model = 'ir.attachment'
+                    res_id = attachment_ids[0]
                     
                 cr.execute("SELECT state from ir_module_module where state='installed' and name = 'mail_gateway'")
                 mail_gateway = cr.fetchall()
@@ -288,6 +291,8 @@ class poweremail_send_wizard(osv.osv_memory):
                         'message_id': mail_id,
                         'description': vals['pem_body_text'] and vals['pem_body_text'] or vals['pem_body_html'],
                         'partner_id': self.get_value(cr, uid, template, template.partner_event, context, id),
+                        'model': model,
+                        'res_id': res_id,
                     }
                     self.pool.get('mailgate.message').create(cr, uid, values, context)
         return mail_ids
