@@ -1,6 +1,6 @@
 """
 Power Email is a module for Open ERP which enables it to send mails
-The mailbox is an object which stores the actual email                                          
+The mailbox is an object which stores the actual email
 """
 #########################################################################
 #   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
@@ -38,7 +38,7 @@ class PoweremailMailbox(osv.osv):
     _description = 'Power Email Mailbox included all type inbox,outbox,junk..'
     _rec_name = "pem_subject"
     _order = "date_mail desc"
-    
+
     def run_mail_scheduler(self, cursor, user, context=None):
         """
         This method is called by Open ERP Scheduler
@@ -50,16 +50,16 @@ class PoweremailMailbox(osv.osv):
             LOGGER.notifyChannel(
                                  _("Power Email"),
                                  netsvc.LOG_ERROR,
-                                 _("Error receiving mail: %s" % str(e)))
+                                 _("Error receiving mail: %s") % str(e))
         try:
             self.send_all_mail(cursor, user, context)
         except Exception, e:
             LOGGER.notifyChannel(
                                  _("Power Email"),
                                  netsvc.LOG_ERROR,
-                                 _("Error sending mail: %s" % str(e)))
- 
-    
+                                 _("Error sending mail: %s") % str(e))
+
+
     def get_all_mail(self, cr, uid, context=None):
         if context is None:
             context = {}
@@ -85,7 +85,7 @@ class PoweremailMailbox(osv.osv):
             core_obj.get_fullmail(cr, uid, context['email_account'], context)
         else:
             raise osv.except_osv(_("Mail fetch exception"), _("No information on which mail should be fetched fully"))
-        
+
     def send_all_mail(self, cr, uid, ids=None, context=None):
         if ids is None:
             ids = []
@@ -103,7 +103,7 @@ class PoweremailMailbox(osv.osv):
         #send mails one by one
         self.send_this_mail(cr, uid, ids, context)
         return True
-    
+
     def send_this_mail(self, cr, uid, ids=None, context=None):
         if ids is None:
             ids = []
@@ -139,69 +139,69 @@ class PoweremailMailbox(osv.osv):
                 self.historise(cr, uid, [id], error, context)
             self.write(cr, uid, id, {'state':'na'}, context)
         return True
-    
+
     def historise(self, cr, uid, ids, message='', context=None):
         for id in ids:
             history = self.read(cr, uid, id, ['history'], context).get('history', '')
             self.write(cr, uid, id, {'history':history or '' + "\n" + time.strftime("%Y-%m-%d %H:%M:%S") + ": " + tools.ustr(message)}, context)
-    
+
     def complete_mail(self, cr, uid, ids, context=None):
         #8888888888888 COMPLETE PARTIALLY DOWNLOADED MAILS 8888888888888888888#
         #FUNCTION get_fullmail(self,cr,uid,mailid) in core is used where mailid=id of current email,
         for id in ids:
             self.pool.get('poweremail.core_accounts').get_fullmail(cr, uid, id, context)
             self.historise(cr, uid, [id], "Full email downloaded", context)
-    
+
     _columns = {
             'pem_from':fields.char(
-                            'From', 
+                            'From',
                             size=64),
             'pem_to':fields.char(
-                            'Recepient (To)', 
+                            'Recepient (To)',
                             size=250,),
             'pem_cc':fields.char(
-                            ' CC', 
+                            ' CC',
                             size=250),
             'pem_bcc':fields.char(
-                            ' BCC', 
+                            ' BCC',
                             size=250),
             'pem_subject':fields.char(
-                            ' Subject', 
+                            ' Subject',
                             size=200,),
             'pem_body_text':fields.text(
                             'Standard Body (Text)'),
             'pem_body_html':fields.text(
                             'Body (Text-Web Client Only)'),
             'pem_attachments_ids':fields.many2many(
-                            'ir.attachment', 
-                            'mail_attachments_rel', 
-                            'mail_id', 
-                            'att_id', 
+                            'ir.attachment',
+                            'mail_attachments_rel',
+                            'mail_id',
+                            'att_id',
                             'Attachments'),
             'pem_account_id' :fields.many2one(
-                            'poweremail.core_accounts', 
-                            'User account', 
+                            'poweremail.core_accounts',
+                            'User account',
                             required=True),
             'pem_user':fields.related(
-                            'pem_account_id', 
-                            'user', 
-                            type="many2one", 
-                            relation="res.users", 
+                            'pem_account_id',
+                            'user',
+                            type="many2one",
+                            relation="res.users",
                             string="User"),
             'server_ref':fields.integer(
-                            'Server Reference of mail', 
-                            help="Applicable for inward items only"),
+                            'Server Reference of mail',
+                            help="Applicable for inward items only."),
             'pem_recd':fields.char('Received at', size=50),
             'mail_type':fields.selection([
-                            ('multipart/mixed', 
+                            ('multipart/mixed',
                              'Has Attachments'),
-                            ('multipart/alternative', 
+                            ('multipart/alternative',
                              'Plain Text & HTML with no attachments'),
-                            ('multipart/related', 
+                            ('multipart/related',
                              'Intermixed content'),
-                            ('text/plain', 
+                            ('text/plain',
                              'Plain Text'),
-                            ('text/html', 
+                            ('text/html',
                              'HTML Body'),
                             ], 'Mail Contents'),
             #I like GMAIL which allows putting same mail in many folders
@@ -223,15 +223,15 @@ class PoweremailMailbox(osv.osv):
             'date_mail':fields.datetime(
                             'Rec/Sent Date'),
             'history':fields.text(
-                            'History', 
-                            readonly=True, 
+                            'History',
+                            readonly=True,
                             store=True)
         }
 
     _defaults = {
         'state': lambda * a: 'na',
         'folder': lambda * a: 'outbox',
-    } 
+    }
 
     def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
         if context is None:
@@ -262,7 +262,7 @@ PoweremailMailbox()
 
 class PoweremailConversation(osv.osv):
     """
-    This is an ambitious approach to grouping emails 
+    This is an ambitious approach to grouping emails
     by automatically grouping attributes
     Something like Gmail
     
@@ -270,14 +270,14 @@ class PoweremailConversation(osv.osv):
     """
     _name = "poweremail.conversation"
     _description = "Conversations are groups of related emails"
-    
+
     _columns = {
         'name':fields.char(
-                    'Name', 
+                    'Name',
                     size=250),
         'mails':fields.one2many(
-                    'poweremail.mailbox', 
-                    'conversation_id', 
+                    'poweremail.mailbox',
+                    'conversation_id',
                     'Related Emails'),
                 }
 PoweremailConversation()

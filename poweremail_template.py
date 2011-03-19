@@ -83,11 +83,11 @@ def send_on_write(self, cr, uid, ids, vals, context=None):
     if template.send_on_write:
         self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, ids, context)
     return result
-    
+
 
 # This is an ugly hack to ensure that send_on_create and send_on_write are
 # initialized when the server is started. Note there's a small time window
-# between when the pool is available and when this function is called which 
+# between when the pool is available and when this function is called which
 # may mean allow creating/writing objects without an e-mail being sent.
 
 
@@ -95,14 +95,14 @@ def new_register_all(db):
     cr = db.cursor()
     pool = pooler.get_pool(cr.dbname)
     value = pool.get('ir.actions.report.xml').register_all(cr)
-    
+
     # If poweremail.templates has not yet been initialized, do not try to
     # SELECT its table yet
     if not 'poweremail.templates' in pool.obj_list():
         return value
 
     cr.execute("""
-        SELECT 
+        SELECT
             pt.id,
             im.model,
             pt.send_on_create,
@@ -183,7 +183,7 @@ def get_value(cursor, user, recid, message=None, template=None, context=None):
 
 class poweremail_templates(osv.osv):
     "Templates for sending Email"
-    
+
     _name = "poweremail.templates"
     _description = 'Power Email Templates for Models'
 
@@ -205,119 +205,118 @@ class poweremail_templates(osv.osv):
         'object_name':fields.many2one('ir.model', 'Model'),
         'model_int_name':fields.char('Model Internal Name', size=200,),
         'def_to':fields.char(
-                 'Recepient (To)',
-                 size=250,
-                 help="The default recepient of email." 
-                 "Placeholders can be used here."),
+                'Recepient (To)',
+                size=250,
+                help="The default recepient of email. "
+                "Placeholders can be used here."),
         'def_cc':fields.char(
-                 'Default CC',
-                 size=250,
-                 help="The default CC for the email."
-                 " Placeholders can be used here."),
+                'Default CC',
+                size=250,
+                help="The default CC for the email. "
+                "Placeholders can be used here."),
         'def_bcc':fields.char(
-                  'Default BCC',
-                  size=250,
-                  help="The default BCC for the email."
-                  " Placeholders can be used here."),
+                'Default BCC',
+                size=250,
+                help="The default BCC for the email. "
+                "Placeholders can be used here."),
         'lang':fields.char(
-                   'Language',
-                   size=250,
-                   help="The default language for the email."
-                   " Placeholders can be used here. "
-                   "eg. ${object.partner_id.lang}"),
+                'Language',
+                size=250,
+                help="The default language for the email. "
+                "Placeholders can be used here. "
+                "eg. ${object.partner_id.lang}"),
         'def_subject':fields.char(
-                  'Default Subject',
-                  size=200,
-                  help="The default subject of email."
-                  " Placeholders can be used here.",
-                  translate=True),
+                'Default Subject',
+                size=200,
+                help="The default subject of email. "
+                "Placeholders can be used here.",
+                translate=True),
         'def_body_text':fields.text(
-                    'Standard Body (Text)',
-                    help="The text version of the mail",
-                    translate=True),
+                'Standard Body (Text)',
+                help="The text version of the mail.",
+                translate=True),
         'def_body_html':fields.text(
-                    'Body (Text-Web Client Only)',
-                    help="The text version of the mail",
-                    translate=True),
+                'Body (Text-Web Client Only)',
+                help="The text version of the mail.",
+                translate=True),
         'use_sign':fields.boolean(
-                  'Use Signature',
-                  help="the signature from the User details" 
-                  "will be appened to the mail"),
+                'Use Signature',
+                help="The signature from the User details "
+                "will be appened to the mail."),
         'file_name':fields.char(
                 'File Name Pattern',
                 size=200,
-                help="File name pattern can be specified with placeholders." 
+                help="File name pattern can be specified with placeholders. "
                 "eg. 2009_SO003.pdf",
                 translate=True),
         'report_template':fields.many2one(
-                  'ir.actions.report.xml',
-                  'Report to send'),
+                'ir.actions.report.xml',
+                'Report to send'),
         #'report_template':fields.reference('Report to send',[('ir.actions.report.xml','Reports')],size=128),
         'allowed_groups':fields.many2many(
-                  'res.groups',
-                  'template_group_rel',
-                  'templ_id', 'group_id',
-                  string="Allowed User Groups",
-                  help="Only users from these groups will be"
-                  " allowed to send mails from this Template"),
+                'res.groups',
+                'template_group_rel',
+                'templ_id', 'group_id',
+                string="Allowed User Groups",
+                help="Only users from these groups will be "
+                "allowed to send mails from this Template."),
         'enforce_from_account':fields.many2one(
-                   'poweremail.core_accounts',
-                   string="Enforce From Account",
-                   help="Emails will be sent only from this account.",
-                   domain="[('company','=','yes')]"),
-
+                'poweremail.core_accounts',
+                string="Enforce From Account",
+                help="Emails will be sent only from this account.",
+                domain="[('company','=','yes')]"),
         'auto_email':fields.boolean('Auto Email',
-                    help="Selecting Auto Email will create a server"
-                    " action for you which automatically sends mail after a"
-                    " new record is created.\nNote:Auto email can be enabled"
-                    " only after saving template."),
+                help="Selecting Auto Email will create a server "
+                "action for you which automatically sends mail after a "
+                "new record is created.\nNote: Auto email can be enabled "
+                "only after saving template."),
         #Referred Stuff - Dont delete even if template is deleted
         'attached_wkf':fields.many2one(
-                   'workflow',
-                   'Workflow'),
+                'workflow',
+                'Workflow'),
         'attached_activity':fields.many2one(
-                    'workflow.activity',
-                    'Activity'),
+                'workflow.activity',
+                'Activity'),
         #Referred Stuff - Delete these if template are deleted or they will crash the system
         'server_action':fields.many2one(
-                    'ir.actions.server',
-                    'Related Server Action',
-                    help="Corresponding server action is here."),
+                'ir.actions.server',
+                'Related Server Action',
+                help="Corresponding server action is here."),
         'ref_ir_act_window':fields.many2one(
-                    'ir.actions.act_window',
-                    'Window Action',
-                    readonly=True),
+                'ir.actions.act_window',
+                'Window Action',
+                readonly=True),
         'ref_ir_value':fields.many2one(
-                   'ir.values',
-                   'Wizard Button',
-                   readonly=True),
+                'ir.values',
+                'Wizard Button',
+               readonly=True),
         #Expression Builder fields
         #Simple Fields
         'model_object_field':fields.many2one(
-                 'ir.model.fields',
-                 string="Field",
-                 help="Select the field from the model you want to use."
-                 "\nIf it is a relationship field you will be able to "
-                 "choose the nested values in the box below\n(Note:If "
-                 "there are no values make sure you have selected the"
-                 " correct model)",
-                 store=False),
+                'ir.model.fields',
+                string="Field",
+                help="Select the field from the model you want to use."
+                "\nIf it is a relationship field you will be able to "
+                "choose the nested values in the box below.\n(Note: If "
+                "there are no values make sure you have selected the "
+                "correct model).",
+                store=False),
         'sub_object':fields.many2one(
-                 'ir.model',
-                 'Sub-model',
-                 help='When a relation field is used this field'
-                 ' will show you the type of field you have selected',
-                 store=False),
+                'ir.model',
+                'Sub-model',
+                help='When a relation field is used this field '
+                'will show you the type of field you have selected.',
+                store=False),
         'sub_model_object_field':fields.many2one(
-                 'ir.model.fields',
-                 'Sub Field',
-                 help="When you choose relationship fields "
-                 "this field will specify the sub value you can use.",
-                 store=False),
+                'ir.model.fields',
+                'Sub Field',
+                help="When you choose relationship fields "
+                "this field will specify the sub value you can use.",
+                store=False),
         'null_value':fields.char(
-                 'Null Value',
-                 help="This Value is used if the field is empty",
-                 size=50, store=False),
+                'Null Value',
+                help="This Value is used if the field is empty.",
+                size=50, store=False),
         'copyvalue':fields.char(
                 'Expression',
                 size=100,
@@ -326,39 +325,44 @@ class poweremail_templates(osv.osv):
                 store=False),
         #Table Fields
         'table_model_object_field':fields.many2one(
-               'ir.model.fields',
-               string="Table Field",
-               help="Select the field from the model you want to use."
-               "\nOnly one2many & many2many fields can be used for tables)",
-               store=False),
+                'ir.model.fields',
+                string="Table Field",
+                help="Select the field from the model you want to use."
+                "\nOnly one2many & many2many fields can be used for tables.",
+                store=False),
         'table_sub_object':fields.many2one(
-               'ir.model',
-               'Table-model',
-               help="This field shows the model you will"
-               " be using for your table", store=False),
+                'ir.model',
+                'Table-model',
+                help="This field shows the model you will "
+                "be using for your table.", store=False),
         'table_required_fields':fields.many2many(
-             'ir.model.fields',
-             'fields_table_rel',
-             'field_id', 'table_id',
-             string="Required Fields",
-             help="Select the fieldsyou require in the table)",
-             store=False),
+                'ir.model.fields',
+                'fields_table_rel',
+                'field_id', 'table_id',
+                string="Required Fields",
+                help="Select the fields you require in the table.",
+                store=False),
         'table_html':fields.text(
-             'HTML code',
-             help="Copy this html code to your HTML message"
-             " body for displaying the info in your mail.",
-             store=False),
+                'HTML code',
+                help="Copy this html code to your HTML message "
+                "body for displaying the info in your mail.",
+                store=False),
         'send_on_create': fields.boolean(
-             'Send on Create',
-             help='Sends an e-mail when a new document is created.'),
+                'Send on Create',
+                help='Sends an e-mail when a new document is created.'),
         'send_on_write': fields.boolean(
-            'Send on Update',
-            help='Sends an e-mail when a document is modified.'),
+                'Send on Update',
+                help='Sends an e-mail when a document is modified.'),
         'partner_event': fields.char(
-             'Partner ID to log Events',
-             size=250,
-             help="Partner ID who an email event is logged."
-             " Placeholders can be used here. eg. ${object.partner_id.id}"),
+                'Partner ID to log Events',
+                size=250,
+                help="Partner ID who an email event is logged.\n"
+                "Placeholders can be used here. eg. ${object.partner_id.id}\n"
+                "You must install the mail_gateway module to see the mail events "
+                "in partner form.\nIf you also want to record the link to the "
+                "object that sends the email, you must to add this object in the "
+                "'Administration/Low Level Objects/Requests/Accepted Links in "
+                "Requests' menu (or 'ir.attachment' to record the attachments)."),
         'template_language':fields.selection(
                 TEMPLATE_ENGINES,
                 'Templating Language',
@@ -451,9 +455,9 @@ class poweremail_templates(osv.osv):
         }, context)
         if vals.get('auto_email'):
             self.update_auto_email(cr, uid, [id], context)
-        if vals.get('send_on_create') or vals.get('send_on_write'): 
+        if vals.get('send_on_create') or vals.get('send_on_write'):
             self.update_send_on_store(cr, uid, [id], context)
-        #if vals.get('partner_event'): 
+        #if vals.get('partner_event'):
         #    self.update_partner_event(cr, uid, [id], context)
         return id
 
@@ -463,7 +467,7 @@ class poweremail_templates(osv.osv):
             self.update_auto_email(cr, uid, ids, context)
         if 'send_on_create' in vals or 'send_on_write' in vals:
             self.update_send_on_store(cr, uid, ids, context)
-        #if 'partner_event' in vals: 
+        #if 'partner_event' in vals:
         #    self.update_partner_event(cr, uid, ids, context)
         return result
 
@@ -486,7 +490,7 @@ class poweremail_templates(osv.osv):
             except:
                 raise osv.except_osv(_("Warning"), _("Deletion of Record failed"))
         return super(poweremail_templates, self).unlink(cr, uid, ids, context)
-    
+
     def copy(self, cr, uid, id, default=None, context=None):
         if default is None:
             default = {}
@@ -498,7 +502,7 @@ class poweremail_templates(osv.osv):
             new_name = new_name + '_' + random.choice('abcdefghij') + random.choice('lmnopqrs') + random.choice('tuvwzyz')
         default.update({'name':new_name})
         return super(poweremail_templates, self).copy(cr, uid, id, default, context)
-    
+
     def compute_pl(self,
                    model_object_field,
                    sub_model_object_field,
@@ -528,10 +532,10 @@ class poweremail_templates(osv.osv):
             if sub_model_object_field:
                 copy_val += "." + sub_model_object_field
             if null_value:
-                copy_val = copy_val + '|default:"' + null_value + '"'  
-            copy_val = copy_val + "}}"        
-        return copy_val 
-            
+                copy_val = copy_val + '|default:"' + null_value + '"'
+            copy_val = copy_val + "}}"
+        return copy_val
+
     def onchange_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
@@ -559,7 +563,7 @@ class poweremail_templates(osv.osv):
             result['sub_model_object_field'] = False
             result['null_value'] = False
         return {'value':result}
-        
+
     def onchange_sub_model_object_field(self, cr, uid, ids, model_object_field, sub_model_object_field, template_language, context=None):
         if not model_object_field or not sub_model_object_field:
             return {}
@@ -617,7 +621,7 @@ class poweremail_templates(osv.osv):
             result['sub_model_object_field'] = False
             result['null_value'] = null_value
         return {'value':result}
-               
+
     def onchange_table_model_object_field(self, cr, uid, ids, model_object_field, template_language, context=None):
         if not model_object_field:
             return {}
@@ -637,7 +641,7 @@ class poweremail_templates(osv.osv):
             return {'value':{'table_html': False}}
         result = ''
         table_field_obj = self.pool.get('ir.model.fields').browse(cr, uid, table_model_object_field, context)
-        field_obj = self.pool.get('ir.model.fields')         
+        field_obj = self.pool.get('ir.model.fields')
         #Generate Html Header
         result += "<p>\n<table border='1'>\n<thead>\n<tr>"
         for each_rec in table_required_fields[0][2]:
@@ -684,9 +688,9 @@ class poweremail_templates(osv.osv):
         @param record_id: ID of the target model
                           for which this mail has
                           to be generated
-        @param mail: Browse record of email object 
+        @param mail: Browse record of email object
         
-        @return: True 
+        @return: True
         """
         name = mail.pem_subject
         if isinstance(name, str):
@@ -730,7 +734,7 @@ class poweremail_templates(osv.osv):
                                                   event_vals,
                                                   context)
         return True
-    
+
     def _generate_attach_reports(self,
                                  cursor,
                                  user,
@@ -749,8 +753,8 @@ class poweremail_templates(osv.osv):
         @param record_id: ID of the target model
                           for which this mail has
                           to be generated
-        @param mail: Browse record of email object 
-        @return: True 
+        @param mail: Browse record of email object
+        @return: True
         """
         lang = get_value(cursor,
                          user,
@@ -811,7 +815,7 @@ class poweremail_templates(osv.osv):
                                },
                                context)
         return True
-    
+
     def _generate_mailbox_item_from_template(self,
                                       cursor,
                                       user,
@@ -829,7 +833,7 @@ class poweremail_templates(osv.osv):
         @param record_id: ID of the target model
                           for which this mail has
                           to be generated
-        @return: ID of created object 
+        @return: ID of created object
         """
         if context is None:
             context = {}
@@ -901,7 +905,7 @@ class poweremail_templates(osv.osv):
             #This is a mandatory field when automatic emails are sent
             'state':'na',
             'folder':'drafts',
-            'mail_type':'multipart/alternative' 
+            'mail_type':'multipart/alternative'
         }
         #Use signatures if allowed
         if template.use_sign:
@@ -920,7 +924,7 @@ class poweremail_templates(osv.osv):
                                                              mailbox_values,
                                                              context)
         return mailbox_id
-        
+
     def generate_mail(self,
                       cursor,
                       user,
@@ -982,7 +986,7 @@ poweremail_templates()
 class poweremail_preview(osv.osv_memory):
     _name = "poweremail.preview"
     _description = "Power Email Template Preview"
-    
+
     def _get_model_recs(self, cr, uid, context=None):
         if context is None:
             context = {}
@@ -994,7 +998,7 @@ class poweremail_preview(osv.osv_memory):
             ref_obj_ids = self.pool.get(ref_obj_name).search(cr, uid, [], context=context)
             ref_obj_recs = self.pool.get(ref_obj_name).name_get(cr, uid, ref_obj_ids, context)
             return ref_obj_recs
-    
+
     def _default_model(self, cursor, user, context=None):
         """
         Returns the default value for model field
@@ -1008,7 +1012,7 @@ class poweremail_preview(osv.osv_memory):
                                                    context['active_id'],
                                                    ['object_name'],
                                                    context)['object_name']
-        
+
     _columns = {
         'ref_template':fields.many2one(
                                        'poweremail.templates',
@@ -1051,7 +1055,7 @@ class poweremail_preview(osv.osv_memory):
         vals['body_html'] = get_value(cr, uid, rel_model_ref, template.def_body_html, template, context)
         vals['report'] = get_value(cr, uid, rel_model_ref, template.file_name, template, context)
         return {'value':vals}
-        
+
 poweremail_preview()
 
 class res_groups(osv.osv):

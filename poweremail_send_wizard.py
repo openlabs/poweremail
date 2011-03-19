@@ -55,8 +55,8 @@ class poweremail_send_wizard(osv.osv_memory):
                 accounts = self.pool.get('poweremail.core_accounts').browse(cr,uid,accounts_id, context)
                 return [(r.id,r.name + " (" + r.email_id + ")") for r in accounts]
             else:
-               logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
-               raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
+                raise osv.except_osv(_("Power Email"),_("No personal email accounts are configured for you. \nEither ask admin to enforce an account for this template or get yourself a personal power email account."))
 
     def get_value(self, cursor, user, template, message, context=None, id=None):
         """Gets the value of the message parsed with the content of object id (or the first 'src_rec_ids' if id is not given)"""
@@ -65,7 +65,7 @@ class poweremail_send_wizard(osv.osv_memory):
         if not id:
             id = context['src_rec_ids'][0]
         return get_value(cursor, user, id, message, template, context)
-    
+
     def _get_template(self, cr, uid, context=None):
         if context is None:
             context = {}
@@ -120,7 +120,7 @@ class poweremail_send_wizard(osv.osv_memory):
         'signature':fields.boolean('Attach my signature to mail'),
         #'filename':fields.text('File Name'),
         'requested':fields.integer('No of requested Mails',readonly=True),
-        'generated':fields.integer('No of generated Mails',readonly=True), 
+        'generated':fields.integer('No of generated Mails',readonly=True),
         'full_success':fields.boolean('Complete Success',readonly=True),
         'attachment_ids': fields.many2many('ir.attachment','send_wizard_attachment_rel', 'wizard_id', 'attachment_id', 'Attachments'),
     }
@@ -186,14 +186,14 @@ class poweremail_send_wizard(osv.osv_memory):
             else:
                 raise osv.except_osv(_("Power Email"),_("Email sending failed for one or more objects."))
         return True
-     
+
     def save_to_mailbox(self, cr, uid, ids, context=None):
         def get_end_value(id, value):
             if len(context['src_rec_ids']) > 1: # Multiple Mail: Gets value from the template
                 return self.get_value(cr, uid, template, value, context, id)
             else:
                 return value
-    
+
         mail_ids = []
         template = self._get_template(cr, uid, context)
         for id in context['src_rec_ids']:
@@ -260,7 +260,6 @@ class poweremail_send_wizard(osv.osv_memory):
                 }, context)
 
             # Create a partner event
-            #if template.partner_event and template.partner_event_type_id and self.pool.get('res.partner.event.type').check(cr, uid, template.partner_event_type_id.key) and self._get_template_value(cr, uid, 'partner_event', context):
             if template.partner_event and self._get_template_value(cr, uid, 'partner_event', context):
                 name = vals['pem_subject']
                 if isinstance(name, str):
@@ -275,7 +274,7 @@ class poweremail_send_wizard(osv.osv_memory):
                 elif attachment_ids and self.pool.get('res.request.link').search(cr, uid, [('object','=','ir.attachment')], context=context):
                     model = 'ir.attachment'
                     res_id = attachment_ids[0]
-                    
+
                 cr.execute("SELECT state from ir_module_module where state='installed' and name = 'mail_gateway'")
                 mail_gateway = cr.fetchall()
                 if mail_gateway:
