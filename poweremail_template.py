@@ -270,6 +270,10 @@ class poweremail_templates(osv.osv):
                 "action for you which automatically sends mail after a "
                 "new record is created.\nNote: Auto email can be enabled "
                 "only after saving template."),
+        'save_to_drafts':fields.boolean('Save to Drafts',
+                    help="When automatically sending emails generated from"
+                    " this template, save them into the Drafts folder rather"
+                    " than sending them immediately."),
         #Referred Stuff - Dont delete even if template is deleted
         'attached_wkf':fields.many2one(
                 'workflow',
@@ -972,13 +976,14 @@ class poweremail_templates(osv.osv):
             # This prevents attempts by the scheduler to send
             # Emails before all the work is complete in
             # Generating email, attachments and event
-            self.pool.get('poweremail.mailbox').write(
-                                                cursor,
-                                                user,
-                                                mailbox_id,
-                                                {'folder':'outbox'},
-                                                context=context
-                                                      )
+            if not template.save_to_drafts:
+                self.pool.get('poweremail.mailbox').write(
+                                                    cursor,
+                                                    user,
+                                                    mailbox_id,
+                                                    {'folder':'outbox'},
+                                                    context=context
+                                                          )
         return True
 
 poweremail_templates()
