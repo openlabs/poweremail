@@ -42,6 +42,20 @@
 				</xpath>
 			</field>
 		</record>
+		<record model="ir.ui.view"
+			id="view_server_action_form_poweremail_3">
+			<field name="name">ir.actions.server.form.poweremail_1</field>
+			<field name="model">ir.actions.server</field>
+			<field name="type">form</field>
+			<field name="inherit_id" ref="base.view_server_action_form" />
+			<field name="arch" type="xml">
+				<xpath
+					expr="/form/notebook/page/field[@name='copy_object']"
+					position="replace">
+					<field name="copy_object" on_change="change_object(copy_object, state)" select="2" attrs="{'required':[('state','=','object_copy')]}"/>
+				</xpath>
+			</field>
+		</record>
 	</data>
 </openerp>
 
