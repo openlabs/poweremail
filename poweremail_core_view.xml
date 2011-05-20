@@ -186,7 +186,7 @@
 			<field name="context">{'company':'yes'}</field>
 		</record>
 
-		<menuitem name="Power Email" id="menu_poweremail_administration_server" />
+		<menuitem name="Power Email" id="menu_poweremail_administration_server" web_icon="images/poweremail.png" web_icon_hover="images/poweremail-hover.png"/>
 
 		<menuitem name="Configuration" id="menu_poweremail_configuration_server" parent="menu_poweremail_administration_server" />
 
