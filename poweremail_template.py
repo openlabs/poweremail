@@ -918,10 +918,11 @@ class poweremail_templates(osv.osv):
                                                    user,
                                                    ['signature'],
                                                    context)['signature']
-            if mailbox_values['pem_body_text']:
-                mailbox_values['pem_body_text'] += sign
-            if mailbox_values['pem_body_html']:
-                mailbox_values['pem_body_html'] += sign
+            if sign:
+                if mailbox_values['pem_body_text']:
+                    mailbox_values['pem_body_text'] += "\n--\n"+sign
+                if mailbox_values['pem_body_html']:
+                    mailbox_values['pem_body_html'] += sign
         mailbox_id = self.pool.get('poweremail.mailbox').create(
                                                              cursor,
                                                              user,
