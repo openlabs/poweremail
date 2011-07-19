@@ -121,7 +121,12 @@ class PoweremailMailbox(osv.osv):
                     #Get filenames & binary of attachments
                     for attid in values['pem_attachments_ids']:
                         attachment = self.pool.get('ir.attachment').browse(cr, uid, attid, context)#,['datas_fname','datas'])
-                        payload[attachment.datas_fname] = attachment.datas
+                        att_name = attachment.datas_fname or attachment.name
+                        counter = 1
+                        while att_name in payload:
+                            att_name = "%s%d" % ( attachment.datas_fname or attachment.name, counter )
+                            counter += 1
+                        payload[att_name] = attachment.datas
                 result = core_obj.send_mail(cr, uid,
                                   [values['pem_account_id'][0]],
                                   {'To':values.get('pem_to', u'') or u'', 'CC':values.get('pem_cc', u'') or u'', 'BCC':values.get('pem_bcc', u'') or u''},
