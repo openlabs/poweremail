@@ -379,7 +379,7 @@ class poweremail_templates(osv.osv):
 
     }
     _sql_constraints = [
-        ('name', 'unique (name)', _('The template name must be unique !'))
+        ('name', 'unique (name)', _('The template name must be unique!'))
     ]
 
     def update_auto_email(self, cr, uid, ids, context=None):

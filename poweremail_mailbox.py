@@ -140,7 +140,7 @@ class PoweremailMailbox(osv.osv):
                     self.historise(cr, uid, [id], result, context)
             except Exception, error:
                 logger = netsvc.Logger()
-                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason:Could not login to server\nError: %s") % (id, error))
+                logger.notifyChannel(_("Power Email"), netsvc.LOG_ERROR, _("Sending of Mail %s failed. Probable Reason: Could not login to server\nError: %s") % (id, error))
                 self.historise(cr, uid, [id], error, context)
             self.write(cr, uid, id, {'state':'na'}, context)
         return True

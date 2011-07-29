@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenERP Server 6.0.1\n"
+"Project-Id-Version: OpenERP Server 6.0.2\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2011-03-19 19:28+0000\n"
-"PO-Revision-Date: 2011-03-19 19:28+0000\n"
+"POT-Creation-Date: 2011-07-29 13:17+0000\n"
+"PO-Revision-Date: 2011-07-29 13:17+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,23 +23,10 @@ msgstr "Selecting Auto Email will create a server action for you which automatic
 "Note: Auto email can be enabled only after saving template."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:490
-#, python-format
-msgid "Mail from Account %s failed. Probable Reason: MIME Error\n"
-"Description: %s"
-msgstr "Mail from Account %s failed. Probable Reason: MIME Error\n"
-"Description: %s"
-
-#. module: poweremail
 #: field:poweremail.mailbox,state:0
 #: field:poweremail.send.wizard,state:0
 msgid "Status"
 msgstr "Status"
-
-#. module: poweremail
-#: field:poweremail.mailbox,pem_account_id:0
-msgid "User account"
-msgstr "User account"
 
 #. module: poweremail
 #: view:poweremail.send.wizard:0
@@ -47,58 +34,58 @@ msgid "Send mail Wizard"
 msgstr "Send mail Wizard"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:400
-#: code:addons/poweremail/poweremail_core.py:405
-#: code:addons/poweremail/poweremail_core.py:490
-#: code:addons/poweremail/poweremail_core.py:496
-#: code:addons/poweremail/poweremail_core.py:500
-#: code:addons/poweremail/poweremail_core.py:503
-#: code:addons/poweremail/poweremail_core.py:554
-#: code:addons/poweremail/poweremail_core.py:596
-#: code:addons/poweremail/poweremail_core.py:610
-#: code:addons/poweremail/poweremail_core.py:618
-#: code:addons/poweremail/poweremail_core.py:627
-#: code:addons/poweremail/poweremail_core.py:670
-#: code:addons/poweremail/poweremail_core.py:681
-#: code:addons/poweremail/poweremail_core.py:695
+#: code:addons/poweremail/poweremail_core.py:398
+#: code:addons/poweremail/poweremail_core.py:403
+#: code:addons/poweremail/poweremail_core.py:488
+#: code:addons/poweremail/poweremail_core.py:494
+#: code:addons/poweremail/poweremail_core.py:498
+#: code:addons/poweremail/poweremail_core.py:501
+#: code:addons/poweremail/poweremail_core.py:552
+#: code:addons/poweremail/poweremail_core.py:593
+#: code:addons/poweremail/poweremail_core.py:607
+#: code:addons/poweremail/poweremail_core.py:614
+#: code:addons/poweremail/poweremail_core.py:622
+#: code:addons/poweremail/poweremail_core.py:664
+#: code:addons/poweremail/poweremail_core.py:674
+#: code:addons/poweremail/poweremail_core.py:687
+#: code:addons/poweremail/poweremail_core.py:728
+#: code:addons/poweremail/poweremail_core.py:731
 #: code:addons/poweremail/poweremail_core.py:737
-#: code:addons/poweremail/poweremail_core.py:740
-#: code:addons/poweremail/poweremail_core.py:746
-#: code:addons/poweremail/poweremail_core.py:763
-#: code:addons/poweremail/poweremail_core.py:766
-#: code:addons/poweremail/poweremail_core.py:768
-#: code:addons/poweremail/poweremail_core.py:779
-#: code:addons/poweremail/poweremail_core.py:791
+#: code:addons/poweremail/poweremail_core.py:754
+#: code:addons/poweremail/poweremail_core.py:757
+#: code:addons/poweremail/poweremail_core.py:759
+#: code:addons/poweremail/poweremail_core.py:770
+#: code:addons/poweremail/poweremail_core.py:782
+#: code:addons/poweremail/poweremail_core.py:787
+#: code:addons/poweremail/poweremail_core.py:788
+#: code:addons/poweremail/poweremail_core.py:793
+#: code:addons/poweremail/poweremail_core.py:794
+#: code:addons/poweremail/poweremail_core.py:795
 #: code:addons/poweremail/poweremail_core.py:796
-#: code:addons/poweremail/poweremail_core.py:797
-#: code:addons/poweremail/poweremail_core.py:802
-#: code:addons/poweremail/poweremail_core.py:803
-#: code:addons/poweremail/poweremail_core.py:804
-#: code:addons/poweremail/poweremail_core.py:805
-#: code:addons/poweremail/poweremail_core.py:845
-#: code:addons/poweremail/poweremail_core.py:851
-#: code:addons/poweremail/poweremail_core.py:852
-#: code:addons/poweremail/poweremail_core.py:853
-#: code:addons/poweremail/poweremail_core.py:871
-#: code:addons/poweremail/poweremail_core.py:890
+#: code:addons/poweremail/poweremail_core.py:836
+#: code:addons/poweremail/poweremail_core.py:842
+#: code:addons/poweremail/poweremail_core.py:843
+#: code:addons/poweremail/poweremail_core.py:844
+#: code:addons/poweremail/poweremail_core.py:862
+#: code:addons/poweremail/poweremail_core.py:881
+#: code:addons/poweremail/poweremail_core.py:902
 #: code:addons/poweremail/poweremail_core.py:911
-#: code:addons/poweremail/poweremail_core.py:920
+#: code:addons/poweremail/poweremail_core.py:916
 #: code:addons/poweremail/poweremail_core.py:925
+#: code:addons/poweremail/poweremail_core.py:930
 #: code:addons/poweremail/poweremail_core.py:935
-#: code:addons/poweremail/poweremail_core.py:941
-#: code:addons/poweremail/poweremail_core.py:946
-#: code:addons/poweremail/poweremail_core.py:984
-#: code:addons/poweremail/poweremail_core.py:994
-#: code:addons/poweremail/poweremail_core.py:999
-#: code:addons/poweremail/poweremail_core.py:1004
-#: code:addons/poweremail/poweremail_core.py:1012
+#: code:addons/poweremail/poweremail_core.py:973
+#: code:addons/poweremail/poweremail_core.py:983
+#: code:addons/poweremail/poweremail_core.py:988
+#: code:addons/poweremail/poweremail_core.py:993
+#: code:addons/poweremail/poweremail_core.py:1001
 #: code:addons/poweremail/poweremail_mailbox.py:51
 #: code:addons/poweremail/poweremail_mailbox.py:58
 #: code:addons/poweremail/poweremail_mailbox.py:138
 #: code:addons/poweremail/poweremail_send_wizard.py:58
 #: code:addons/poweremail/poweremail_send_wizard.py:59
-#: code:addons/poweremail/poweremail_send_wizard.py:181
-#: code:addons/poweremail/poweremail_send_wizard.py:187
+#: code:addons/poweremail/poweremail_send_wizard.py:208
+#: code:addons/poweremail/poweremail_send_wizard.py:214
 #: code:addons/poweremail/poweremail_template.py:47
 #: code:addons/poweremail/poweremail_template.py:61
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_administration_server
@@ -107,7 +94,7 @@ msgid "Power Email"
 msgstr "Power Email"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_send_wizard.py:181
+#: code:addons/poweremail/poweremail_send_wizard.py:208
 #, python-format
 msgid "Emails for multiple items saved in outbox."
 msgstr "Emails for multiple items saved in outbox."
@@ -118,9 +105,9 @@ msgid "Shows a list of IMAP folders"
 msgstr "Shows a list of IMAP folders"
 
 #. module: poweremail
-#: view:poweremail.templates:0
-msgid "Note: HTML body can't be edited with GTK desktop client."
-msgstr "Note: HTML body can't be edited with GTK desktop client."
+#: selection:poweremail.send.wizard,state:0
+msgid "Send Type"
+msgstr "Send Type"
 
 #. module: poweremail
 #: field:poweremail.templates,def_bcc:0
@@ -138,16 +125,18 @@ msgid "Get Mail"
 msgstr "Get Mail"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:871
-#: code:addons/poweremail/poweremail_core.py:1015
-#, python-format
-msgid "Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete."
-msgstr "Incoming server login attempt dropped Account:%s Check if Incoming server attributes are complete."
+#: help:poweremail.templates,model_object_field:0
+msgid "Select the field from the model you want to use.\n"
+"If it is a relationship field you will be able to choose the nested values in the box below.\n"
+"(Note: If there are no values make sure you have selected the correct model)."
+msgstr "Select the field from the model you want to use.\n"
+"If it is a relationship field you will be able to choose the nested values in the box below.\n"
+"(Note: If there are no values make sure you have selected the correct model)."
 
 #. module: poweremail
-#: field:poweremail.core_accounts,rec_headers_den_mail:0
-msgid "First Receive headers, then download mail"
-msgstr "First Receive headers, then download mail"
+#: field:poweremail.templates,null_value:0
+msgid "Null Value"
+msgstr "Null Value"
 
 #. module: poweremail
 #: field:ir.actions.server,poweremail_template:0
@@ -167,22 +156,21 @@ msgid "Log partner events"
 msgstr "Log partner events"
 
 #. module: poweremail
+#: model:ir.model,name:poweremail.model_poweremail_engines
+msgid "Power Email Engine"
+msgstr "Power Email Engine"
+
+#. module: poweremail
 #: selection:poweremail.mailbox,mail_type:0
 msgid "Plain Text & HTML with no attachments"
 msgstr "Plain Text & HTML with no attachments"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1195
+#: code:addons/poweremail/poweremail_core.py:782
+#: code:addons/poweremail/poweremail_core.py:905
 #, python-format
-msgid "Select a folder before you save record "
-msgstr "Select a folder before you save record "
-
-#. module: poweremail
-#: view:poweremail.mailbox:0
-#: field:poweremail.mailbox,pem_body_text:0
-#: field:poweremail.templates,def_body_text:0
-msgid "Standard Body (Text)"
-msgstr "Standard Body (Text)"
+msgid "IMAP Server Error Account: %s Error: %s."
+msgstr "IMAP Server Error Account: %s Error: %s."
 
 #. module: poweremail
 #: field:poweremail.preview,body_html:0
@@ -193,12 +181,12 @@ msgid "Body"
 msgstr "Body"
 
 #. module: poweremail
-#: help:poweremail.templates,def_cc:0
-msgid "The default CC for the email. Placeholders can be used here."
-msgstr "The default CC for the email. Placeholders can be used here."
+#: view:poweremail.send.wizard:0
+msgid " "
+msgstr " "
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:491
+#: code:addons/poweremail/poweremail_template.py:496
 #, python-format
 msgid "Deletion of Record failed"
 msgstr "Deletion of Record failed"
@@ -221,6 +209,12 @@ msgid "Workflow"
 msgstr "Workflow"
 
 #. module: poweremail
+#: field:poweremail.send.wizard,single_email:0
+#: field:poweremail.templates,single_email:0
+msgid "Single email"
+msgstr "Single email"
+
+#. module: poweremail
 #: view:poweremail.mailbox:0
 #: view:poweremail.templates:0
 msgid "Standard Body"
@@ -232,10 +226,16 @@ msgid "Company"
 msgstr "Company"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_send_wizard.py:241
+#: selection:poweremail.core_accounts,company:0
+msgid "No"
+msgstr "No"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:609
+#: code:addons/poweremail/poweremail_core.py:666
 #, python-format
-msgid "Report"
-msgstr "Report"
+msgid "Save Header -> Mailbox create error. Account: %s, Mail: %s, Error: %s"
+msgstr "Save Header -> Mailbox create error. Account: %s, Mail: %s, Error: %s"
 
 #. module: poweremail
 #: field:poweremail.core_accounts,dont_auto_down_attach:0
@@ -243,9 +243,10 @@ msgid "Dont Download attachments automatically"
 msgstr "Dont Download attachments automatically"
 
 #. module: poweremail
-#: view:poweremail.send.wizard:0
-msgid "Send all mails"
-msgstr "Send all mails"
+#: code:addons/poweremail/poweremail_core.py:731
+#, python-format
+msgid "Mail %s Saved successfully as ID: %s for Account: %s."
+msgstr "Mail %s Saved successfully as ID: %s for Account: %s."
 
 #. module: poweremail
 #: help:poweremail.core_accounts,iserver:0
@@ -263,9 +264,9 @@ msgid "Server Reference of mail"
 msgstr "Server Reference of mail"
 
 #. module: poweremail
-#: field:poweremail.core_accounts,smtpserver:0
-msgid "Server"
-msgstr "Server"
+#: field:poweremail.core_accounts,iserver_type:0
+msgid "Server Type"
+msgstr "Server Type"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal_my
@@ -274,11 +275,16 @@ msgid "My Accounts"
 msgstr "My Accounts"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:851
-#: code:addons/poweremail/poweremail_core.py:997
+#: field:poweremail.preview,rel_model_ref:0
+#: field:poweremail.send.wizard,rel_model_ref:0
+msgid "Referred Document"
+msgstr "Referred Document"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:770
 #, python-format
-msgid "POP3 Server Login Error Account:%s Error:%s."
-msgstr "POP3 Server Login Error Account:%s Error:%s."
+msgid "Starting Header reception for account: %s."
+msgstr "Starting Header reception for account: %s."
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -287,22 +293,27 @@ msgid "Approved"
 msgstr "Approved"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1118
+#: code:addons/poweremail/poweremail_core.py:1106
 #, python-format
 msgid "IMAP Server connection Error"
 msgstr "IMAP Server connection Error"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:796
-#: code:addons/poweremail/poweremail_core.py:923
+#: code:addons/poweremail/poweremail_core.py:1179
 #, python-format
-msgid "IMAP Server Login Error Account:%s Error:%s."
-msgstr "IMAP Server Login Error Account:%s Error:%s."
+msgid "This is an invalid folder"
+msgstr "This is an invalid folder"
 
 #. module: poweremail
-#: field:poweremail.templates,table_html:0
-msgid "HTML code"
-msgstr "HTML code"
+#: code:addons/poweremail/poweremail_core.py:318
+#, python-format
+msgid "Programming Error in _get_pop3_server method. The record received is invalid."
+msgstr "Programming Error in _get_pop3_server method. The record received is invalid."
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these r ecords). If you don't check it, an email with its optional attachment will be send for each record."
+msgstr "Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these r ecords). If you don't check it, an email with its optional attachment will be send for each record."
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -310,9 +321,19 @@ msgid "Incoming"
 msgstr "Incoming"
 
 #. module: poweremail
-#: selection:poweremail.mailbox,state:0
-msgid "Un-Read"
-msgstr "Un-Read"
+#: code:addons/poweremail/poweremail_mailbox.py:138
+#, python-format
+msgid "Sending of Mail %s failed. Probable Reason: Could not login to server\n"
+"Error: %s"
+msgstr "Sending of Mail %s failed. Probable Reason: Could not login to server\n"
+"Error: %s"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:403
+#: code:addons/poweremail/poweremail_core.py:501
+#, python-format
+msgid "Mail from Account %s failed. Probable Reason: Account not approved"
+msgstr "Mail from Account %s failed. Probable Reason: Account not approved"
 
 #. module: poweremail
 #: help:poweremail.core_accounts,email_id:0
@@ -320,10 +341,12 @@ msgid "eg: yourname@yourdomain.com"
 msgstr "eg: yourname@yourdomain.com"
 
 #. module: poweremail
-#: field:poweremail.preview,to:0
-#: field:poweremail.send.wizard,to:0
-msgid "To"
-msgstr "To"
+#: code:addons/poweremail/poweremail_core.py:494
+#, python-format
+msgid "Mail from Account %s failed. Probable Reason: Server Send Error\n"
+"Description: %s"
+msgstr "Mail from Account %s failed. Probable Reason: Server Send Error\n"
+"Description: %s"
 
 #. module: poweremail
 #: field:poweremail.mailbox,pem_recd:0
@@ -341,16 +364,31 @@ msgid "Conversation"
 msgstr "Conversation"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_send_wizard.py:187
+#: code:addons/poweremail/poweremail_core.py:844
+#, python-format
+msgid "POP3 Statistics: %s mails of %s size for Account: %s"
+msgstr "POP3 Statistics: %s mails of %s size for Account: %s"
+
+#. module: poweremail
+#: help:poweremail.templates,table_sub_object:0
+msgid "This field shows the model you will be using for your table."
+msgstr "This field shows the model you will be using for your table."
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_send_wizard.py:214
 #, python-format
 msgid "Email sending failed for one or more objects."
 msgstr "Email sending failed for one or more objects."
 
 #. module: poweremail
-#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
-#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_form
-msgid "E-M@IL Templates"
-msgstr "E-M@IL Templates"
+#: view:poweremail.templates:0
+msgid "Note: HTML body can't be edited with GTK desktop client."
+msgstr "Note: HTML body can't be edited with GTK desktop client."
+
+#. module: poweremail
+#: help:poweremail.templates,sub_model_object_field:0
+msgid "When you choose relationship fields this field will specify the sub value you can use."
+msgstr "When you choose relationship fields this field will specify the sub value you can use."
 
 #. module: poweremail
 #: selection:poweremail.send.wizard,state:0
@@ -358,9 +396,10 @@ msgid "Wizard Complete"
 msgstr "Wizard Complete"
 
 #. module: poweremail
-#: view:poweremail.templates:0
-msgid "Preview Template"
-msgstr "Preview Template"
+#: code:addons/poweremail/poweremail_core.py:862
+#, python-format
+msgid "Incoming server login attempt dropped Account: %s Check if Incoming server attributes are complete."
+msgstr "Incoming server login attempt dropped Account: %s Check if Incoming server attributes are complete."
 
 #. module: poweremail
 #: selection:poweremail.mailbox,state:0
@@ -383,30 +422,20 @@ msgid "Complete Success"
 msgstr "Complete Success"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1116
-#: code:addons/poweremail/poweremail_core.py:1119
-#: code:addons/poweremail/poweremail_core.py:1124
-#: code:addons/poweremail/poweremail_core.py:1127
-#: code:addons/poweremail/poweremail_core.py:1145
-#: code:addons/poweremail/poweremail_core.py:1148
-#, python-format
-msgid "An error occurred : %s "
-msgstr "An error occurred : %s "
+#: field:poweremail.templates,use_sign:0
+msgid "Use Signature"
+msgstr "Use Signature"
 
 #. module: poweremail
-#: field:poweremail.core_accounts,smtpssl:0
-msgid "Use SSL/TLS (only in python 2.6)"
-msgstr "Use SSL/TLS (only in python 2.6)"
+#: model:ir.module.module,shortdesc:poweremail.module_meta_information
+msgid "Powerful Email capabilities for Open ERP"
+msgstr "Powerful Email capabilities for Open ERP"
 
 #. module: poweremail
 #: view:poweremail.preview:0
+#: view:poweremail.send.wizard:0
 msgid "OK"
 msgstr "OK"
-
-#. module: poweremail
-#: field:poweremail.templates,null_value:0
-msgid "Null Value"
-msgstr "Null Value"
 
 #. module: poweremail
 #: code:addons/poweremail/poweremail_template.py:49
@@ -430,13 +459,11 @@ msgid "The default recepient of email. Placeholders can be used here."
 msgstr "The default recepient of email. Placeholders can be used here."
 
 #. module: poweremail
-#: help:poweremail.templates,model_object_field:0
-msgid "Select the field from the model you want to use.\n"
-"If it is a relationship field you will be able to choose the nested values in the box below.\n"
-"(Note: If there are no values make sure you have selected the correct model)."
-msgstr "Select the field from the model you want to use.\n"
-"If it is a relationship field you will be able to choose the nested values in the box below.\n"
-"(Note: If there are no values make sure you have selected the correct model)."
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_body_text:0
+#: field:poweremail.templates,def_body_text:0
+msgid "Standard Body (Text)"
+msgstr "Standard Body (Text)"
 
 #. module: poweremail
 #: field:poweremail.conversation,mails:0
@@ -454,15 +481,9 @@ msgid "IMAP Folder"
 msgstr "IMAP Folder"
 
 #. module: poweremail
-#: field:poweremail.templates,use_sign:0
-msgid "Use Signature"
-msgstr "Use Signature"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:491
-#, python-format
-msgid "Warning"
-msgstr "Warning"
+#: help:poweremail.templates,def_cc:0
+msgid "The default CC for the email. Placeholders can be used here."
+msgstr "The default CC for the email. Placeholders can be used here."
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -486,14 +507,15 @@ msgid "Conversations are groups of related emails"
 msgstr "Conversations are groups of related emails"
 
 #. module: poweremail
+#: field:poweremail.preview,to:0
+#: field:poweremail.send.wizard,to:0
+msgid "To"
+msgstr "To"
+
+#. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_mailbox
 msgid "Power Email Mailbox included all type inbox,outbox,junk.."
 msgstr "Power Email Mailbox included all type inbox,outbox,junk.."
-
-#. module: poweremail
-#: view:poweremail.send.wizard:0
-msgid "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to language."
-msgstr "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to language."
 
 #. module: poweremail
 #: field:poweremail.core_accounts,isssl:0
@@ -512,7 +534,7 @@ msgid "Subject"
 msgstr "Subject"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:350
+#: code:addons/poweremail/poweremail_core.py:348
 #, python-format
 msgid "Incoming server user name is not defined"
 msgstr "Incoming server user name is not defined"
@@ -529,15 +551,18 @@ msgid "No information on which mail should be fetched fully"
 msgstr "No information on which mail should be fetched fully"
 
 #. module: poweremail
-#: help:poweremail.templates,table_required_fields:0
-msgid "Select the fields you require in the table."
-msgstr "Select the fields you require in the table."
+#: code:addons/poweremail/poweremail_core.py:595
+#, python-format
+msgid "Saving Header of unknown payload (%s) Account: %s."
+msgstr "Saving Header of unknown payload (%s) Account: %s."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:557
-#, python-format
-msgid "Datetime Extraction failed. Date:%s 	Error:%s"
-msgstr "Datetime Extraction failed. Date:%s 	Error:%s"
+#: view:poweremail.mailbox:0
+#: field:poweremail.mailbox,pem_attachments_ids:0
+#: view:poweremail.send.wizard:0
+#: field:poweremail.send.wizard,attachment_ids:0
+msgid "Attachments"
+msgstr "Attachments"
 
 #. module: poweremail
 #: view:poweremail.templates:0
@@ -576,12 +601,6 @@ msgid "Body (Text-Web Client Only)"
 msgstr "Body (Text-Web Client Only)"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:892
-#, python-format
-msgid "Starting Full mail reception for mail:%s."
-msgstr "Starting Full mail reception for mail:%s."
-
-#. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_preview
 msgid "Power Email Template Preview"
 msgstr "Power Email Template Preview"
@@ -602,33 +621,24 @@ msgid "Power Email Follow Up"
 msgstr "Power Email Follow Up"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:598
-#, python-format
-msgid "Saving Header of unknown payload (%s) Account:%s."
-msgstr "Saving Header of unknown payload (%s) Account:%s."
-
-#. module: poweremail
 #: code:addons/poweremail/poweremail_core.py:282
 #, python-format
 msgid "Out going connection test failed"
 msgstr "Out going connection test failed"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:500
+#: code:addons/poweremail/poweremail_core.py:498
 #, python-format
 msgid "Mail from Account %s successfully Sent."
 msgstr "Mail from Account %s successfully Sent."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:496
-#, python-format
-msgid "Mail from Account %s failed. Probable Reason:Server Send Error\n"
-"Description: %s"
-msgstr "Mail from Account %s failed. Probable Reason:Server Send Error\n"
-"Description: %s"
+#: help:poweremail.templates,table_required_fields:0
+msgid "Select the fields you require in the table."
+msgstr "Select the fields you require in the table."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:360
+#: code:addons/poweremail/poweremail_core.py:358
 #, python-format
 msgid "The specified record for connection does not exist"
 msgstr "The specified record for connection does not exist"
@@ -639,9 +649,20 @@ msgid "POP3"
 msgstr "POP3"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_serveraction.py:88
+#, python-format
+msgid "Please specify an template to use for auto email in poweremail!"
+msgstr "Please specify an template to use for auto email in poweremail!"
+
+#. module: poweremail
 #: selection:poweremail.templates,template_language:0
 msgid "Mako Templates"
 msgstr "Mako Templates"
+
+#. module: poweremail
+#: view:poweremail.core_accounts:0
+msgid "Suspend Account"
+msgstr "Suspend Account"
 
 #. module: poweremail
 #: help:poweremail.templates,send_on_create:0
@@ -649,9 +670,9 @@ msgid "Sends an e-mail when a new document is created."
 msgstr "Sends an e-mail when a new document is created."
 
 #. module: poweremail
-#: help:poweremail.templates,lang:0
-msgid "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
-msgstr "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+#: selection:poweremail.mailbox,state:0
+msgid "Un-Read"
+msgstr "Un-Read"
 
 #. module: poweremail
 #: selection:poweremail.mailbox,folder:0
@@ -669,15 +690,49 @@ msgid "Name of Template"
 msgstr "Name of Template"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:758
+#: code:addons/poweremail/poweremail_core.py:914
 #, python-format
-msgid "No Subject"
-msgstr "No Subject"
+msgid "IMAP Server Login Error Account:%s Error: %s."
+msgstr "IMAP Server Login Error Account:%s Error: %s."
 
 #. module: poweremail
-#: help:poweremail.templates,def_bcc:0
-msgid "The default BCC for the email. Placeholders can be used here."
-msgstr "The default BCC for the email. Placeholders can be used here."
+#: model:ir.module.module,description:poweremail.module_meta_information
+msgid "\n"
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"\n"
+"    Features:\n"
+"\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"\n"
+"    "
+msgstr "\n"
+"    Power Email - extends the most Power ful open source ERP with email which powers the world today.\n"
+"\n"
+"    Features:\n"
+"\n"
+"    1. Multiple Email Accounts\n"
+"    2. Company & Personal Email accounts\n"
+"    3. Security (In Progress)\n"
+"    4. Email Folders (Inbox.Outbox.Drafts etc)\n"
+"    5. Sending of Mails via SMTP (SMTP SSL also supported)\n"
+"    6. Reception of Mails (IMAP & POP3) With SSL & Folders for IMAP supported\n"
+"    7. Simple one point Template designer which automatically updates system. No extra config req.\n"
+"    8. Automatic Email feature on workflow stages\n"
+"\n"
+"    NOTE: This is a beta release. Please update bugs at:\n"
+"    http://bugs.launchpad.net/poweremail/+filebug (or) https://bugs.launchpad.net/poweremail/+filebug\n"
+"\n"
+"    "
 
 #. module: poweremail
 #: field:poweremail.core_accounts,smtptls:0
@@ -685,24 +740,15 @@ msgid "Use TLS"
 msgstr "Use TLS"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:629
-#: code:addons/poweremail/poweremail_core.py:697
-#: code:addons/poweremail/poweremail_core.py:746
+#: code:addons/poweremail/poweremail_template.py:496
 #, python-format
-msgid "IMAP Mail->Mailbox create error Account:%s, Mail:%s"
-msgstr "IMAP Mail->Mailbox create error Account:%s, Mail:%s"
+msgid "Warning"
+msgstr "Warning"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1004
-#, python-format
-msgid "POP3 Statistics:%s mails of %s size for Account:%s:"
-msgstr "POP3 Statistics:%s mails of %s size for Account:%s:"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_serveraction.py:88
-#, python-format
-msgid "Please specify an template to use for auto email in poweremail !"
-msgstr "Please specify an template to use for auto email in poweremail !"
+#: field:poweremail.mailbox,pem_account_id:0
+msgid "User account"
+msgstr "User account"
 
 #. module: poweremail
 #: field:poweremail.send.wizard,signature:0
@@ -715,7 +761,7 @@ msgid "Select Folder"
 msgstr "Select Folder"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:375
+#: code:addons/poweremail/poweremail_core.py:373
 #, python-format
 msgid "Incoming Test Connection Was Successful"
 msgstr "Incoming Test Connection Was Successful"
@@ -743,7 +789,7 @@ msgstr "Advanced"
 
 #. module: poweremail
 #: code:addons/poweremail/poweremail_core.py:283
-#: code:addons/poweremail/poweremail_core.py:381
+#: code:addons/poweremail/poweremail_core.py:379
 #, python-format
 msgid "Reason: %s"
 msgstr "Reason: %s"
@@ -752,6 +798,14 @@ msgstr "Reason: %s"
 #: view:poweremail.templates:0
 msgid "Expression Builder"
 msgstr "Expression Builder"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:794
+#, python-format
+msgid "IMAP Server Folder Selection Error Account: %s Error: %s.\n"
+"Check account settings if you have selected a folder."
+msgstr "IMAP Server Folder Selection Error Account: %s Error: %s.\n"
+"Check account settings if you have selected a folder."
 
 #. module: poweremail
 #: field:poweremail.core_accounts,state:0
@@ -769,9 +823,11 @@ msgid "security"
 msgstr "security"
 
 #. module: poweremail
-#: view:poweremail.core_accounts:0
-msgid "Suspend Account"
-msgstr "Suspend Account"
+#: code:addons/poweremail/poweremail_core.py:836
+#: code:addons/poweremail/poweremail_core.py:976
+#, python-format
+msgid "POP3 Server Error Account: %s Error: %s."
+msgstr "POP3 Server Error Account: %s Error: %s."
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_my
@@ -789,10 +845,9 @@ msgid "Power Email Drafts"
 msgstr "Power Email Drafts"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:853
-#, python-format
-msgid "POP3 Statistics:%s mails of %s size for Account:%s"
-msgstr "POP3 Statistics:%s mails of %s size for Account:%s"
+#: view:poweremail.templates:0
+msgid "Preview Template"
+msgstr "Preview Template"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_core_accounts_Personal
@@ -811,9 +866,9 @@ msgid "Copy and paste the value in the location you want to use a system value."
 msgstr "Copy and paste the value in the location you want to use a system value."
 
 #. module: poweremail
-#: help:poweremail.templates,sub_model_object_field:0
-msgid "When you choose relationship fields this field will specify the sub value you can use."
-msgstr "When you choose relationship fields this field will specify the sub value you can use."
+#: field:poweremail.core_accounts,smtpssl:0
+msgid "Use SSL/TLS (only in python 2.6)"
+msgstr "Use SSL/TLS (only in python 2.6)"
 
 #. module: poweremail
 #: field:poweremail.templates,lang:0
@@ -826,14 +881,27 @@ msgid "Attachments (Report to attach)"
 msgstr "Attachments (Report to attach)"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:843
+#: code:addons/poweremail/poweremail_core.py:991
+#, python-format
+msgid "POP3 Server Connected & logged in successfully Account: %s."
+msgstr "POP3 Server Connected & logged in successfully Account: %s."
+
+#. module: poweremail
 #: view:poweremail.templates:0
 msgid "Security"
 msgstr "Security"
 
 #. module: poweremail
-#: view:poweremail.send.wizard:0
-msgid "Save in Drafts"
-msgstr "Save in Drafts"
+#: field:poweremail.core_accounts,smtpserver:0
+msgid "Server"
+msgstr "Server"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_send_wizard.py:284
+#, python-format
+msgid "Report"
+msgstr "Report"
 
 #. module: poweremail
 #: selection:poweremail.core_accounts,iserver_type:0
@@ -861,7 +929,7 @@ msgid "Send on Update"
 msgstr "Send on Update"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:380
+#: code:addons/poweremail/poweremail_core.py:378
 #, python-format
 msgid "In coming connection test failed"
 msgstr "In coming connection test failed"
@@ -893,21 +961,16 @@ msgid "SMTP SERVER or PORT not specified"
 msgstr "SMTP SERVER or PORT not specified"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:766
-#, python-format
-msgid "Attachment to mail for %s relation success! Account:%s."
-msgstr "Attachment to mail for %s relation success! Account:%s."
-
-#. module: poweremail
 #: code:addons/poweremail/poweremail_core.py:277
 #, python-format
 msgid "SMTP Test Connection Was Successful"
 msgstr "SMTP Test Connection Was Successful"
 
 #. module: poweremail
-#: selection:poweremail.send.wizard,state:0
-msgid "Multiple Mail Wizard Step 1"
-msgstr "Multiple Mail Wizard Step 1"
+#: code:addons/poweremail/poweremail_core.py:346
+#, python-format
+msgid "Incoming port is not defined"
+msgstr "Incoming port is not defined"
 
 #. module: poweremail
 #: selection:poweremail.core_accounts,send_pref:0
@@ -930,9 +993,11 @@ msgid "Company Mail A/c"
 msgstr "Company Mail A/c"
 
 #. module: poweremail
-#: help:poweremail.templates,table_sub_object:0
-msgid "This field shows the model you will be using for your table."
-msgstr "This field shows the model you will be using for your table."
+#: code:addons/poweremail/poweremail_core.py:796
+#: code:addons/poweremail/poweremail_core.py:938
+#, python-format
+msgid "IMAP Folder Statistics for Account: %s: %s"
+msgstr "IMAP Folder Statistics for Account: %s: %s"
 
 #. module: poweremail
 #: field:poweremail.templates,ref_ir_act_window:0
@@ -956,11 +1021,18 @@ msgid "Programming Error in _get_imap_server method. The record received is inva
 msgstr "Programming Error in _get_imap_server method. The record received is invalid."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:620
-#: code:addons/poweremail/poweremail_core.py:683
+#: code:addons/poweremail/poweremail_core.py:488
 #, python-format
-msgid "Header for Mail %s Saved successfully as ID:%s for Account:%s."
-msgstr "Header for Mail %s Saved successfully as ID:%s for Account:%s."
+msgid "Mail from Account %s failed. Probable Reason: MIME Error\n"
+"Description: %s"
+msgstr "Mail from Account %s failed. Probable Reason: MIME Error\n"
+"Description: %s"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:737
+#, python-format
+msgid "IMAP Mail -> Mailbox create error Account: %s, Mail: %s"
+msgstr "IMAP Mail -> Mailbox create error Account: %s, Mail: %s"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_drafts
@@ -970,9 +1042,12 @@ msgid "Drafts"
 msgstr "Drafts"
 
 #. module: poweremail
-#: selection:poweremail.core_accounts,company:0
-msgid "No"
-msgstr "No"
+#: code:addons/poweremail/poweremail_core.py:398
+#, python-format
+msgid "Mail from Account %s failed on login. Probable Reason: Could not login to server\n"
+"Error: %s"
+msgstr "Mail from Account %s failed on login. Probable Reason: Could not login to server\n"
+"Error: %s"
 
 #. module: poweremail
 #: view:poweremail.send.wizard:0
@@ -980,16 +1055,23 @@ msgid "After clicking send all mails, mails will be sent to outbox and cleared i
 msgstr "After clicking send all mails, mails will be sent to outbox and cleared in next Send/Recieve"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_template.py:382
+#: sql_constraint:poweremail.templates:0
+#, python-format
+msgid "The template name must be unique!"
+msgstr "The template name must be unique!"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:788
+#: code:addons/poweremail/poweremail_core.py:919
+#, python-format
+msgid "IMAP Server Connected & logged in successfully Account: %s."
+msgstr "IMAP Server Connected & logged in successfully Account: %s."
+
+#. module: poweremail
 #: field:poweremail.mailbox,mail_type:0
 msgid "Mail Contents"
 msgstr "Mail Contents"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:377
-#: sql_constraint:poweremail.templates:0
-#, python-format
-msgid "The template name must be unique !"
-msgstr "The template name must be unique !"
 
 #. module: poweremail
 #: field:poweremail.preview,bcc:0
@@ -1003,9 +1085,20 @@ msgid "Plain Text"
 msgstr "Plain Text"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:754
+#, python-format
+msgid "Downloaded & saved %s attachments Account: %s."
+msgstr "Downloaded & saved %s attachments Account: %s."
+
+#. module: poweremail
 #: view:poweremail.core_accounts:0
 msgid "Draft"
 msgstr "Draft"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to langu age."
+msgstr "Tip: Multiple emails are sent in the same language (the first one is proposed). We suggest you send emails in groups according to langu age."
 
 #. module: poweremail
 #: field:poweremail.templates,model_int_name:0
@@ -1019,11 +1112,16 @@ msgid "User Name"
 msgstr "User Name"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:804
-#: code:addons/poweremail/poweremail_core.py:944
+#: code:addons/poweremail/poweremail_core.py:795
 #, python-format
 msgid "IMAP Folder selected successfully Account:%s."
 msgstr "IMAP Folder selected successfully Account:%s."
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:749
+#, python-format
+msgid "No Subject"
+msgstr "No Subject"
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -1050,9 +1148,21 @@ msgid "Outgoing"
 msgstr "Outgoing"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:842
+#: code:addons/poweremail/poweremail_core.py:986
+#, python-format
+msgid "POP3 Server Login Error Account: %s Error: %s."
+msgstr "POP3 Server Login Error Account: %s Error: %s."
+
+#. module: poweremail
 #: selection:poweremail.core_accounts,state:0
 msgid "Initiated"
 msgstr "Initiated"
+
+#. module: poweremail
+#: view:poweremail.send.wizard:0
+msgid "Send all mails"
+msgstr "Send all mails"
 
 #. module: poweremail
 #: help:poweremail.core_accounts,isfolder:0
@@ -1079,6 +1189,7 @@ msgstr "Power Email Templates for Models"
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_template_form
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_template_tree_all
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates_all
 msgid "Email Templates"
 msgstr "Email Templates"
 
@@ -1093,24 +1204,16 @@ msgid "Sub Field"
 msgstr "Sub Field"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1191
-#, python-format
-msgid "This is an invalid folder "
-msgstr "This is an invalid folder "
+#: field:poweremail.mailbox,pem_user:0
+msgid "User"
+msgstr "User"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:779
+#: code:addons/poweremail/poweremail_core.py:624
+#: code:addons/poweremail/poweremail_core.py:689
 #, python-format
-msgid "Starting Header reception for account:%s."
-msgstr "Starting Header reception for account:%s."
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:803
-#, python-format
-msgid "IMAP Server Folder Selection Error Account:%s Error:%s.\n"
-"Check account settings if you have selected a folder."
-msgstr "IMAP Server Folder Selection Error Account:%s Error:%s.\n"
-"Check account settings if you have selected a folder."
+msgid "IMAP Mail -> Mailbox create error. Account: %s, Mail: %s"
+msgstr "IMAP Mail -> Mailbox create error. Account: %s, Mail: %s"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_outbox
@@ -1120,11 +1223,9 @@ msgid "Outbox"
 msgstr "Outbox"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:797
-#: code:addons/poweremail/poweremail_core.py:928
-#, python-format
-msgid "IMAP Server Connected & logged in successfully Account:%s."
-msgstr "IMAP Server Connected & logged in successfully Account:%s."
+#: view:poweremail.send.wizard:0
+msgid "Save in Drafts"
+msgstr "Save in Drafts"
 
 #. module: poweremail
 #: view:poweremail.templates:0
@@ -1132,15 +1233,15 @@ msgid "Power Email Templates"
 msgstr "Power Email Templates"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:446
+#: code:addons/poweremail/poweremail_template.py:451
 #, python-format
 msgid "Send Mail (%s)"
 msgstr "Send Mail (%s)"
 
 #. module: poweremail
-#: field:poweremail.mailbox,pem_user:0
-msgid "User"
-msgstr "User"
+#: model:ir.ui.menu,name:poweremail.menu_poweremail_templates
+msgid "Templates"
+msgstr "Templates"
 
 #. module: poweremail
 #: view:poweremail.send.wizard:0
@@ -1159,22 +1260,21 @@ msgid "CC"
 msgstr "CC"
 
 #. module: poweremail
-#: view:poweremail.mailbox:0
-msgid "Send Mail"
-msgstr "Send Mail"
+#: help:poweremail.send.wizard,single_email:0
+#: help:poweremail.templates,single_email:0
+msgid "Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these records). If you don't check it, an email with its optional attachment will be send for each record."
+msgstr "Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these records). If you don't check it, an email with its optional attachment will be send for each record."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:740
+#: code:addons/poweremail/poweremail_core.py:1104
+#: code:addons/poweremail/poweremail_core.py:1107
+#: code:addons/poweremail/poweremail_core.py:1112
+#: code:addons/poweremail/poweremail_core.py:1115
+#: code:addons/poweremail/poweremail_core.py:1133
+#: code:addons/poweremail/poweremail_core.py:1136
 #, python-format
-msgid "Mail %s Saved successfully as ID:%s for Account:%s."
-msgstr "Mail %s Saved successfully as ID:%s for Account:%s."
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:791
-#: code:addons/poweremail/poweremail_core.py:914
-#, python-format
-msgid "IMAP Server Error Account:%s Error:%s."
-msgstr "IMAP Server Error Account:%s Error:%s."
+msgid "An error occurred: %s"
+msgstr "An error occurred: %s"
 
 #. module: poweremail
 #: field:poweremail.templates,file_name:0
@@ -1182,9 +1282,9 @@ msgid "File Name Pattern"
 msgstr "File Name Pattern"
 
 #. module: poweremail
-#: field:poweremail.core_accounts,iserver_type:0
-msgid "Server Type"
-msgstr "Server Type"
+#: view:poweremail.mailbox:0
+msgid "Power Email Inbox"
+msgstr "Power Email Inbox"
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.act_selfolder_form
@@ -1196,6 +1296,11 @@ msgstr "IMAP Folder Selection Wizard"
 #, python-format
 msgid "Error"
 msgstr "Error"
+
+#. module: poweremail
+#: field:poweremail.templates,save_to_drafts:0
+msgid "Save to Drafts"
+msgstr "Save to Drafts"
 
 #. module: poweremail
 #: field:poweremail.send.wizard,report:0
@@ -1234,11 +1339,10 @@ msgid "Select if this mail account does not belong to specific user but the orga
 msgstr "Select if this mail account does not belong to specific user but the organisation as a whole. eg: info@somedomain.com"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:405
-#: code:addons/poweremail/poweremail_core.py:503
+#: code:addons/poweremail/poweremail_core.py:787
 #, python-format
-msgid "Mail from Account %s failed. Probable Reason: Account not approved"
-msgstr "Mail from Account %s failed. Probable Reason: Account not approved"
+msgid "IMAP Server Login Error Account: %s Error: %s."
+msgstr "IMAP Server Login Error Account: %s Error: %s."
 
 #. module: poweremail
 #: code:addons/poweremail/poweremail_template.py:63
@@ -1247,12 +1351,12 @@ msgid "Django templates not installed"
 msgstr "Django templates not installed"
 
 #. module: poweremail
-#: view:poweremail.mailbox:0
-#: field:poweremail.mailbox,pem_attachments_ids:0
-#: view:poweremail.send.wizard:0
-#: field:poweremail.send.wizard,attachment_ids:0
-msgid "Attachments"
-msgstr "Attachments"
+#: code:addons/poweremail/poweremail_core.py:555
+#, python-format
+msgid "Datetime Extraction failed. Date: %s\n"
+"Error: %s"
+msgstr "Datetime Extraction failed. Date: %s\n"
+"Error: %s"
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_ir_actions_server
@@ -1285,14 +1389,8 @@ msgid "Report to send"
 msgstr "Report to send"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:737
-#, python-format
-msgid "Save Mail->Mailbox write error Account:%s, Mail:%s"
-msgstr "Save Mail->Mailbox write error Account:%s, Mail:%s"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1190
-#: code:addons/poweremail/poweremail_core.py:1194
+#: code:addons/poweremail/poweremail_core.py:1178
+#: code:addons/poweremail/poweremail_core.py:1182
 #, python-format
 msgid "Folder Error"
 msgstr "Folder Error"
@@ -1304,7 +1402,7 @@ msgid "The text version of the mail."
 msgstr "The text version of the mail."
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:499
+#: code:addons/poweremail/poweremail_template.py:504
 #, python-format
 msgid "Copy of template "
 msgstr "Copy of template "
@@ -1326,6 +1424,7 @@ msgstr "Only users from these groups will be allowed to send mails from this Tem
 
 #. module: poweremail
 #: view:poweremail.core_selfolder:0
+#: view:poweremail.send.wizard:0
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -1367,7 +1466,7 @@ msgid "Body (HTML-Web Client Only)"
 msgstr "Body (HTML-Web Client Only)"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_send_wizard.py:239
+#: code:addons/poweremail/poweremail_send_wizard.py:282
 #, python-format
 msgid "%s (Email Attachment)"
 msgstr "%s (Email Attachment)"
@@ -1376,12 +1475,6 @@ msgstr "%s (Email Attachment)"
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_personal
 msgid "Personal"
 msgstr "Personal"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:768
-#, python-format
-msgid "Attachment to mail for %s relation failed Account:%s."
-msgstr "Attachment to mail for %s relation failed Account:%s."
 
 #. module: poweremail
 #: code:addons/poweremail/poweremail_mailbox.py:87
@@ -1402,10 +1495,16 @@ msgid "Trash"
 msgstr "Trash"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_template.py:434
+#: code:addons/poweremail/poweremail_template.py:439
 #, python-format
 msgid "%s Mail Form"
 msgstr "%s Mail Form"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:883
+#, python-format
+msgid "Starting Full mail reception for mail: %s."
+msgstr "Starting Full mail reception for mail: %s."
 
 #. module: poweremail
 #: field:poweremail.core_accounts,allowed_groups:0
@@ -1425,10 +1524,9 @@ msgid "Email Account Desc"
 msgstr "Email Account Desc"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:348
-#, python-format
-msgid "Incoming port is not defined"
-msgstr "Incoming port is not defined"
+#: field:poweremail.templates,table_html:0
+msgid "HTML code"
+msgstr "HTML code"
 
 #. module: poweremail
 #: help:poweremail.core_accounts,isport:0
@@ -1447,11 +1545,14 @@ msgid "Folder"
 msgstr "Folder"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:852
-#: code:addons/poweremail/poweremail_core.py:1002
-#, python-format
-msgid "POP3 Server Connected & logged in successfully Account:%s."
-msgstr "POP3 Server Connected & logged in successfully Account:%s."
+#: help:poweremail.templates,def_bcc:0
+msgid "The default BCC for the email. Placeholders can be used here."
+msgstr "The default BCC for the email. Placeholders can be used here."
+
+#. module: poweremail
+#: help:poweremail.templates,save_to_drafts:0
+msgid "When automatically sending emails generated from this template, save them into the Drafts folder rather than sending them immediately."
+msgstr "When automatically sending emails generated from this template, save them into the Drafts folder rather than sending them immediately."
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_drafts_tree
@@ -1470,16 +1571,8 @@ msgid "Email Mailbox"
 msgstr "Email Mailbox"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_mailbox.py:138
-#, python-format
-msgid "Sending of Mail %s failed. Probable Reason:Could not login to server\n"
-"Error: %s"
-msgstr "Sending of Mail %s failed. Probable Reason:Could not login to server\n"
-"Error: %s"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1144
-#: code:addons/poweremail/poweremail_core.py:1147
+#: code:addons/poweremail/poweremail_core.py:1132
+#: code:addons/poweremail/poweremail_core.py:1135
 #, python-format
 msgid "IMAP Server Folder Error"
 msgstr "IMAP Server Folder Error"
@@ -1490,7 +1583,7 @@ msgid "Partner ID to log Events"
 msgstr "Partner ID to log Events"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:352
+#: code:addons/poweremail/poweremail_core.py:350
 #, python-format
 msgid "Incoming server password is not defined"
 msgstr "Incoming server password is not defined"
@@ -1506,23 +1599,20 @@ msgid "Read"
 msgstr "Read"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:346
+#: code:addons/poweremail/poweremail_core.py:344
 #, python-format
 msgid "Incoming server is not defined"
 msgstr "Incoming server is not defined"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:802
-#: code:addons/poweremail/poweremail_core.py:938
-#, python-format
-msgid "IMAP Server Folder Selection Error Account:%s Error:%s."
-msgstr "IMAP Server Folder Selection Error Account:%s Error:%s."
+#: selection:poweremail.send.wizard,state:0
+msgid "Multiple Mail Wizard Step 1"
+msgstr "Multiple Mail Wizard Step 1"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:763
-#, python-format
-msgid "Downloaded & saved %s attachments Account:%s."
-msgstr "Downloaded & saved %s attachments Account:%s."
+#: field:poweremail.core_accounts,rec_headers_den_mail:0
+msgid "First Receive headers, then download mail"
+msgstr "First Receive headers, then download mail"
 
 #. module: poweremail
 #: field:poweremail.core_accounts,smtpport:0
@@ -1552,6 +1642,12 @@ msgid "Sent"
 msgstr "Sent"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:759
+#, python-format
+msgid "Attachment to mail for %s relation failed Account: %s."
+msgstr "Attachment to mail for %s relation failed Account: %s."
+
+#. module: poweremail
 #: view:poweremail.templates:0
 msgid "Insert Table"
 msgstr "Insert Table"
@@ -1562,23 +1658,20 @@ msgid "Another setting already exists with this email ID !"
 msgstr "Another setting already exists with this email ID !"
 
 #. module: poweremail
-#: field:poweremail.preview,rel_model_ref:0
-#: field:poweremail.send.wizard,rel_model_ref:0
-msgid "Referred Document"
-msgstr "Referred Document"
-
-#. module: poweremail
 #: field:poweremail.core_accounts,ispass:0
 #: field:poweremail.core_accounts,smtppass:0
 msgid "Password"
 msgstr "Password"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:805
-#: code:addons/poweremail/poweremail_core.py:949
-#, python-format
-msgid "IMAP Folder Statistics for Account:%s:%s"
-msgstr "IMAP Folder Statistics for Account:%s:%s"
+#: help:poweremail.templates,lang:0
+msgid "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+msgstr "The default language for the email. Placeholders can be used here. eg. ${object.partner_id.lang}"
+
+#. module: poweremail
+#: view:poweremail.mailbox:0
+msgid "Send Mail"
+msgstr "Send Mail"
 
 #. module: poweremail
 #: selection:poweremail.mailbox,folder:0
@@ -1591,6 +1684,12 @@ msgid "File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"
 msgstr "File name pattern can be specified with placeholders. eg. 2009_SO003.pdf"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:1183
+#, python-format
+msgid "Select a folder before you save record"
+msgstr "Select a folder before you save record"
+
+#. module: poweremail
 #: field:poweremail.preview,report:0
 msgid "Report Name"
 msgstr "Report Name"
@@ -1599,6 +1698,12 @@ msgstr "Report Name"
 #: field:poweremail.conversation,name:0
 msgid "Name"
 msgstr "Name"
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:757
+#, python-format
+msgid "Attachment to mail for %s relation success! Account: %s."
+msgstr "Attachment to mail for %s relation success! Account: %s."
 
 #. module: poweremail
 #: selection:poweremail.mailbox,state:0
@@ -1611,14 +1716,14 @@ msgid "poweremail.core_accounts"
 msgstr "poweremail.core_accounts"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1123
-#: code:addons/poweremail/poweremail_core.py:1126
+#: code:addons/poweremail/poweremail_core.py:1111
+#: code:addons/poweremail/poweremail_core.py:1114
 #, python-format
 msgid "IMAP Server Login Error"
 msgstr "IMAP Server Login Error"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:1115
+#: code:addons/poweremail/poweremail_core.py:1103
 #, python-format
 msgid "IMAP Server Error"
 msgstr "IMAP Server Error"
@@ -1679,22 +1784,21 @@ msgid "Corresponding server action is here."
 msgstr "Corresponding server action is here."
 
 #. module: poweremail
-#: selection:poweremail.core_accounts,company:0
-msgid "Yes"
-msgstr "Yes"
-
-#. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:400
+#: code:addons/poweremail/poweremail_core.py:993
 #, python-format
-msgid "Mail from Account %s failed on login. Probable Reason:Could not login to server\n"
-"Error: %s"
-msgstr "Mail from Account %s failed on login. Probable Reason:Could not login to server\n"
-"Error: %s"
+msgid "POP3 Statistics: %s mails of %s size for Account: %s:"
+msgstr "POP3 Statistics: %s mails of %s size for Account: %s:"
 
 #. module: poweremail
 #: help:poweremail.templates,def_subject:0
 msgid "The default subject of email. Placeholders can be used here."
 msgstr "The default subject of email. Placeholders can be used here."
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:728
+#, python-format
+msgid "Save Mail -> Mailbox write error Account: %s, Mail: %s"
+msgstr "Save Mail -> Mailbox write error Account: %s, Mail: %s"
 
 #. module: poweremail
 #: model:ir.model,name:poweremail.model_poweremail_send_wizard
@@ -1707,9 +1811,12 @@ msgid "Enforce From Account"
 msgstr "Enforce From Account"
 
 #. module: poweremail
-#: model:ir.model,name:poweremail.model_poweremail_engines
-msgid "Power Email Engine"
-msgstr "Power Email Engine"
+#: code:addons/poweremail/poweremail_core.py:1004
+#, python-format
+msgid "Incoming server login attempt dropped Account: %s\n"
+"Check if Incoming server attributes are complete."
+msgstr "Incoming server login attempt dropped Account: %s\n"
+"Check if Incoming server attributes are complete."
 
 #. module: poweremail
 #: model:ir.actions.act_window,name:poweremail.action_poweremail_core_accounts_tree_all
@@ -1750,11 +1857,10 @@ msgid "Last Downloaded Mail"
 msgstr "Last Downloaded Mail"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:612
-#: code:addons/poweremail/poweremail_core.py:672
+#: code:addons/poweremail/poweremail_core.py:928
 #, python-format
-msgid "Save Header->Mailbox create error Account:%s, Mail:%s, Error:%s"
-msgstr "Save Header->Mailbox create error Account:%s, Mail:%s, Error:%s"
+msgid "IMAP Server Folder Selection Error. Account: %s Error: %s."
+msgstr "IMAP Server Folder Selection Error. Account: %s Error: %s."
 
 #. module: poweremail
 #: view:poweremail.core_accounts:0
@@ -1762,10 +1868,9 @@ msgid "Request Re-activation"
 msgstr "Request Re-activation"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:319
-#, python-format
-msgid "Programming Error in _get_pop3_server method. The record received is invalid."
-msgstr "Programming Error in _get_pop3_server method. The record received is invalid."
+#: selection:poweremail.core_accounts,company:0
+msgid "Yes"
+msgstr "Yes"
 
 #. module: poweremail
 #: model:ir.ui.menu,name:poweremail.menu_poweremail_inbox
@@ -1780,21 +1885,16 @@ msgid "Simple Mail Wizard Step 1"
 msgstr "Simple Mail Wizard Step 1"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_core.py:845
-#: code:addons/poweremail/poweremail_core.py:987
-#, python-format
-msgid "POP3 Server Error Account:%s Error:%s."
-msgstr "POP3 Server Error Account:%s Error:%s."
-
-#. module: poweremail
 #: selection:poweremail.mailbox,mail_type:0
 msgid "Has Attachments"
 msgstr "Has Attachments"
 
 #. module: poweremail
-#: view:poweremail.mailbox:0
-msgid "Power Email Inbox"
-msgstr "Power Email Inbox"
+#: code:addons/poweremail/poweremail_core.py:616
+#: code:addons/poweremail/poweremail_core.py:676
+#, python-format
+msgid "Header for Mail %s Saved successfully as ID: %s for Account: %s."
+msgstr "Header for Mail %s Saved successfully as ID: %s for Account: %s."
 
 #. module: poweremail
 #: code:addons/poweremail/poweremail_mailbox.py:53
@@ -1803,12 +1903,24 @@ msgid "Error receiving mail: %s"
 msgstr "Error receiving mail: %s"
 
 #. module: poweremail
+#: code:addons/poweremail/poweremail_core.py:793
+#, python-format
+msgid "IMAP Server Folder Selection Error Account: %s Error: %s."
+msgstr "IMAP Server Folder Selection Error Account: %s Error: %s."
+
+#. module: poweremail
 #: field:poweremail.core_accounts,isport:0
 msgid "Port"
 msgstr "Port"
 
 #. module: poweremail
-#: code:addons/poweremail/poweremail_send_wizard.py:242
+#: code:addons/poweremail/poweremail_core.py:933
+#, python-format
+msgid "IMAP Folder selected successfully Account: %s."
+msgstr "IMAP Folder selected successfully Account: %s."
+
+#. module: poweremail
+#: code:addons/poweremail/poweremail_send_wizard.py:285
 #, python-format
 msgid "No Description"
 msgstr "No Description"
