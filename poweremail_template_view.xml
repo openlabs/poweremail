@@ -75,6 +75,7 @@
                                     required="1" />
                                 <field name="def_cc" colspan="4" />
                                 <field name="def_bcc" colspan="4" />
+                                <field name="single_email"/>
                             </group>
                             <group col="2" colspan="2">
                                 <field name="def_subject" colspan="4"

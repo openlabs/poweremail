@@ -371,7 +371,8 @@ class poweremail_templates(osv.osv):
                 TEMPLATE_ENGINES,
                 'Templating Language',
                 required=True
-                )
+                ),
+                'single_email': fields.boolean("Single email", help="Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these records). If you don't check it, an email with its optional attachment will be send for each record."),
     }
 
     _defaults = {
@@ -743,7 +744,7 @@ class poweremail_templates(osv.osv):
                                  cursor,
                                  user,
                                  template,
-                                 record_id,
+                                 record_ids,
                                  mail,
                                  context=None):
         """
@@ -754,15 +755,15 @@ class poweremail_templates(osv.osv):
         @param user: ID of User
         @param template: Browse record of
                          template
-        @param record_id: ID of the target model
-                          for which this mail has
-                          to be generated
+        @param record_ids: IDs of the target model
+                           for which this mail has
+                           to be generated
         @param mail: Browse record of email object
         @return: True
         """
         lang = get_value(cursor,
                          user,
-                         record_id,
+                         record_ids[0],
                          template.lang,
                          template,
                          context)
@@ -782,7 +783,7 @@ class poweremail_templates(osv.osv):
         data['model'] = template.model_int_name
         (result, format) = service.create(cursor,
                                           user,
-                                          [record_id],
+                                          record_ids,
                                           data,
                                           context)
         attachment_obj = self.pool.get('ir.attachment')
@@ -793,7 +794,7 @@ class poweremail_templates(osv.osv):
                              get_value(
                                    cursor,
                                    user,
-                                   record_id,
+                                   record_ids[0],
                                    template.file_name,
                                    template,
                                    context
@@ -941,6 +942,11 @@ class poweremail_templates(osv.osv):
         template = self.browse(cursor, user, template_id, context=context)
         if not template:
             raise Exception("The requested template could not be loaded")
+        report_record_ids = record_ids[:]
+        if template.single_email and len(record_ids) > 1:
+            # We send a single email for several records
+            record_ids = record_ids[:1]
+
         for record_id in record_ids:
             mailbox_id = self._generate_mailbox_item_from_template(
                                                                 cursor,
@@ -955,11 +961,22 @@ class poweremail_templates(osv.osv):
                                                         context=context
                                                               )
             if template.report_template:
-                self._generate_attach_reports(
+                if template.single_email and len(report_record_ids) > 1:
+                    # The optional attachment will be generated as a single file for all these records
+                    self._generate_attach_reports(
                                               cursor,
                                               user,
                                               template,
-                                              record_id,
+                                              report_record_ids,
+                                              mail,
+                                              context
+                                              )
+                else:                              
+                    self._generate_attach_reports(
+                                              cursor,
+                                              user,
+                                              template,
+                                              [record_id],
                                               mail,
                                               context
                                               )
