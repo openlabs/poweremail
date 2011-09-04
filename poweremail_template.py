@@ -36,6 +36,7 @@ TEMPLATE_ENGINES = []
 
 from osv import osv, fields
 from tools.translate import _
+from tools.safe_eval import safe_eval
 #Try and check the available templating engines
 from mako.template import Template  #For backward combatibility
 try:
@@ -373,6 +374,16 @@ class poweremail_templates(osv.osv):
                 required=True
                 ),
                 'single_email': fields.boolean("Single email", help="Check it if you want to send a single email for several records (the optional attachment will be generated as a single file for all these records). If you don't check it, an email with its optional attachment will be send for each record."),
+        'use_filter':fields.boolean(
+                    'Active Filter',
+                    help="This option allow you to add a custom python filter"
+                    " before sending a mail"),
+        'filter':fields.text(
+                    'Filter',
+                    help="The python code entered here will be excecuted if the"
+                    "result is True the mail will be send if it false the mail "
+                    "won't be send.\n"
+                    "Example : o.type == 'out_invoice' and o.number and o.number[:3]<>'os_' "),
     }
 
     _defaults = {
@@ -942,6 +953,14 @@ class poweremail_templates(osv.osv):
         template = self.browse(cursor, user, template_id, context=context)
         if not template:
             raise Exception("The requested template could not be loaded")
+        
+        if template.use_filter and template.filter:
+            filtered_record_ids=[]
+            for record in self.pool.get(template.object_name.model).browse(cursor, user, record_ids, context=context):
+                if safe_eval(template.filter, {'o':record, 'self':self, 'cr':cursor, 'context':context}):
+                    filtered_record_ids.append(record.id)
+            record_ids=filtered_record_ids
+        
         report_record_ids = record_ids[:]
         if template.single_email and len(record_ids) > 1:
             # We send a single email for several records

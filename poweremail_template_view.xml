@@ -185,6 +185,21 @@
                             <field name="send_on_create" />
                             <field name="send_on_write" />
                             <field name="save_to_drafts" />
+                            <field name="use_filter" />
+                            <group string="Filter" colspan="4" attrs="{'invisible':[('use_filter','=',False)]}">
+                                <group colspan="3" col="1">
+                                    <separator string="OpenObject Code Filter:"/>
+                                    <field name="filter" nolabel="1"/>
+                                </group>
+                                <group colspan="1" col="1">
+                                    <separator string="Available global variables:"/>
+                                    <label string="o - current object"/>
+                                    <label string="self - objects pointer"/>
+                                    <label string="uid - current user ID"/>
+                                    <label string="cr - database cursor"/>
+                                    <label string="context - current context"/>
+                                </group>
+                            </group>
                             <separator string="Email action and wizard"
                                 colspan="4" />
                             <field name="server_action" readonly="1" />
