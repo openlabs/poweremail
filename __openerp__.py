@@ -48,17 +48,17 @@ https://github.com/openlabs/poweremail/issues/new
 
     """,
     "init_xml": [
-        'poweremail_scheduler_data.xml'
+        'scheduler_data.xml'
     ],
     "update_xml": [
-        'security/poweremail_security.xml',
+        'security/security.xml',
         'security/ir.model.access.csv',
-        'poweremail_workflow.xml',
-        'poweremail_core_view.xml',
-        'poweremail_template_view.xml',
-        'poweremail_send_wizard.xml',
-        'poweremail_mailbox_view.xml',
-        'poweremail_serveraction_view.xml',
+        'workflow.xml',
+        'core_view.xml',
+        'template_view.xml',
+        'send_wizard.xml',
+        'mailbox_view.xml',
+        'serveraction_view.xml',
     ],
     "installable": True,
     "active": False,
