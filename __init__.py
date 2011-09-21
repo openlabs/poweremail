@@ -1,12 +1,6 @@
 #########################################################################
-#Power Email is a module for Open ERP which enables it to send mails    #
-#to customers, suppliers etc. and also has a fiull fledged email client.#
-#########################################################################
-#   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
-#   #   #   #  #   #      #  #     #  #    #    # # #  #  #  #    #     #
-#   ####    #   #   #    #   ###   ###     ###  #   #  #  #  #    #     #
-#   #        # #    # # #    #     # #     #    #   #  ####  #    #     #
-#   #         #     #  #     ####  #  #    ###  #   #  #  # ###   ####  #
+#                                                                       #
+# Copyright (C) 2010-2011 Openlabs Technologies & Consulting (P) LTD    #
 # Copyright (C) 2009  Sharoon Thomas                                    #
 #                                                                       #
 #This program is free software: you can redistribute it and/or modify   #
@@ -23,8 +17,8 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 
-import poweremail_core
-import poweremail_template
-import poweremail_send_wizard
-import poweremail_mailbox
-import poweremail_serveraction
+from .core import *
+from .template import *
+from .send_wizard import *
+from .mailbox import *
+from .serveraction import *
