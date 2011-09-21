@@ -26,6 +26,7 @@ import string
 import email
 import time
 import datetime
+import warnings
 from email import Encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -215,45 +216,50 @@ class poweremail_core_accounts(osv.osv):
                           }
                 }
 
-    def _get_outgoing_server(self, cursor, user, ids, context=None):
-        """
-        Returns the Out Going Connection (SMTP) object
+    def _get_outgoing_server(self, cursor, user, account_id, context=None):
+        """Returns the Out Going Connection (SMTP) object
         
-        @attention: DO NOT USE except_osv IN THIS METHOD
-        @param cursor: Database Cursor
-        @param user: ID of current user
-        @param ids: ID/list of ids of current object for
-                    which connection is required
-                    First ID will be chosen from lists
-        @param context: Context
+        .. attention: 
+            DO NOT USE except_osv IN THIS METHOD
+
+        :param cursor: Database Cursor
+        :param user: ID of current user
+        :param account_id: ID of email account
+        :param context: Context
         
-        @return: SMTP server object or Exception
+        :return: SMTP server object
         """
-        #Type cast ids to integer
-        if type(ids) == list:
-            ids = ids[0]
-        this_object = self.browse(cursor, user, ids, context)
-        if this_object:
-            if this_object.smtpserver and this_object.smtpport:
-                try:
-                    if this_object.smtpssl:
-                        serv = smtplib.SMTP_SSL(this_object.smtpserver, this_object.smtpport)
-                    else:
-                        serv = smtplib.SMTP(this_object.smtpserver, this_object.smtpport)
-                    if this_object.smtptls:
-                        serv.ehlo()
-                        serv.starttls()
-                        serv.ehlo()
-                except Exception, error:
-                    raise error
-                try:
-                    if serv.has_extn('AUTH') or this_object.smtpuname or this_object.smtppass:
-                        serv.login(this_object.smtpuname, this_object.smtppass)
-                except Exception, error:
-                    raise error
-                return serv
+        if type(account_id) == list:
+            warnings.warn(
+                "Support for passing list of ids to _get_outgoing_server "
+                "will be deprecated in 0.8", DeprecationWarning
+            )
+            account_id = account_id[0]
+
+        account = self.browse(cursor, user, account_id, context)
+
+        if not account:
+            raise Exception(_("Connection for the given ID does not exist"))
+        if not (account.smtpserver and account.smtpport):
             raise Exception(_("SMTP SERVER or PORT not specified"))
-        raise Exception(_("Core connection for the given ID does not exist"))
+
+        if account.smtpssl:
+            server = smtplib.SMTP_SSL(account.smtpserver, account.smtpport)
+        else:
+            server = smtplib.SMTP(account.smtpserver, account.smtpport)
+
+        if account.smtptls:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+
+        if server.has_extn('AUTH') or account.smtpuname or account.smtppass:
+            server.login(
+                account.smtpuname.encode('UTF-8'),
+                account.smtppass.encode('UTF-8')
+            )
+
+        return server
 
     def check_outgoing_connection(self, cursor, user, ids, context=None):
         """
