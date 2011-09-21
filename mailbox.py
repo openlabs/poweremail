@@ -26,7 +26,6 @@ The mailbox is an object which stores the actual email
 
 from osv import osv, fields
 import time
-import poweremail_engines
 import netsvc
 from tools.translate import _
 import tools

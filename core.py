@@ -41,7 +41,6 @@ import imaplib
 import string
 import email
 import time, datetime
-import poweremail_engines
 from tools.translate import _
 import tools
 
