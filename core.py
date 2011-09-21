@@ -1,12 +1,6 @@
 #########################################################################
-#Power Email is a module for Open ERP which enables it to send mails    #
-#Core settings are stored here                                          #
-#########################################################################
-#   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
-#   #   #   #  #   #      #  #     #  #    #    # # #  #  #  #    #     #
-#   ####    #   #   #    #   ###   ###     ###  #   #  #  #  #    #     #
-#   #        # #    # # #    #     # #     #    #   #  ####  #    #     #
-#   #         #     #  #     ####  #  #    ###  #   #  #  # ###   ####  #
+#                                                                       #
+# Copyright (C) 2010-2011 Openlabs Technologies & Consulting (P) LTD    #
 # Copyright (C) 2009  Sharoon Thomas                                    #
 #                                                                       #
 #This program is free software: you can redistribute it and/or modify   #
@@ -23,24 +17,24 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
 
-from osv import osv, fields
-from html2text import html2text
 import re
 import smtplib
+import poplib
+import imaplib
 import base64
+import string
+import email
+import time
+import datetime
 from email import Encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import decode_header, Header
 from email.utils import formatdate
-import re
+
 import netsvc
-import poplib
-import imaplib
-import string
-import email
-import time, datetime
+from osv import osv, fields
 from tools.translate import _
 import tools
 
