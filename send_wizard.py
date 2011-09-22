@@ -1,18 +1,12 @@
 #########################################################################
-#Power Email is a module for Open ERP which enables it to send mails    #
-#Core settings are stored here                                          #
-#########################################################################
-#   #####     #   #        # ####  ###     ###  #   #   ##  ###   #     #
-#   #   #   #  #   #      #  #     #  #    #    # # #  #  #  #    #     #
-#   ####    #   #   #    #   ###   ###     ###  #   #  #  #  #    #     #
-#   #        # #    # # #    #     # #     #    #   #  ####  #    #     #
-#   #         #     #  #     ####  #  #    ###  #   #  #  # ###   ####  #
+#                                                                       #
+# Copyright (C) 2010-2011 Openlabs Technologies & Consulting (P) LTD    #
 # Copyright (C) 2009  Sharoon Thomas                                    #
 #                                                                       #
 #This program is free software: you can redistribute it and/or modify   #
 #it under the terms of the GNU General Public License as published by   #
 #the Free Software Foundation, either version 3 of the License, or      #
-# any later version.                                                    #
+#(at your option) any later version.                                    #
 #                                                                       #
 #This program is distributed in the hope that it will be useful,        #
 #but WITHOUT ANY WARRANTY; without even the implied warranty of         #
@@ -22,15 +16,15 @@
 #You should have received a copy of the GNU General Public License      #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.  #
 #########################################################################
-from osv import osv, fields
-from mako.template import Template
-from mako import exceptions
-import netsvc
 import base64
 import time
-from tools.translate import _
+
+import netsvc
 import tools
-from poweremail_template import get_value
+from tools.translate import _
+from osv import osv, fields
+from template import get_value
+
 
 class poweremail_send_wizard(osv.osv_memory):
     _name = 'poweremail.send.wizard'
