@@ -39,109 +39,146 @@ from osv import osv, fields
 from tools.translate import _
 import tools
 
-class poweremail_core_accounts(osv.osv):
-    """
-    Object to store email account settings
-    """
-    _name = "poweremail.core_accounts"
-    _known_content_types = ['multipart/mixed',
-                            'multipart/alternative',
-                            'multipart/related',
-                            'text/plain',
-                            'text/html'
-                            ]
-    _columns = {
-        'name': fields.char('Email Account Desc',
-                        size=64, required=True,
-                        readonly=True, select=True,
-                        states={'draft':[('readonly', False)]}),
-        'user':fields.many2one('res.users',
-                        'Related User', required=True,
-                        readonly=True, states={'draft':[('readonly', False)]}),
-        'email_id': fields.char('Email ID',
-                        size=120, required=True,
-                        readonly=True, states={'draft':[('readonly', False)]} ,
-                        help="eg: yourname@yourdomain.com"),
-        'smtpserver': fields.char('Server',
-                        size=120, required=True,
-                        readonly=True, states={'draft':[('readonly', False)]},
-                        help="Enter name of outgoing server, eg: smtp.gmail.com"),
-        'smtpport': fields.integer('SMTP Port ',
-                        size=64, required=True,
-                        readonly=True, states={'draft':[('readonly', False)]},
-                        help="Enter port number, eg: SMTP-587 "),
-        'smtpuname': fields.char('User Name',
-                        size=120, required=False,
-                        readonly=True, states={'draft':[('readonly', False)]}),
-        'smtppass': fields.char('Password',
-                        size=120, invisible=True,
-                        required=False, readonly=True,
-                        states={'draft':[('readonly', False)]}),
-        'smtptls':fields.boolean('Use TLS',
-                        states={'draft':[('readonly', False)]}, readonly=True),
-        'smtpssl':fields.boolean('Use SSL/TLS (only in python 2.6)',
-                        states={'draft':[('readonly', False)]}, readonly=True),
-        'send_pref':fields.selection([
-                                      ('html', 'HTML otherwise Text'),
-                                      ('text', 'Text otherwise HTML'),
-                                      ('both', 'Both HTML & Text')
-                                      ], 'Mail Format', required=True),
-        'iserver':fields.char('Incoming Server',
-                        size=100, readonly=True,
-                        states={'draft':[('readonly', False)]},
-                        help="Enter name of incoming server, eg: imap.gmail.com"),
-        'isport': fields.integer('Port',
-                        readonly=True, states={'draft':[('readonly', False)]},
-                        help="For example IMAP: 993,POP3:995"),
-        'isuser':fields.char('User Name',
-                        size=100, readonly=True,
-                        states={'draft':[('readonly', False)]}),
-        'ispass':fields.char('Password',
-                        size=100, readonly=True,
-                        states={'draft':[('readonly', False)]}),
-        'iserver_type': fields.selection([
-                        ('imap', 'IMAP'),
-                        ('pop3', 'POP3')
-                        ], 'Server Type', readonly=True,
-                        states={'draft':[('readonly', False)]}),
-        'isssl':fields.boolean('Use SSL',
-                        readonly=True, states={
-                                           'draft':[('readonly', False)]
-                                           }),
-        'isfolder':fields.char('Folder',
-                        readonly=True, size=100,
-                        help="Folder to be used for downloading IMAP mails.\n" \
-                        "Click on adjacent button to select from a list of folders."),
-        'last_mail_id':fields.integer(
-                        'Last Downloaded Mail', readonly=True),
-        'rec_headers_den_mail':fields.boolean(
-                        'First Receive headers, then download mail'),
-        'dont_auto_down_attach':fields.boolean(
-                        'Dont Download attachments automatically'),
-        'allowed_groups':fields.many2many(
-                        'res.groups',
-                        'account_group_rel', 'templ_id', 'group_id',
-                        string="Allowed User Groups",
-                        help="Only users from these groups will be " \
-                        "allowed to send mails from this ID."),
-        'company':fields.selection([
-                        ('yes', 'Yes'),
-                        ('no', 'No')
-                        ], 'Company Mail A/c',
-                        readonly=True,
-                        help="Select if this mail account does not belong " \
-                        "to specific user but the organisation as a whole. " \
-                        "eg: info@somedomain.com",
-                        required=True, states={
-                                           'draft':[('readonly', False)]
-                                           }),
 
-        'state':fields.selection([
-                                  ('draft', 'Initiated'),
-                                  ('suspended', 'Suspended'),
-                                  ('approved', 'Approved')
-                                  ],
-                        'Account Status', required=True, readonly=True),
+class poweremail_core_accounts(osv.osv):
+    """Email Accounts"""
+    _name = "poweremail.core_accounts"
+    _description = __doc__
+
+    _known_content_types = [
+        'multipart/mixed',
+        'multipart/alternative',
+        'multipart/related',
+        'text/plain',
+        'text/html',
+    ]
+
+    _columns = {
+        'name': fields.char(
+            'Name', size=64, required=True,
+            readonly=True, select=True, states={
+                'draft': [('readonly', False)]
+            },
+        ),
+        'user': fields.many2one(
+            'res.users', 'Related User', required=True,
+            readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'email_id': fields.char(
+            'Email ID', size=120, required=True,
+            readonly=True, states={
+                'draft':[('readonly', False)]
+            }, help="eg: yourname@yourdomain.com"
+        ),
+        'smtpserver': fields.char(
+            'Server', size=120, required=True,
+            readonly=True, states={
+                'draft':[('readonly', False)]
+            }, help="Enter name of outgoing server, eg: smtp.gmail.com"
+        ),
+        'smtpport': fields.integer(
+            'SMTP Port ', size=64, required=True,
+            readonly=True, states={
+                'draft':[('readonly', False)]
+            }, help="Enter port number, eg: SMTP-587"
+        ),
+        'smtpuname': fields.char(
+            'User Name', size=120, required=False,
+            readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'smtppass': fields.char(
+            'Password', size=120, invisible=True,
+            required=False, readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'smtptls': fields.boolean(
+            'Use TLS', readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'smtpssl': fields.boolean(
+            'Use SSL/TLS (only in python 2.6)', readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'send_pref': fields.selection([
+                ('html', 'HTML otherwise Text'),
+                ('text', 'Text otherwise HTML'),
+                ('both', 'Both HTML & Text'),
+            ], 'Mail Format', required=True
+        ),
+        'iserver': fields.char(
+            'Incoming Server', size=100, readonly=True,
+            states={
+                'draft':[('readonly', False)]
+            }, help="Enter name of incoming server, eg: imap.gmail.com"
+        ),
+        'isport': fields.integer(
+            'Port', readonly=True, states={
+                'draft':[('readonly', False)]
+            }, help="For example IMAP: 993,POP3:995"
+        ),
+        'isuser': fields.char(
+            'User Name', size=100, readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'ispass': fields.char(
+            'Password', size=100, readonly=True,
+            states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'iserver_type': fields.selection([
+                ('imap', 'IMAP'),
+                ('pop3', 'POP3')
+            ], 'Server Type', readonly=True, states={
+                'draft':[('readonly', False)]
+            },
+        ),
+        'isssl': fields.boolean(
+            'Use SSL', readonly=True, states={
+                'draft':[('readonly', False)],
+                },
+        ),
+        'isfolder': fields.char(
+            'Folder', readonly=True, size=100, help="Folder to be used for "
+                "downloading IMAP mails.\n Click on adjacent button to select "
+                "from a list of folders."
+        ),
+        'last_mail_id': fields.integer(
+            'Last Downloaded Mail', readonly=True
+        ),
+        'rec_headers_den_mail': fields.boolean(
+            'First Receive headers, then download mail'
+        ),
+        'dont_auto_down_attach': fields.boolean(
+            'Dont Download attachments automatically'
+        ),
+        'allowed_groups': fields.many2many(
+            'res.groups', 'account_group_rel', 'templ_id', 'group_id',
+            string="Allowed User Groups", help="Only users from these groups "
+                "will be allowed to send mails from this ID."
+        ),
+        'company': fields.selection([
+                ('yes', 'Yes'),
+                ('no', 'No'),
+            ], 'Company Mail A/c', readonly=True, required=True, states={
+                'draft':[('readonly', False)]
+            }, help="Select if this mail account does not belong to specific "
+                "user but the organisation as a whole. eg: info@somedomain.com"
+        ),
+        'state': fields.selection([
+                ('draft', 'Initiated'),
+                ('suspended', 'Suspended'),
+                ('approved', 'Approved'),
+            ], 'Account Status', required=True, readonly=True
+        ),
     }
 
     _defaults = {
@@ -226,7 +263,7 @@ class poweremail_core_accounts(osv.osv):
         :param user: ID of current user
         :param account_id: ID of email account
         :param context: Context
-        
+
         :return: SMTP server object
         """
         if type(account_id) == list:
