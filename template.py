@@ -90,56 +90,53 @@ def send_on_write(self, cr, uid, ids, vals, context=None):
 # between when the pool is available and when this function is called which
 # may mean allow creating/writing objects without an e-mail being sent.
 
+class report_xml(osv.osv):
 
-def new_register_all(db):
-    cr = db.cursor()
-    pool = pooler.get_pool(cr.dbname)
-    value = pool.get('ir.actions.report.xml').register_all(cr)
+    _inherit= 'ir.actions.report.xml'
 
-    # If poweremail.templates has not yet been initialized, do not try to
-    # SELECT its table yet
-    if not 'poweremail.templates' in pool.obj_list():
-        return value
+    def register_all(self, cr):
+        res = super(report_xml, self).register_all(cr)
+        pool = pooler.get_pool(cr.dbname)
+        if not 'poweremail.templates' in pool.obj_list():
+            return res
+        cr.execute("""
+            SELECT
+                pt.id,
+                im.model,
+                pt.send_on_create,
+                pt.send_on_write
+            FROM
+                poweremail_templates pt,
+                ir_model im
+            WHERE
+                pt.object_name = im.id
+        """)
+        for record in cr.fetchall():
+            id = record[0]
+            model = record[1]
+            soc = record[2]
+            sow = record[3]
+            obj = pool.get(model)
+            if not obj:
+                continue
+            if hasattr(obj, 'old_create'):
+                obj.create = obj.old_create
+                del obj.old_create
+            if hasattr(obj, 'old_write'):
+                obj.write = obj.old_write
+                del obj.old_write
+            if soc:
+                obj.template_id = id
+                obj.old_create = obj.create
+                obj.create = types.MethodType(send_on_create, obj, osv.osv)
+            if sow:
+                obj.template_id = id
+                obj.old_write = obj.write
+                obj.write = types.MethodType(send_on_write, obj, osv.osv)
+            
+        return res
 
-    cr.execute("""
-        SELECT
-            pt.id,
-            im.model,
-            pt.send_on_create,
-            pt.send_on_write
-        FROM
-            poweremail_templates pt,
-            ir_model im
-        WHERE
-            pt.object_name = im.id
-    """)
-    for record in cr.fetchall():
-        id = record[0]
-        model = record[1]
-        soc = record[2]
-        sow = record[3]
-        obj = pool.get(model)
-        if not obj:
-            continue
-        if hasattr(obj, 'old_create'):
-            obj.create = obj.old_create
-            del obj.old_create
-        if hasattr(obj, 'old_write'):
-            obj.write = obj.old_write
-            del obj.old_write
-        if soc:
-            obj.template_id = id
-            obj.old_create = obj.create
-            obj.create = types.MethodType(send_on_create, obj, osv.osv)
-        if sow:
-            obj.template_id = id
-            obj.old_write = obj.write
-            obj.write = types.MethodType(send_on_write, obj, osv.osv)
-
-    cr.close()
-    return value
-
-report.interface.register_all = new_register_all
+report_xml()
 
 def get_value(cursor, user, recid, message=None, template=None, context=None):
     """
