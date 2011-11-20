@@ -1167,7 +1167,7 @@ class PoweremailSelectFolder(osv.osv_memory):
                         else:
                             data = folders
                         if data.find('Noselect') == -1: #If it is a selectable folder
-			    if folder_readable_name:
+                            if folder_readable_name:
                                 folderlist.append(
                                                   (folder_readable_name,
                                                    folder_readable_name)
