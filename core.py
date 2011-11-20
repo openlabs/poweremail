@@ -1134,10 +1134,10 @@ class PoweremailSelectFolder(osv.osv_memory):
         return False
 
     def _get_folders(self, cr, uid, context=None):
-        if 'active_ids' in context.keys():
+        if 'account_id' in context.keys():
             record = self.pool.get(
                         'poweremail.core_accounts'
-                        ).browse(cr, uid, context['active_ids'][0], context)
+                        ).browse(cr, uid, context['account_id'], context)
             if record:
                 folderlist = []
                 try:
@@ -1167,7 +1167,7 @@ class PoweremailSelectFolder(osv.osv_memory):
                         else:
                             data = folders
                         if data.find('Noselect') == -1: #If it is a selectable folder
-			    if folder_readable_name:
+                            if folder_readable_name:
                                 folderlist.append(
                                                   (folder_readable_name,
                                                    folder_readable_name)
@@ -1197,7 +1197,7 @@ class PoweremailSelectFolder(osv.osv_memory):
     }
 
     _defaults = {
-        'name':lambda self, cr, uid, ctx: ctx['active_ids'][0],
+        'name':lambda self, cr, uid, ctx: ctx['account_id'],
         'folder': lambda self, cr, uid, ctx:self.inboxvalue
     }
 
@@ -1210,7 +1210,7 @@ class PoweremailSelectFolder(osv.osv_memory):
                              ['folder'], context)[0]['folder'] == 'invalid':
                 self.pool.get(
                         'poweremail.core_accounts'
-                            ).write(cr, uid, context['active_ids'][0],
+                            ).write(cr, uid, context['account_id'],
                                     {
                                      'isfolder':self.read(cr, uid, ids,
                                                   ['folder'],
