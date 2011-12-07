@@ -953,7 +953,10 @@ class poweremail_templates(osv.osv):
         if template.use_filter and template.filter:
             filtered_record_ids=[]
             for record in self.pool.get(template.object_name.model).browse(cursor, user, record_ids, context=context):
-                if safe_eval(template.filter, {'o':record, 'self':self, 'cr':cursor, 'context':context}):
+                if safe_eval(template.filter, {'o':record, 'self':self,
+                                               'cr':cursor,
+                                               'context':context,
+                                               'uid': user}):
                     filtered_record_ids.append(record.id)
             record_ids=filtered_record_ids
         
