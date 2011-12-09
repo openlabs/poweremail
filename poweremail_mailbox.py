@@ -157,6 +157,31 @@ class PoweremailMailbox(osv.osv):
             self.pool.get('poweremail.core_accounts').get_fullmail(cr, uid, id, context)
             self.historise(cr, uid, [id], "Full email downloaded", context)
 
+    def check_email_valid(self, email):
+        """Check if email is valid. Check @ and .
+        :email str
+        return True/False
+        """
+        def get_validate_email(email):
+            sep=[x for x in email if not x.isalpha()]
+            sepjoined=''.join(sep)
+            if sepjoined.strip('.') != '@': return False
+            for i in sep:
+                part,i,email=email.partition(i)
+                if len(part)<2: return False
+            return True
+
+        if not email:
+            return False
+
+        emails = email.split(',')
+        if len(emails)>0:
+            for email in emails:
+                if not get_validate_email(email):
+                    return False
+                    break
+        return True
+
     _columns = {
             'pem_from':fields.char(
                             'From',
