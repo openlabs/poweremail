@@ -31,6 +31,8 @@ import netsvc
 from tools.translate import _
 import tools
 
+import re
+
 LOGGER = netsvc.Logger()
 
 class PoweremailMailbox(osv.osv):
@@ -163,12 +165,8 @@ class PoweremailMailbox(osv.osv):
         return True/False
         """
         def get_validate_email(email):
-            sep=[x for x in email if not x.isalpha()]
-            sepjoined=''.join(sep)
-            if sepjoined.strip('.') != '@': return False
-            for i in sep:
-                part,i,email=email.partition(i)
-                if len(part)<2: return False
+            if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
+                return False
             return True
 
         if not email:
