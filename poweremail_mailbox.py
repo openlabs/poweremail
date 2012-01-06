@@ -31,6 +31,8 @@ import netsvc
 from tools.translate import _
 import tools
 
+import re
+
 LOGGER = netsvc.Logger()
 
 class PoweremailMailbox(osv.osv):
@@ -156,6 +158,27 @@ class PoweremailMailbox(osv.osv):
         for id in ids:
             self.pool.get('poweremail.core_accounts').get_fullmail(cr, uid, id, context)
             self.historise(cr, uid, [id], "Full email downloaded", context)
+
+    def check_email_valid(self, email):
+        """Check if email is valid. Check @ and .
+        :email str
+        return True/False
+        """
+        def get_validate_email(email):
+            if not re.match(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
+                return False
+            return True
+
+        if not email:
+            return False
+
+        emails = email.split(',')
+        if len(emails)>0:
+            for email in emails:
+                if not get_validate_email(email):
+                    return False
+                    break
+        return True
 
     _columns = {
             'pem_from':fields.char(

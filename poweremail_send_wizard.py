@@ -28,6 +28,7 @@ from mako import exceptions
 import netsvc
 import base64
 import time
+import re
 from tools.translate import _
 import tools
 from poweremail_template import get_value
@@ -190,8 +191,24 @@ class poweremail_send_wizard(osv.osv_memory):
     def send_mail(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
+        mailbox_obj = self.pool.get('poweremail.mailbox')
+        values = {'folder':'outbox'}
+        check_email = True
+
         mailid = self.save_to_mailbox(cr, uid, ids, context)
-        if self.pool.get('poweremail.mailbox').write(cr, uid, mailid, {'folder':'outbox'}, context):
+
+        if len(mailid)>0:
+            mail = mailbox_obj.browse(cr, uid, mailid[0], context)
+            check_email = mail.pem_to and mailbox_obj.check_email_valid(mail.pem_to) or False
+            if mail.pem_cc:
+                check_email = check_email and mailbox_obj.check_email_valid(mail.pem_cc)
+            if mail.pem_bcc:
+                check_email = check_email and mailbox_obj.check_email_valid(mail.pem_bcc)
+
+        if not check_email:
+            values = {'folder':'drafts'}
+
+        if mailbox_obj.write(cr, uid, mailid, values, context):
             return {'type':'ir.actions.act_window_close' }
 
     def get_generated(self, cr, uid, ids=None, context=None):
