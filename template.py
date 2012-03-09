@@ -64,6 +64,7 @@ except:
                          _("Django templates not installed")
                          )
 
+import poweremail_engines
 import tools
 import report
 import pooler
@@ -85,38 +86,33 @@ def send_on_write(self, cr, uid, ids, vals, context=None):
     return result
 
 
-# This is an ugly hack to ensure that send_on_create and send_on_write are
-# initialized when the server is started. Note there's a small time window
-# between when the pool is available and when this function is called which
-# may mean allow creating/writing objects without an e-mail being sent.
-
-class report_xml(osv.osv):
-
-    _inherit= 'ir.actions.report.xml'
-
+class actions(osv.osv):
+    _name = 'ir.actions.report.xml'
+    _inherit = 'ir.actions.report.xml'
+    
     def register_all(self, cr):
-        res = super(report_xml, self).register_all(cr)
-        pool = pooler.get_pool(cr.dbname)
-        if not 'poweremail.templates' in pool.obj_list():
-            return res
+        value = super(actions, self).register_all(cr)
+        if not 'poweremail.templates' in self.pool.obj_list():
+            return value
+
         cr.execute("""
-            SELECT
-                pt.id,
-                im.model,
-                pt.send_on_create,
-                pt.send_on_write
-            FROM
-                poweremail_templates pt,
-                ir_model im
-            WHERE
-                pt.object_name = im.id
+                    SELECT
+                        pt.id,
+                        im.model,
+                        pt.send_on_create,
+                        pt.send_on_write
+                    FROM
+                        poweremail_templates pt,
+                        ir_model im
+                    WHERE
+                        pt.object_name = im.id
         """)
         for record in cr.fetchall():
             id = record[0]
             model = record[1]
             soc = record[2]
             sow = record[3]
-            obj = pool.get(model)
+            obj = self.pool.get(model)
             if not obj:
                 continue
             if hasattr(obj, 'old_create'):
@@ -133,10 +129,8 @@ class report_xml(osv.osv):
                 obj.template_id = id
                 obj.old_write = obj.write
                 obj.write = types.MethodType(send_on_write, obj, osv.osv)
-            
-        return res
-
-report_xml()
+        return value
+actions()
 
 def get_value(cursor, user, recid, message=None, template=None, context=None):
     """
@@ -953,10 +947,7 @@ class poweremail_templates(osv.osv):
         if template.use_filter and template.filter:
             filtered_record_ids=[]
             for record in self.pool.get(template.object_name.model).browse(cursor, user, record_ids, context=context):
-                if safe_eval(template.filter, {'o':record, 'self':self,
-                                               'cr':cursor,
-                                               'context':context,
-                                               'uid': user}):
+                if safe_eval(template.filter, {'o':record, 'self':self, 'cr':cursor, 'context':context}):
                     filtered_record_ids.append(record.id)
             record_ids=filtered_record_ids
         
