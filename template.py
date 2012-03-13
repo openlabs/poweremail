@@ -64,7 +64,6 @@ except:
                          _("Django templates not installed")
                          )
 
-import poweremail_engines
 import tools
 import report
 import pooler
