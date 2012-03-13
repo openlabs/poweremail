@@ -70,18 +70,20 @@ import pooler
 
 def send_on_create(self, cr, uid, vals, context=None):
     id = self.old_create(cr, uid, vals, context)
-    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
-    # Ensure it's still configured to send on create
-    if template.send_on_create:
-        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, [id], context)
+    templates = self.pool.get('poweremail.templates').browse(cr, uid, self.template_ids, context)
+    for template in templates:
+        # Ensure it's still configured to send on create
+        if template.send_on_create:
+            self.pool.get('poweremail.templates').generate_mail(cr, uid, template.id, [id], context)
     return id
 
 def send_on_write(self, cr, uid, ids, vals, context=None):
     result = self.old_write(cr, uid, ids, vals, context)
-    template = self.pool.get('poweremail.templates').browse(cr, uid, self.template_id, context)
-    # Ensure it's still configured to send on write
-    if template.send_on_write:
-        self.pool.get('poweremail.templates').generate_mail(cr, uid, self.template_id, ids, context)
+    templates = self.pool.get('poweremail.templates').browse(cr, uid, self.template_ids, context)
+    for template in templates:
+        # Ensure it's still configured to send on write
+        if template.send_on_write:
+            self.pool.get('poweremail.templates').generate_mail(cr, uid, template.id, ids, context)
     return result
 
 
@@ -120,12 +122,14 @@ class actions(osv.osv):
             if hasattr(obj, 'old_write'):
                 obj.write = obj.old_write
                 del obj.old_write
+            if not hasattr(obj, 'template_ids'):
+                obj.template_ids = []
             if soc:
-                obj.template_id = id
+                obj.template_ids.append(id)
                 obj.old_create = obj.create
                 obj.create = types.MethodType(send_on_create, obj, osv.osv)
             if sow:
-                obj.template_id = id
+                obj.template_ids.append(id)
                 obj.old_write = obj.write
                 obj.write = types.MethodType(send_on_write, obj, osv.osv)
         return value
@@ -423,12 +427,14 @@ class poweremail_templates(osv.osv):
             if hasattr(obj, 'old_write'):
                 obj.write = obj.old_write
                 del obj.old_write
+            if not hasattr(obj, 'template_ids'):
+                obj.template_ids = []
             if template.send_on_create:
-                obj.template_id = template.id
+                obj.template_ids.append(template.id)
                 obj.old_create = obj.create
                 obj.create = types.MethodType(send_on_create, obj, osv.osv)
             if template.send_on_write:
-                obj.template_id = template.id
+                obj.template_ids.append(template.id)
                 obj.old_write = obj.write
                 obj.write = types.MethodType(send_on_write, obj, osv.osv)
 
@@ -946,7 +952,8 @@ class poweremail_templates(osv.osv):
         if template.use_filter and template.filter:
             filtered_record_ids=[]
             for record in self.pool.get(template.object_name.model).browse(cursor, user, record_ids, context=context):
-                if safe_eval(template.filter, {'o':record, 'self':self, 'cr':cursor, 'context':context}):
+                if safe_eval(template.filter,
+                    {'o':record, 'self':self, 'cr':cursor, 'context':context, 'uid': user}):
                     filtered_record_ids.append(record.id)
             record_ids=filtered_record_ids
         
