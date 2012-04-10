@@ -70,15 +70,16 @@ class actions_server(osv.osv):
 
         for action in self.browse(cr, uid, ids, context):
             obj_pool = self.pool.get(action.model_id.model)
-            obj = obj_pool.browse(cr, uid, context['active_id'], context=context)
             cxt = {
                 'context':context,
-                'object': obj,
                 'time':time,
                 'cr': cr,
                 'pool' : self.pool,
                 'uid' : uid
             }
+            if context.get('active_id', False):
+                obj = obj_pool.browse(cr, uid, context['active_id'], context=context)
+                cxt['object'] = obj
             expr = eval(str(action.condition), cxt)
             if not expr:
                 continue
