@@ -91,7 +91,7 @@ class poweremail_core_accounts(osv.osv):
             },
         ),
         'smtppass': fields.char(
-            'Password', size=120, invisible=True,
+            'Password', size=120,
             required=False, readonly=True, states={
                 'draft':[('readonly', False)]
             },
