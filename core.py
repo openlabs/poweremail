@@ -290,7 +290,7 @@ class poweremail_core_accounts(osv.osv):
             server.starttls()
             server.ehlo()
 
-        if server.has_extn('AUTH') or account.smtpuname or account.smtppass:
+        if server.has_extn('AUTH') and account.smtpuname and account.smtppass:
             server.login(
                 account.smtpuname.encode('UTF-8'),
                 account.smtppass.encode('UTF-8')
